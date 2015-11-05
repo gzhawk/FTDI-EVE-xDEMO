@@ -4,3 +4,15 @@ tags
 FT800/FT900/img/pm.hex
 FT800/FT900/img/xdemo.bin
 FT800/FT900/img/xdemo.elf
+*.tlog
+FT800/VC2010Express/Debug/FT800.exe
+*.manifest
+*.log
+*.obj
+*.pdb
+*.cache
+*.sdf
+*.user
+FT800/VC2010Express/Debug/FT800.lastbuildstate
+*.idb
+FT800/VC2010Express/FT800.suo
