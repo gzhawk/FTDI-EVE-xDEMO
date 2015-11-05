@@ -21,3 +21,5 @@ FT800/VC2012Emu/Debug/FT800.exe
 *.ilk
 FT800/VC2012Emu/Debug/FT800.lastbuildstate
 *.suo
+FT800/STM32F4/img/xdemo.bin
+FT800/STM32F4/img/xdemo.elf
