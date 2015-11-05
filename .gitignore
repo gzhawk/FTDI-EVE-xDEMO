@@ -17,3 +17,7 @@ FT800/VC2010Express/Debug/FT800.lastbuildstate
 *.idb
 FT800/VC2010Express/FT800.suo
 A_Rename.bat
+FT800/VC2012Emu/Debug/FT800.exe
+*.ilk
+FT800/VC2012Emu/Debug/FT800.lastbuildstate
+*.suo
