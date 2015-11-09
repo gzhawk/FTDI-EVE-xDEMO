@@ -330,7 +330,6 @@ FTINDEF FTU32 ui_standby_point_show (FTU32 X)
 		}
 	} else {
 		HAL_CmdBufIn(POINT_SIZE(KEY_POINT_SIZE_OUT));
-		size = 5;
 	}
 	HAL_CmdBufIn(VERTEX2F(LOCK_POINT_X, LOCK_POINT_Y));
 	HAL_CmdBufIn(END());
