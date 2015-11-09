@@ -27,7 +27,7 @@
 				   5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.26.4"
+#define FT800_VER "5.A.26.5"
 
 #define BYTES4ALIGN(l) ((l)%4)?((l)+(4-(l)%4)):(l)
 
