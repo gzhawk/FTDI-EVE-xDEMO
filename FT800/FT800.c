@@ -11,19 +11,26 @@
 #include "FT800_APP.h"
 #include "FT800_demo.h"
 
-FTINDEF FTU8 verify (FTVOID)
+#define RETRY_COUNT  8
+/* for FT9XX delay has to be larger than 10 
+   use a larger wait time (100) to expand the system's
+   adaptability*/
+#define READ_ID_WAIT 100
+
+FTU8 verify (FTVOID)
 {
-	FTU8 count = 8, id;
+	FTU8 count = RETRY_COUNT, id;
 	do {
 		id = HAL_Read8(REG_ID);
 		count--;
-		/* for FT9XX delay has to be larger than 10 
-		   use a larger wait time (100) to expand the system's
-		   adaptability*/
-		FTDELAY(100);
+		FTDELAY(READ_ID_WAIT);
 	} while (count && (id != FT800_ID));
 
 	if (count) {
+		/* for FT81X, users are recommended to 
+		   read 4 bytes data from address 0xC0000 
+		   before application overwrites this address,
+		   since it is located in RAM_G. */
 		HAL_Get_EVE_ID();
 	}
 	return count;
@@ -82,6 +89,7 @@ FTVOID end_loop (FTVOID)
 	HAL_FT800_EndDisp();
 }
 
+/* main() from here */
 FTMAIN
 {
 	FTPREINIT;
@@ -95,8 +103,10 @@ FTMAIN
 	FTEND;
 }
 
+/* arduino platform would use it */
 FTDUMMY
 
+/* MSVC2012 emulator platform would use it */
 FTEMU
 
 
