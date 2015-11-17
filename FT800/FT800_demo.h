@@ -18,6 +18,7 @@
 //#define DEMO_FVIDEO
 //#define DEMO_RIPPLE
 /* coded for customer */
+//#define DEMO_CJ
 //#define DEMO_STELIGENT
 //#define DEMO_LITTLESWAN
 //#define DEMO_BSH
@@ -172,6 +173,12 @@
 #elif defined(DEMO_STELIGENT)
 #if defined(LCD_WVGA)
 #include "DEMO_steligent.h"
+#else
+#error "Necessary definition missing!"
+#endif
+#elif defined(DEMO_CJ) && (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
+#if defined(LCD_WVGA)
+#include "DEMO_cj.h"
 #else
 #error "Necessary definition missing!"
 #endif

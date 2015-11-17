@@ -1,3 +1,8 @@
+-1. Everything here is ONLY for learning EVE's purpose, I DO NOT have
+    any responsibility to any one or any organization, to their usage
+	on any peices of my codes. I'll delete related parts, if any meterials
+	have any license violate, just let me know.
+
 0. The whole project was made and tested under the Win7 platform
    so the compile, debug, program all Windows based.
 
@@ -21,6 +26,9 @@
 5. You may also think it's uncomfortable why not manage the related platform 
    in related directory ('src', 'inc', etc.) but hide them all in FT800, 
    still doc/ReadMe_xDEMO.doc would tell you more.
+
+-1. 所有材料仅做学习EVE使用，我不对任何团体或者个人，参考这里任何一段代码到自己产品里
+    产生的任何问题，负任何责任。里面使用到任何素材，如有侵权，告知我后会立刻删除
 
 0. 整个工程是构建与Win7基础上，编译，调试，烧录等工具都是基于Windows
 
