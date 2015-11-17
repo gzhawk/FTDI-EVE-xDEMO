@@ -296,16 +296,27 @@ FTVOID resWrEve (FTU32 para)
 #endif
 
 	for (i = 0; i < x; ) {
+		/* clean up buffer for the next read */
+		memset(p,0,FT800_BLOCK_SIZE);
 #if defined(FT9XXEV)
 		f_lseek(wfp->res,wfp->Src+i);
-		/* '&j' is useless, just re-use j to fill up the f_read para */
+		/* j reuse to get the real read out length */
 		f_read(wfp->res, (FTVOID *)p,l,&j);
+		if (j == 0) {
+			/* after that j may still zero (file read up)
+			   or it's the none 4 bytes align tail */
+			j = x-i;
+		}
+		if (j) {
+			HAL_Write8Src(wfp->Des+i, p, j);
+		}
+		i += j;
 #else
 		wfp->res.readsector(p);
-#endif
 		l = ((x - i) > FT800_BLOCK_SIZE)?FT800_BLOCK_SIZE:(x - i);
 		HAL_Write8Src(wfp->Des+i, p, l);
 		i += l;
+#endif
 	}
 		
 #endif
