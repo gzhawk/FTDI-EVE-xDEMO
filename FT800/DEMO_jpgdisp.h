@@ -18,7 +18,10 @@ app_para_t appGP = {0};
 #else
 #define PATH_DISP ROOT_PATH"00.jpg"
 #endif
-#define FIFOSIZE        (60*1024)/* make sure this size larger than JPG file size */
+
+/* make sure FIFOSIZE larger than JPG file size
+   and less than (1024-LCD_WIDTH*LCD_HIGH*2/1024) */
+#define FIFOSIZE        (60*1024)
 #define FIFOADDR        (FT800_RAMG_SIZE - FIFOSIZE)
 
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)

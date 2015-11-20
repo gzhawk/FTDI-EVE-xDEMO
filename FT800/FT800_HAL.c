@@ -747,10 +747,6 @@ the SPI clock is allowed to go up to 30MHz.
 }
 FTVOID HAL_Get_EVE_ID (FTVOID)
 {
-	/* users are recommended to 
-	   read 4 bytes data from address 0xC0000 
-	   before application overwrites this address,
-	   since it is located in RAM_G. */
 	EVE_ID = HAL_Read8(EVE_ID_REG);
 }
 FTVOID HAL_Path_Config ( FTVOID )
