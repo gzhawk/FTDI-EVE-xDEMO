@@ -608,15 +608,19 @@ static FTVOID drawCol (datetime_st *pstDT, FTU32 timeORdate)
 	if (timeORdate) {
 		for (i = 0, k = TIME_XL; i < 3; i++, k += 3*TIME_W) {
 			for (j = 0; j < 2; j++) {
-				HAL_CmdBufIn(VERTEX2II(k+j*TIME_W,TIME_YT,0,0));
-				HAL_CmdBufIn(VERTEX2II(k+j*TIME_W,TIME_YB-TIME_H/2,1,0));
+                HAL_CmdBufIn(BITMAP_HANDLE(0));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
+                HAL_CmdBufIn(BITMAP_HANDLE(1));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,(TIME_YB-TIME_H/2)*FT800_PIXEL_UNIT));
 			}
 		}
 	} else {
 		for (i = 0, k = TIME_D_XL; i < 3; i++, k += ((i==1)?5*TIME_W:3*TIME_W)) {
 			for (j = 0; j < (i?(FTU32)2:(FTU32)4); j++) {
-				HAL_CmdBufIn(VERTEX2II(k+j*TIME_W,TIME_YT,0,0));
-				HAL_CmdBufIn(VERTEX2II(k+j*TIME_W,TIME_YB-TIME_H/2,1,0));
+                HAL_CmdBufIn(BITMAP_HANDLE(0));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
+                HAL_CmdBufIn(BITMAP_HANDLE(1));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,(TIME_YB-TIME_H/2)*FT800_PIXEL_UNIT));
 			}
 		}
 	}
@@ -730,7 +734,8 @@ static FTVOID aniMoveup (FTVOID)
 
 		/* bitmap area setting */
 		HAL_CmdBufIn(BEGIN(BITMAPS));
-		HAL_CmdBufIn(VERTEX2II(X,Y,BMP_H_0,0));
+        HAL_CmdBufIn(BITMAP_HANDLE(BMP_H_0));
+        HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -758,7 +763,8 @@ FTVOID aniZoomin (FTVOID)
 		CoCmd_SCALE(FT800_TRANSFORM_MAX/BOOT_LOGO_ZOOM*step,FT800_TRANSFORM_MAX/BOOT_LOGO_ZOOM*step);
 		CoCmd_TRANSLATE(-BOOT_LOGO_W/2*FT800_TRANSFORM_MAX,-BOOT_LOGO_H/2*FT800_TRANSFORM_MAX);
 		CoCmd_SETMATRIX;
-		HAL_CmdBufIn(VERTEX2II(X,Y,BMP_H_0,0));
+        HAL_CmdBufIn(BITMAP_HANDLE(BMP_H_0));
+        HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -919,7 +925,8 @@ FTVOID cashMain (FTU32 cashPara)
 				CoCmd_ROTATE(Rotate*FT800_TRANSFORM_MAX/360);
 				CoCmd_TRANSLATE(-ICON_W/2*FT800_TRANSFORM_MAX,-ICON_H/2*FT800_TRANSFORM_MAX);
 				CoCmd_SETMATRIX;
-				HAL_CmdBufIn(VERTEX2II(ICON_X0(i),ICON_Y0(i),i,0));
+                HAL_CmdBufIn(BITMAP_HANDLE(i));
+                HAL_CmdBufIn(VERTEX2F(ICON_X0(i)*FT800_PIXEL_UNIT,ICON_Y0(i)*FT800_PIXEL_UNIT));
 				defaultMatrix();
 				HAL_CmdBufIn(COLOR_TITLE);
 				CoCmd_TEXT(ICON_T_X(i),ICON_T_Y(i), FONT_MENU, OPT_CENTERX, &iconStr[i][0]);
@@ -938,7 +945,8 @@ FTVOID cashMain (FTU32 cashPara)
 			/* keep showing the rest of the icon */
 			HAL_CmdBufIn(TAG(TAG_CASH_REST+i));
 			defaultMatrix();
-			HAL_CmdBufIn(VERTEX2II(ICON_X0(i),ICON_Y0(i),i,0));
+            HAL_CmdBufIn(BITMAP_HANDLE(i));
+            HAL_CmdBufIn(VERTEX2F(ICON_X0(i)*FT800_PIXEL_UNIT,ICON_Y0(i)*FT800_PIXEL_UNIT));
 			/* display the title on each icon by using external font */
 			HAL_CmdBufIn(COLOR_TITLE);
 			CoCmd_TEXT(ICON_T_X(i),ICON_T_Y(i), FONT_MENU, OPT_CENTERX, &iconStr[i][0]);

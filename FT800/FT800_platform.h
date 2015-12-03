@@ -27,7 +27,7 @@
 				   5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.27.1"
+#define FT800_VER "5.A.27.2"
 
 #define BYTES4ALIGN(l) ((l)%4)?((l)+(4-(l)%4)):(l)
 
@@ -69,19 +69,15 @@
  * different EVE     : FT80X, FT81X
  * Cap or Res touch  : CAP_MULTI/CAP_NONMULTI/RES
 #define DEF_CAP_MULTI
-#define DEF_CAP_NONMULTI
 */
+#define DEF_CAP_NONMULTI
 
 /* set the LCD screen based on your real connected LCD
-LCD_WQVGA: 480x272
-LCD_QVGA : 320x240
-LCD_HVGA : 320x480
-LCD_WVGA : 800x480
 */
-//#define LCD_WQVGA 
-//#define LCD_QVGA 
-//#define LCD_HVGA //for FTDI ME8XXA_HV35R module
-#define LCD_WVGA //only FT81X have WVGA
+//#define LCD_WQVGA //480x272
+//#define LCD_QVGA //320x240
+//#define LCD_HVGA //320x480 for FTDI ME8XXA_HV35R module
+#define LCD_WVGA //800x480 only FT81X have WVGA
 
 /* SPI, DSPI or QSPI supported
    only FT81X can set to 2 or 4*/
