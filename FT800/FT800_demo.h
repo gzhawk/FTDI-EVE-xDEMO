@@ -53,7 +53,7 @@
 #error "Necessary definition missing!"
 #endif
 #elif defined(DEMO_DISPRAW)
-#if !defined(DEF_81X) && !defined(STM32F4) && defined(LCD_WQVGA)
+#if !defined(STM32F4)
 #include "DEMO_dispraw.h"
 #else
 #error "Necessary definition missing!"
@@ -71,7 +71,7 @@
 #error "Necessary definition missing!"
 #endif
 #elif defined(DEMO_LIERDA)
-#if defined(DEF_81X) && defined(DEF_CAP_NONMULTI) && defined(LCD_WVGA) && (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
+#if defined(DEF_81X) && !defined(DEF_CAP_MULTI) && defined(LCD_WVGA) && (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
 #include "DEMO_lierda.h"
 #else
 #error "Necessary definition missing!"

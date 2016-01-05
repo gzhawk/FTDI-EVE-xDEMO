@@ -49,7 +49,9 @@ FTVOID dispraw (FTU32 para)
 	HAL_CmdBufIn(CLEAR(1,1,1));
 
 	HAL_CmdBufIn(BEGIN(BITMAPS));
-	HAL_CmdBufIn(VERTEX2II(0,0,0,0));
+    HAL_CmdBufIn(BITMAP_HANDLE(0));
+    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(VERTEX2F(0,0));
 	HAL_CmdBufIn(END());
 	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,24,OPT_CENTERX,"show the RAW file on screen");
 

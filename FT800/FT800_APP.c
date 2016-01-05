@@ -548,11 +548,20 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 		HAL_DlpBufIn(BITMAP_SOURCE(src));
 		if (ARGB2 == pbmpHD[i].format || RGB332 == pbmpHD[i].format || PALETTED == pbmpHD[i].format || L8 == pbmpHD[i].format) {
 			HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,pbmpHD[i].wide,pbmpHD[i].high));
+#ifdef DEF_81X
+			HAL_DlpBufIn(BITMAP_LAYOUT_H(pbmpHD[i].wide >> 10,pbmpHD[i].high>>9));
+#endif          
 		} else {
 			HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,pbmpHD[i].wide*2,pbmpHD[i].high));
+#ifdef DEF_81X
+			HAL_DlpBufIn(BITMAP_LAYOUT_H((pbmpHD[i].wide*2) >> 10,pbmpHD[i].high>>9));
+#endif          
 		}
 		/* don't know the different between NEAREST and BILINEAR, here just use NEAREST */
 		HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
+#ifdef DEF_81X
+		HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
+#endif          
 		src += pbmpHD[i].len;
 	}
 

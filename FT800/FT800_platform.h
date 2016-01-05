@@ -27,7 +27,7 @@
 				   5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.27.2"
+#define FT800_VER "5.A.27.3"
 
 #define BYTES4ALIGN(l) ((l)%4)?((l)+(4-(l)%4)):(l)
 
@@ -50,7 +50,7 @@
  * too limit resource on Arduino platform, 
  * may disable the print for resource saving
  */
-#define FT800_PRINT
+//#define FT800_PRINT
 
 /* 
  * when not using external OSC
