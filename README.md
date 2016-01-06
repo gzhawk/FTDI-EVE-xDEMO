@@ -8,6 +8,12 @@
 
 1. Execute "RunMe.bat" to build the related image, 
    and please DO read the words it gives out.
+1.1 DO change the define in FT800_platform.h depend on your real system
+    e.g. LCD resolution: '320x240', '800x480', EVE version: '80X', '81X', etc.
+1.2 DO change the define in FT800_demo.h depend on what demo you would like to 
+    play. For example, active DEMO_AVI and comment others, and make sure you know
+    the code limits while playing DEMO_AVI: it only works on DEF_81X 
+    under the LCD_WVGA resolution.
 
 2. All the code are under the root directry of FT800, 
    others like "STM32F4", "VC2010Express", etc. 
@@ -33,6 +39,11 @@
 0. 整个工程是构建与Win7基础上，编译，调试，烧录等工具都是基于Windows
 
 1. 编译环境请运行“编译.bat”打开，并根据需求阅读里面文字。
+1.1 一定记得根据你实际系统修改FT800_platform.h
+    比如LCD 像素: '320x240', '800x480', EVE 芯片版本: '80X', '81X', etc.
+1.2 一定记得根据你要运行的Demo修改FT800_demo.h
+    比如激活DEMO_AVI注释掉其它的，并且知道运行DEMO_AVI的限制: 只支持81X芯片，
+    只支持LCD_WVGA屏幕
 
 2. 代码都在FT800文件夹根目录下，其他子目录“STM32F4”，“VC2010Express”，等等，
    里面都是平台相关代码，和主程序无关。
