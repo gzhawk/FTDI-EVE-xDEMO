@@ -6,7 +6,7 @@
 */
 #ifdef DEMO_DISPRAW
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
 #define DISPRAW_PATH ROOT_PATH"dispraw\\test.raw"
 #else
 #define DISPRAW_PATH ROOT_PATH"test.raw"
@@ -23,6 +23,7 @@ FTVOID dispraw (FTU32 para)
 {
 	bmpHDR_st bmp_header = {
 		DISPRAW_PATH,
+		0,
 		RGB565,
 		0,
 		480,

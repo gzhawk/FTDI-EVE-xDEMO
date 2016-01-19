@@ -1105,7 +1105,7 @@ FTVOID HAL_FT800_LCDConfig ( FTVOID )
 	HAL_Write16(REG_SOUND,0x0060);
 	HAL_Write8(REG_PLAY,0x01);
 
-#if defined(LCD_HVGA)
+#if defined(LCD_HVGA) && defined(FT9XXEV)
 	/*spi sck = system clock/SPI_Div, 100MHz/256=390KHz
 	  ILI9488 looks like need 500KHz, 100MHz/128=781KHz, 
 	  for FT900 no 200 can be selected */

@@ -411,11 +411,10 @@
 
 
 #define VERTEX2F(x,y) ((1UL<<30)|(((x)&32767UL)<<15)|(((y)&32767UL)<<0))
+#define VERTEX2II(x,y,handle,cell) ((2UL<<30)|(((x)&511UL)<<21)|(((y)&511UL)<<12)|(((handle)&31UL)<<7)|(((cell)&127UL)<<0))
 #ifdef DEF_81X
-//we would not have VERTEX2II under the FT81X
 #define BITMAP_SOURCE(addr) ((1UL<<24)|(((addr)&4194303UL)<<0))
 #else
-#define VERTEX2II(x,y,handle,cell) ((2UL<<30)|(((x)&511UL)<<21)|(((y)&511UL)<<12)|(((handle)&31UL)<<7)|(((cell)&127UL)<<0))
 #define BITMAP_SOURCE(addr) ((1UL<<24)|(((addr)&1048575UL)<<0))
 #endif
 #define CLEAR_COLOR_RGB(red,green,blue) ((2UL<<24)|(((red)&255UL)<<16)|(((green)&255UL)<<8)|(((blue)&255UL)<<0))

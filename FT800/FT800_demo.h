@@ -11,6 +11,7 @@
 //#define DEMO_JPGDISP
 //#define DEMO_DISPRAW
 //#define DEMO_FONT
+//#define DEMO_BITMAP
 //#define DEMO_BKGND
 //#define DEMO_AUDIO
 //#define DEMO_DRAGICON
@@ -49,6 +50,12 @@
 #elif defined(DEMO_JPGDISP)
 #if defined(DEF_81X) && defined(DEF_CAP_NONMULTI) && defined(LCD_WVGA)
 #include "DEMO_jpgdisp.h"
+#else
+#error "Necessary definition missing!"
+#endif
+#elif defined(DEMO_BITMAP)
+#if !defined(STM32F4)
+#include "DEMO_bitmap.h"
 #else
 #error "Necessary definition missing!"
 #endif

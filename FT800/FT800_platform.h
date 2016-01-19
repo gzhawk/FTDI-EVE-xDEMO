@@ -27,7 +27,7 @@
 				   5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.27.3"
+#define FT800_VER "5.A.28.0"
 
 #define BYTES4ALIGN(l) ((l)%4)?((l)+(4-(l)%4)):(l)
 
@@ -43,7 +43,9 @@
 #define USED_CMD_BUF //put it in each platform define, only Arduino not use it
  */
 
-/* enable it when using FT81X */
+/* 
+ * enable it when using FT81X 
+ */
 #define DEF_81X
 
 /* 
@@ -55,8 +57,8 @@
 /* 
  * when not using external OSC
  * you may do the clock trimming if needed
- */
 #define TRIM_NEEDED
+ */
 
 /* 
  * you may bypass the calibration phase
@@ -81,7 +83,7 @@
 
 /* SPI, DSPI or QSPI supported
    only FT81X can set to 2 or 4*/
-#define EVE_SPI_TYPE 4
+#define EVE_SPI_TYPE 1
 
 /*-------------------------------------------------------------MSVC2010EXPRESS*/
 #ifdef MSVC2010EXPRESS

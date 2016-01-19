@@ -540,16 +540,49 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 			DBGPRINT;
 			return APP_ERR_LEN;
 		}
+        if (
+#ifdef DEF_81X
+            PALETTED8 == pbmpHD[i].format || 
+            PALETTED565 == pbmpHD[i].format || 
+            PALETTED4444 == pbmpHD[i].format
+#else
+            PALETTED == pbmpHD[i].format    
+#endif 
+            ) {
+            if (appFileToRamG(pbmpHD[i].path_lut,RAM_PAL,0,0,0) == 0) {
+                DBGPRINT;
+                return APP_ERR_LEN;
+            }    
+        }
 		src += pbmpHD[i].len;
 	}
 
 	for (i = 0, src = ramgAddr; i < nums; i++) {
 		HAL_DlpBufIn(BITMAP_HANDLE(i+bmpHdl));
 		HAL_DlpBufIn(BITMAP_SOURCE(src));
-		if (ARGB2 == pbmpHD[i].format || RGB332 == pbmpHD[i].format || PALETTED == pbmpHD[i].format || L8 == pbmpHD[i].format) {
+		if (ARGB2 == pbmpHD[i].format || 
+            RGB332 == pbmpHD[i].format || 
+#ifdef DEF_81X
+            PALETTED8 == pbmpHD[i].format || 
+            PALETTED565 == pbmpHD[i].format || 
+            PALETTED4444 == pbmpHD[i].format ||
+#else
+            PALETTED == pbmpHD[i].format ||
+#endif 
+            L8 == pbmpHD[i].format) {
 			HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,pbmpHD[i].wide,pbmpHD[i].high));
 #ifdef DEF_81X
-			HAL_DlpBufIn(BITMAP_LAYOUT_H(pbmpHD[i].wide >> 10,pbmpHD[i].high>>9));
+            if (PALETTED8 != pbmpHD[i].format && 
+                PALETTED565 != pbmpHD[i].format && 
+                PALETTED4444 != pbmpHD[i].format) {
+			    HAL_DlpBufIn(BITMAP_LAYOUT_H(pbmpHD[i].wide >> 10,pbmpHD[i].high>>9));
+            } else {
+			    HAL_DlpBufIn(PALETTE_SOURCE(RAM_PAL));
+            }
+#else
+            if (PALETTED == pbmpHD[i].format) {
+			    HAL_DlpBufIn(PALETTE_SOURCE(RAM_PAL));
+            }
 #endif          
 		} else {
 			HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,pbmpHD[i].wide*2,pbmpHD[i].high));
@@ -560,7 +593,11 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 		/* don't know the different between NEAREST and BILINEAR, here just use NEAREST */
 		HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
 #ifdef DEF_81X
-		HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
+        if (PALETTED8 != pbmpHD[i].format && 
+            PALETTED565 != pbmpHD[i].format && 
+            PALETTED4444 != pbmpHD[i].format) {
+            HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
+        }
 #endif          
 		src += pbmpHD[i].len;
 	}
