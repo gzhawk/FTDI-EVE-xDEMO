@@ -164,7 +164,6 @@
 #define RAM_ROMSUB           3186688UL
 #define RECTS                9UL
 #define RAM_G                0UL
-#define RAM_PAL              1056768UL
 #define REG_BIST_CMD         1058124UL
 #define REG_BIST_RESULT      1058128UL
 
@@ -286,6 +285,7 @@
 #define REG_VSYNC1           3154000UL
 #else
 #define ROMFONT_TABLEADDRESS 1048572UL
+#define RAM_PAL              1056768UL
 #define RAM_CMD              1081344UL
 #define RAM_DL               1048576UL
 #define RAM_REG              1057792UL
@@ -411,6 +411,7 @@
 
 
 #define VERTEX2F(x,y) ((1UL<<30)|(((x)&32767UL)<<15)|(((y)&32767UL)<<0))
+/* if X coordinate larger than 512, SHOULD NOT use VERTEX2II, use VERTEX2F instead */
 #define VERTEX2II(x,y,handle,cell) ((2UL<<30)|(((x)&511UL)<<21)|(((y)&511UL)<<12)|(((handle)&31UL)<<7)|(((cell)&127UL)<<0))
 #ifdef DEF_81X
 #define BITMAP_SOURCE(addr) ((1UL<<24)|(((addr)&4194303UL)<<0))

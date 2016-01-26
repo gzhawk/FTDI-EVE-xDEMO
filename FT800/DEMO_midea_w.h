@@ -208,9 +208,9 @@ FTVOID main_m (FTU32 para)
 	HAL_CmdBufIn(BITMAP_TRANSFORM_F(0))
 
 	bmpHDR_st bmp_header[HDL_MAX] = {
-		{PATH_L,ARGB4,0,59,47},
-		{PATH_Lx,ARGB4,0,36,30},
-		{PATH_R,ARGB4,0,110,110}
+		{PATH_L, 0,0,ARGB4,0,0,59,47},
+		{PATH_Lx,0,0,ARGB4,0,0,36,30},
+		{PATH_R, 0,0,ARGB4,0,0,110,110}
 	};
 	FTU32 len;
 	static FTU16 angle = 0, flag = 0;

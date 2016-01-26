@@ -46,20 +46,38 @@
 
 #endif
 
+#define FNT_WIDE  30
+
+#define BMP_NUM   4
+
+#ifdef DEF_81X
+#define PAL_NUM   3
+#else
+#define PAL_NUM   1
+#endif
+
+#define RAW_NUM   (BMP_NUM+PAL_NUM)
+#define HDL_START 0
+bmpHDR_st bmp_header[RAW_NUM] = {
+    {DISPBP_ARGB1555,   0,                     0,ARGB1555,    0,0,128,128},
+    {DISPBP_ARGB4,      0,                     0,ARGB4,       0,0,128,128},
+    {DISPBP_RGB332,     0,                     0,RGB332,      0,0,128,128},
+    {DISPBP_RGB565,     0,                     0,RGB565,      0,0,128,128},
+#ifdef DEF_81X
+    {DISPBP_PALETTE4444,DISPBP_PALETTE4444_LUT,0,PALETTED4444,0,0,128,128},
+    {DISPBP_PALETTE8,   DISPBP_PALETTE8_LUT,   0,PALETTED8,   0,0,128,128},
+    {DISPBP_PALETTE565, DISPBP_PALETTE565_LUT, 0,PALETTED565, 0,0,128,128},
+#else
+    {DISPBP_PALETTE,    DISPBP_PALETTE_LUT,    0,PALETTED,    0,0,128,128}
+#endif
+};
+
 typedef struct app_para_st {
 	FTU32 appIndex;
 	FTU32 appPara;
 }app_para_t;
 
 app_para_t appGP = {0};
-
-#ifdef DEF_81X
-#define RAW_NUM   5
-#else
-#define RAW_NUM   3
-#endif
-#define HDL_START 0
-#define FNT_WIDE  30
 
 FTVOID dispTEXT (FTU32 format, FTU32 X)
 {
@@ -95,52 +113,92 @@ FTVOID dispTEXT (FTU32 format, FTU32 X)
             break;
 #endif
         default:
-            CoCmd_TEXT(X,0,24,OPT_CENTERX,"Unknown");
+            CoCmd_TEXT(X,(FT800_LCD_HIGH-FNT_WIDE),24,OPT_CENTERX,"Unknown");
             break;
     }
 }
 
 #ifdef DEF_81X
-FTVOID dispPal8 (FTU32 X, FTU32 Y)
+FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl)
 {
+    /* every thing after this commands would not display
+       if not use save/restore context */
+    HAL_CmdBufIn(SAVE_CONTEXT());
     HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
     HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
-    HAL_CmdBufIn(PALETTE_SOURCE(RAM_PAL + 3));
-    HAL_CmdBufIn(VERTEX2II(X, Y, 0, 0));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
     HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(RAM_PAL + 2));
-    HAL_CmdBufIn(VERTEX2II(X, Y, 0, 0));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(RAM_PAL + 1));
-    HAL_CmdBufIn(VERTEX2II(X, Y, 0, 0));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(RAM_PAL + 0));
-    HAL_CmdBufIn(VERTEX2II(X, Y, 0, 0));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 #endif
 
+FTVOID FillBmpLayoutSize(bmpHDR_st bmpHD)
+{
+    FTU32 linestride;
+
+    switch (bmpHD.format) {
+        case L1:
+            linestride = bmpHD.wide/8;
+            break;
+        case L2:
+            linestride = bmpHD.wide/4;
+            break;
+        case L4:
+            linestride = bmpHD.wide/2;
+            break;
+        case L8:
+        case ARGB2:
+        case RGB332:
+#ifdef DEF_81X
+        case PALETTED8:
+        case PALETTED565:
+        case PALETTED4444:
+#else
+        case PALETTED:
+#endif 
+            linestride = bmpHD.wide;
+            break;
+        case ARGB4:
+        case RGB565:
+        case ARGB1555:
+        default:
+            linestride = bmpHD.wide*2;
+            break;
+    }
+    HAL_CmdBufIn(BITMAP_LAYOUT(bmpHD.format,linestride,bmpHD.high));
+#ifdef DEF_81X
+    HAL_CmdBufIn(BITMAP_LAYOUT_H(linestride >> 10,bmpHD.high>>9));
+#endif       
+    /* don't know the different between NEAREST and BILINEAR, here just use NEAREST */
+    HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmpHD.wide,bmpHD.high));
+#ifdef DEF_81X
+    HAL_CmdBufIn(BITMAP_SIZE_H(bmpHD.wide >> 9,bmpHD.high>>9));
+#endif         
+}
+
 FTVOID disp_bitmap (FTU32 para)
 {
-	bmpHDR_st bmp_header[RAW_NUM] = {
-#ifdef DEF_81X
-        //{DISPBP_L8,0,L8,0,128,128},
-        {DISPBP_RGB332,0,RGB332,0,128,128},
-        {DISPBP_RGB565,0,RGB565,0,128,128},
-        {DISPBP_ARGB4,0,ARGB4,0,128,128},
-        {DISPBP_ARGB1555,0,ARGB1555,0,128,128},
-        {DISPBP_PALETTE8,DISPBP_PALETTE8_LUT,PALETTED8,0,128,128},
-        //{DISPBP_PALETTE565,DISPBP_PALETTE565_LUT,PALETTED565,0,128,128},
-        //{DISPBP_PALETTE4444,DISPBP_PALETTE4444_LUT,PALETTED4444,0,128,128},
-#else
-        {DISPBP_RGB565,0,RGB565,0,128,128},
-        {DISPBP_ARGB1555,0,ARGB1555,0,128,128},
-        {DISPBP_PALETTE,DISPBP_PALETTE_LUT,PALETTED,0,128,128}
-#endif
-    };
 	static FTU8 flag = 0;
     FTU32 i,j;
 
@@ -160,52 +218,49 @@ FTVOID disp_bitmap (FTU32 para)
 	}
 
 	HAL_CmdBufIn(CMD_DLSTART);
-	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,255));
+	HAL_CmdBufIn(CLEAR_COLOR_RGB(255,255,255));
 	HAL_CmdBufIn(CLEAR(1,1,1));
 	
     HAL_CmdBufIn(BEGIN(BITMAPS));
-    
-    for (i = HDL_START; i < RAW_NUM; i++) {
-    
-        if (
-#ifdef DEF_81X
-            PALETTED8 != bmp_header[i].format && 
-            PALETTED565 != bmp_header[i].format && 
-            PALETTED4444 != bmp_header[i].format
-#else
-            PALETTED != bmp_header[i].format    
-#endif 
-           ) {
-            HAL_CmdBufIn(BITMAP_HANDLE(i));
-            HAL_CmdBufIn(CELL(0));
-        }
-        if (i < (RAW_NUM-1)) {
-            j = (FT800_LCD_WIDTH/RAW_NUM)*(i+1);
+   
+    for (i = 0; i < RAW_NUM; i++) {
+        HAL_CmdBufIn(BITMAP_HANDLE(i));
+        HAL_CmdBufIn(CELL(0));
+
+        /* bitmap display location */
+        if (i < BMP_NUM) {
+            j = (FT800_LCD_WIDTH/(BMP_NUM+1))*(i+1);
             HAL_CmdBufIn(VERTEX2F((j-bmp_header[i].wide/2)*FT800_PIXEL_UNIT,
                                     FNT_WIDE*FT800_PIXEL_UNIT));
         } else {
-            j = FT800_LCD_WIDTH/2;
+            j = (FT800_LCD_WIDTH/(PAL_NUM+1))*(i-BMP_NUM+1);
 #ifdef DEF_81X
-            //if (PALETTED8 == bmp_header[i].format) {
-            //    dispPal8((j-bmp_header[i].wide/2), (FT800_LCD_HIGH-bmp_header[i].high-FNT_WIDE));
-            //} else {
+            if (PALETTED8 == bmp_header[i].format) {
+                dispPal8((j-bmp_header[i].wide/2), 
+                         (FT800_LCD_HIGH-bmp_header[i].high-FNT_WIDE), 
+                         bmp_header[i].lut_src, i);
+            } else {
+                HAL_CmdBufIn(PALETTE_SOURCE(bmp_header[i].lut_src));
                 HAL_CmdBufIn(VERTEX2F((j-bmp_header[i].wide/2)*FT800_PIXEL_UNIT,
                                     (FT800_LCD_HIGH-bmp_header[i].high-FNT_WIDE)*FT800_PIXEL_UNIT));
-            //}
+            }
 #else
             HAL_CmdBufIn(VERTEX2F((j-bmp_header[i].wide/2)*FT800_PIXEL_UNIT,
                                     (FT800_LCD_HIGH-bmp_header[i].high-FNT_WIDE)*FT800_PIXEL_UNIT));
 #endif
         }
-
+        /* format title display */
+        HAL_CmdBufIn(SAVE_CONTEXT());
+        HAL_CmdBufIn(COLOR_RGB(0,0,255));
         dispTEXT(bmp_header[i].format, j);
+        HAL_CmdBufIn(RESTORE_CONTEXT());
     }
+
 	HAL_CmdBufIn(END());
-	
     HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);
-	HAL_BufToReg(RAM_CMD,0);
 
+    HAL_BufToReg(RAM_CMD,0);
 	appGP.appIndex = 0;
 }
 

@@ -70,8 +70,8 @@ app_para_t appGP = {0};
 #endif
 
 bmpHDR_st bmpHD[ICON_CLASS] = {
-	{PATH_TRANS,	ARGB4,	0,	ICON_W,	ICON_H},
-	{PATH_PLACE,	ARGB4,	0,	ICON_W,	ICON_H}
+	{PATH_TRANS,	0,0,ARGB4,	0,0,	ICON_W,	ICON_H},
+	{PATH_PLACE,	0,0,ARGB4,	0,0,	ICON_W,	ICON_H}
 };
 
 typedef enum actHDL_ {

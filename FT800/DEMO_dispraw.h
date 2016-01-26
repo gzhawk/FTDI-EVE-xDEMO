@@ -24,7 +24,9 @@ FTVOID dispraw (FTU32 para)
 	bmpHDR_st bmp_header = {
 		DISPRAW_PATH,
 		0,
+		0,
 		RGB565,
+		0,
 		0,
 		480,
 		272

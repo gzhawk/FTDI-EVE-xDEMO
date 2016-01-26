@@ -27,21 +27,14 @@
 				   5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.28.0"
+#define FT800_VER "5.A.28.1"
 
 #define BYTES4ALIGN(l) ((l)%4)?((l)+(4-(l)%4)):(l)
 
-/*!!! define this length base on your own system mem !!!*/
-#define USE_STATIC_MEM_LEN 512 
-
-/* 
- * in order to enhance the effective
- * during command transfering
- * we may buffer the command
- * then send it when buffer full
- * or command list needs to be sent by user
-#define USED_CMD_BUF //put it in each platform define, only Arduino not use it
+/*
+ * !!! define this length base on your own system mem !!!
  */
+#define USE_STATIC_MEM_LEN 512 
 
 /* 
  * enable it when using FT81X 
@@ -51,8 +44,8 @@
 /* 
  * too limit resource on Arduino platform, 
  * may disable the print for resource saving
+#define FT800_PRINT
  */
-//#define FT800_PRINT
 
 /* 
  * when not using external OSC
@@ -74,15 +67,19 @@
 */
 #define DEF_CAP_NONMULTI
 
-/* set the LCD screen based on your real connected LCD
-*/
-//#define LCD_WQVGA //480x272
-//#define LCD_QVGA //320x240
-//#define LCD_HVGA //320x480 for FTDI ME8XXA_HV35R module
+/* 
+ * set the LCD screen based on your real connected LCD
+#define LCD_QVGA //320x240
+#define LCD_HVGA //320x480 for FTDI ME8XXA_HV35R module
+#define LCD_WQVGA //480x272
+ */
 #define LCD_WVGA //800x480 only FT81X have WVGA
 
-/* SPI, DSPI or QSPI supported
-   only FT81X can set to 2 or 4*/
+/* 
+ * SPI, DSPI or QSPI supported
+ * only FT81X can set to 2 or 4
+ * also, need to know if your MCU use what kind of SPI
+ */
 #define EVE_SPI_TYPE 1
 
 /*-------------------------------------------------------------MSVC2010EXPRESS*/

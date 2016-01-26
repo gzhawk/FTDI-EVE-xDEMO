@@ -191,9 +191,9 @@ FTVOID playmidea (FTU32 para)
 	FTU8 hdl = DXT1_START_HDL, touch = 0, pre_touch = 0, tmp[DXT1_PATH_LEN] = PATH_STATUS;
 	dxt1_path_st *path = &dxt1MPath;
 	bmpHDR_st bmphdl[BITMAP_NUMS] = {
-		{PATH_LINE_TOP0, RGB565, 0, 480, 10},
-		{PATH_LINE_TOP1, RGB565, 0, 480, 10},
-		{PATH_STATUS, RGB565, 0, 126, 62},
+		{PATH_LINE_TOP0, 0,0,RGB565, 0,0, 480, 10},
+		{PATH_LINE_TOP1, 0,0,RGB565, 0,0, 480, 10},
+		{PATH_STATUS,    0,0,RGB565, 0,0, 126, 62},
 	};
 
 	/* just for debug */

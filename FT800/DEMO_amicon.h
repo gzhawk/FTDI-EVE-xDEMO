@@ -122,14 +122,14 @@ typedef enum fire_icon_grp {
 
 
 bmpHDR_st FireBmpHD[FIRE_ICON_GROUP] = {
-	{PATH_FIRE_F1,  ARGB4,  0,  128,    128},
-	{PATH_FIRE_F2,  ARGB4,  0,  128,    128},
-	{PATH_FIRE_J1,  ARGB4,  0,  128,    128},
-	{PATH_FIRE_J2,  ARGB4,  0,  128,    128},
-	{PATH_FIRE_P1,  ARGB4,  0,  128,    128},
-	{PATH_FIRE_P2,  ARGB4,  0,  128,    128},
-	{PATH_FIRE_Q1,  ARGB4,  0,  128,    128},
-	{PATH_FIRE_Q2,  ARGB4,  0,  128,    128}
+	{PATH_FIRE_F1,  0,0,ARGB4,  0,0,  128,    128},
+	{PATH_FIRE_F2,  0,0,ARGB4,  0,0,  128,    128},
+	{PATH_FIRE_J1,  0,0,ARGB4,  0,0,  128,    128},
+	{PATH_FIRE_J2,  0,0,ARGB4,  0,0,  128,    128},
+	{PATH_FIRE_P1,  0,0,ARGB4,  0,0,  128,    128},
+	{PATH_FIRE_P2,  0,0,ARGB4,  0,0,  128,    128},
+	{PATH_FIRE_Q1,  0,0,ARGB4,  0,0,  128,    128},
+	{PATH_FIRE_Q2,  0,0,ARGB4,  0,0,  128,    128}
 };
 bmpHDR_st temp_bmpHD[1];
 

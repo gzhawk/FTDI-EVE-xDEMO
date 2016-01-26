@@ -40,8 +40,10 @@
 typedef struct bmpHDR_ {
 	FTC8  *path;
 	FTC8  *path_lut; //for palette only
+	FTU32 lut_src;   //for palette only
 	FTU32 format;
 	FTU32 len;
+	FTU32 len_lut;   //for palette only
 	FTU32 wide;
 	FTU32 high;
 }bmpHDR_st;

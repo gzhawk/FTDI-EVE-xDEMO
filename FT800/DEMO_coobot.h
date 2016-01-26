@@ -154,7 +154,7 @@ typedef struct coobot_st {
 #define LOGO_ZOOM  50
 
 bmpHDR_st bmpLogoHD[ICON_NUM] = {
-	{PATH_ICON_1, ARGB1555, 0, 211, 221},
+	{PATH_ICON_1, 0,0,ARGB1555, 0,0, 211, 221},
 };
 
 coobot_t UIData = {

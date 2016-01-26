@@ -72,12 +72,12 @@ FTVOID screen_lock (FTU32 para)
 		ULCK_HDL_MAX
 	};
 	bmpHDR_st bmp_header[ULCK_HDL_MAX] = {
-		      {ULCK_TXT_P, ARGB4, 0, TXT_ULCK_W, TXT_ULCK_H},
-		      {ULCK_BG_P, ARGB4, 0, BG_ULCK_W, BG_ULCK_H},
-		      {ULCK_LCK_P, ARGB4, 0, ICON_ULCK_W, ICON_ULCK_H},
-		      {ULCK_ULCK_P, ARGB4, 0, ICON_ULCK_W, ICON_ULCK_H},
-		      {ULCK_UOPN_P, ARGB4, 0, ICON_ULCK_W, ICON_ULCK_H},
-		      {ULCK_OPN_P, ARGB4, 0, ICON_ULCK_W, ICON_ULCK_H},
+		      {ULCK_TXT_P, 0,0,ARGB4, 0,0, TXT_ULCK_W, TXT_ULCK_H},
+		      {ULCK_BG_P, 0,0,ARGB4, 0,0, BG_ULCK_W, BG_ULCK_H},
+		      {ULCK_LCK_P, 0,0,ARGB4, 0,0, ICON_ULCK_W, ICON_ULCK_H},
+		      {ULCK_ULCK_P, 0,0,ARGB4, 0,0, ICON_ULCK_W, ICON_ULCK_H},
+		      {ULCK_UOPN_P, 0,0,ARGB4, 0,0, ICON_ULCK_W, ICON_ULCK_H},
+		      {ULCK_OPN_P, 0,0,ARGB4, 0,0, ICON_ULCK_W, ICON_ULCK_H},
 
 	};
 	static FTU32 f_loaded = 0, go_clock = 0;
@@ -253,11 +253,11 @@ FTVOID screen_main (FTU32 para)
 	};
 
 	bmpHDR_st bmp_header[M_HDL_MAX] = {
-		      {M_TOP_P, ARGB4, 0, M_TOP_W, M_TOP_H},
-		      {M_BTM_P, ARGB4, 0, M_BTM_W, M_BTM_H},
-		      {M_BTM1_P, ARGB4, 0, M_BTM_W, M_BTM_H},
-		      {M_BTMt_P, ARGB4, 0, M_BTMt_W, M_BTMt_H},
-		      {M_MID_P, ARGB4, 0, M_MID_W, M_MID_H}
+		      {M_TOP_P, 0,0,ARGB4, 0,0, M_TOP_W, M_TOP_H},
+		      {M_BTM_P, 0,0,ARGB4, 0,0, M_BTM_W, M_BTM_H},
+		      {M_BTM1_P, 0,0,ARGB4, 0,0, M_BTM_W, M_BTM_H},
+		      {M_BTMt_P, 0,0,ARGB4, 0,0, M_BTMt_W, M_BTMt_H},
+		      {M_MID_P, 0,0,ARGB4, 0,0, M_MID_W, M_MID_H}
 	};
 
 	static FTU32 f_loaded = 0;
@@ -474,10 +474,10 @@ FTVOID screen_clock (FTU32 para)
 		CLK_HDL_MAX
 	};
 	bmpHDR_st bmp_header[CLK_HDL_MAX] = {
-		      {CLK_1_P, ARGB4, 0, CLK_1_W, CLK_1_H},
-		      {CLK_2_P, ARGB4, 0, CLK_2_W, CLK_2_H},
-		      {CLK_H_P, ARGB4, 0, CLK_H_W, CLK_H_H},
-		      {CLK_M_P, ARGB4, 0, CLK_M_W, CLK_M_H},
+		      {CLK_1_P, 0,0,ARGB4, 0,0, CLK_1_W, CLK_1_H},
+		      {CLK_2_P, 0,0,ARGB4, 0,0, CLK_2_W, CLK_2_H},
+		      {CLK_H_P, 0,0,ARGB4, 0,0, CLK_H_W, CLK_H_H},
+		      {CLK_M_P, 0,0,ARGB4, 0,0, CLK_M_W, CLK_M_H},
 	};
 	FTU8 alpha = 255;
 	static FTU32 f_loaded = 0, r_h = 0, r_m = 0;

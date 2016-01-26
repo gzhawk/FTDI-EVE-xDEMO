@@ -519,11 +519,106 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 
 	return Len;
 }
-
-appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
 	FTU32 i, src;
 
+	for (i = 0, src = ramgAddr; i < nums; i++) {
+		pbmpHD[i].len = appFileToRamG(pbmpHD[i].path,src,1,0,0);
+		if (pbmpHD[i].len == 0) {
+			DBGPRINT;
+			return APP_ERR_LEN;
+		}
+		src += pbmpHD[i].len;
+#ifdef DEF_81X
+        if (PALETTED8 == pbmpHD[i].format || 
+            PALETTED565 == pbmpHD[i].format || 
+            PALETTED4444 == pbmpHD[i].format) {
+            pbmpHD[i].lut_src = src;
+            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
+            if (pbmpHD[i].len_lut == 0) {
+                DBGPRINT;
+                return APP_ERR_LEN;
+            }
+
+		    src += pbmpHD[i].len_lut;
+        }
+#else
+        if (PALETTED == pbmpHD[i].format) {
+            pbmpHD[i].lut_src = RAM_PAL;
+            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
+            if (pbmpHD[i].len_lut == 0) {
+                DBGPRINT;
+                return APP_ERR_LEN;
+            }    
+        }
+#endif
+	}
+
+    return APP_OK;
+}
+
+FTVOID FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+{
+	FTU32 i, src, linestride;
+
+	for (i = 0, src = ramgAddr; i < nums; i++) {
+        switch (pbmpHD[i].format) {
+            case L1:
+                linestride = pbmpHD[i].wide/8;
+                break;
+            case L2:
+                linestride = pbmpHD[i].wide/4;
+                break;
+            case L4:
+                linestride = pbmpHD[i].wide/2;
+                break;
+            case L8:
+            case ARGB2:
+            case RGB332:
+#ifdef DEF_81X
+            case PALETTED8:
+            case PALETTED565:
+            case PALETTED4444:
+#else
+            case PALETTED:
+#endif 
+                linestride = pbmpHD[i].wide;
+                break;
+            case ARGB4:
+            case RGB565:
+            case ARGB1555:
+            default:
+                linestride = pbmpHD[i].wide*2;
+                break;
+        }
+		HAL_DlpBufIn(BITMAP_HANDLE(i+bmpHdl));
+		HAL_DlpBufIn(BITMAP_SOURCE(src));
+        HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,linestride,pbmpHD[i].high));
+#ifdef DEF_81X
+        HAL_DlpBufIn(BITMAP_LAYOUT_H(linestride >> 10,pbmpHD[i].high>>9));
+#endif       
+		/* don't know the different between NEAREST and BILINEAR, here just use NEAREST */
+		HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
+#ifdef DEF_81X
+        HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
+#endif         
+		src += pbmpHD[i].len;
+#ifdef DEF_81X
+		if (PALETTED8 == pbmpHD[i].format || 
+            PALETTED565 == pbmpHD[i].format || 
+            PALETTED4444 == pbmpHD[i].format) {
+		    src += pbmpHD[i].len_lut;
+        }
+#endif
+	}
+
+	HAL_DlpBufIn(DISPLAY());
+	HAL_BufToReg(RAM_DL,0);
+}
+
+appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+{
 	if (nums > FT800_BMP_EXT_HANDLE || bmpHdl >= FT800_BMP_EXT_HANDLE) {
 		DBGPRINT;
 		return APP_ERR_HDL_EXC;
@@ -534,76 +629,11 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 	 * better under the condition of co-processor finished previous operation*/
 	//HAL_BufToReg(RAM_CMD,0);
 
-	for (i = 0, src = ramgAddr; i < nums; i++) {
-		pbmpHD[i].len = appFileToRamG(pbmpHD[i].path,src,1,0,0);
-		if (pbmpHD[i].len == 0) {
-			DBGPRINT;
-			return APP_ERR_LEN;
-		}
-        if (
-#ifdef DEF_81X
-            PALETTED8 == pbmpHD[i].format || 
-            PALETTED565 == pbmpHD[i].format || 
-            PALETTED4444 == pbmpHD[i].format
-#else
-            PALETTED == pbmpHD[i].format    
-#endif 
-            ) {
-            if (appFileToRamG(pbmpHD[i].path_lut,RAM_PAL,0,0,0) == 0) {
-                DBGPRINT;
-                return APP_ERR_LEN;
-            }    
-        }
-		src += pbmpHD[i].len;
-	}
+    if (APP_OK != appLoadBmp(ramgAddr,pbmpHD,nums) ) {
+        return APP_ERR_LEN;
+    }
 
-	for (i = 0, src = ramgAddr; i < nums; i++) {
-		HAL_DlpBufIn(BITMAP_HANDLE(i+bmpHdl));
-		HAL_DlpBufIn(BITMAP_SOURCE(src));
-		if (ARGB2 == pbmpHD[i].format || 
-            RGB332 == pbmpHD[i].format || 
-#ifdef DEF_81X
-            PALETTED8 == pbmpHD[i].format || 
-            PALETTED565 == pbmpHD[i].format || 
-            PALETTED4444 == pbmpHD[i].format ||
-#else
-            PALETTED == pbmpHD[i].format ||
-#endif 
-            L8 == pbmpHD[i].format) {
-			HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,pbmpHD[i].wide,pbmpHD[i].high));
-#ifdef DEF_81X
-            if (PALETTED8 != pbmpHD[i].format && 
-                PALETTED565 != pbmpHD[i].format && 
-                PALETTED4444 != pbmpHD[i].format) {
-			    HAL_DlpBufIn(BITMAP_LAYOUT_H(pbmpHD[i].wide >> 10,pbmpHD[i].high>>9));
-            } else {
-			    HAL_DlpBufIn(PALETTE_SOURCE(RAM_PAL));
-            }
-#else
-            if (PALETTED == pbmpHD[i].format) {
-			    HAL_DlpBufIn(PALETTE_SOURCE(RAM_PAL));
-            }
-#endif          
-		} else {
-			HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,pbmpHD[i].wide*2,pbmpHD[i].high));
-#ifdef DEF_81X
-			HAL_DlpBufIn(BITMAP_LAYOUT_H((pbmpHD[i].wide*2) >> 10,pbmpHD[i].high>>9));
-#endif          
-		}
-		/* don't know the different between NEAREST and BILINEAR, here just use NEAREST */
-		HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
-#ifdef DEF_81X
-        if (PALETTED8 != pbmpHD[i].format && 
-            PALETTED565 != pbmpHD[i].format && 
-            PALETTED4444 != pbmpHD[i].format) {
-            HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
-        }
-#endif          
-		src += pbmpHD[i].len;
-	}
-
-	HAL_DlpBufIn(DISPLAY());
-	HAL_BufToReg(RAM_DL,0);
+    FillBmpDL(bmpHdl, ramgAddr, pbmpHD, nums);
 
 	return APP_OK;
 }
