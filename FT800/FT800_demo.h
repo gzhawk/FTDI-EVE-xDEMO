@@ -104,7 +104,7 @@
 #elif defined(DEMO_DRAGICON)
 #include "DEMO_dragicon.h"
 #elif defined(DEMO_DXT1)
-#if defined(LCD_WQVGA) && !defined(STM32F4)
+#if !defined(STM32F4)
 #include "DEMO_dxt1.h"
 #else
 #error "Necessary definition missing!"
