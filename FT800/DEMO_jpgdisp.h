@@ -27,7 +27,7 @@ app_para_t appGP = {0};
 
 /* make sure FIFOSIZE larger than JPG file size
    and less than (1024-LCD_WIDTH*LCD_HIGH*2/1024) */
-#define FIFOSIZE        (60*1024)
+#define FIFOSIZE        (200*1024)
 #define FIFOADDR        (FT800_RAMG_SIZE - FIFOSIZE)
 
 FTVOID PressAndRelease (FTVOID)
@@ -236,15 +236,15 @@ FTVOID pngdisp (FTU32 para)
 
 FTVOID jpgdisp (FTU32 para)
 {
-	FTU32 opt = 0;
+	FTU32 opt = OPT_MEDIAFIFO;
 
 	do {
 		DisplayJPG(0, RAM_G, opt);
         
         PressAndRelease();
        
-        if (!(OPT_MEDIAFIFO & opt)) {
-            opt = OPT_MEDIAFIFO;
+        if (OPT_MEDIAFIFO & opt) {
+            opt = 0;
         } else {
 			break;
         }
