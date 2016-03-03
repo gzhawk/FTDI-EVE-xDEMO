@@ -119,7 +119,7 @@ FTVOID dispTEXT (FTU32 format, FTU32 X)
 }
 
 #ifdef DEF_81X
-FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl)
+FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
 {
     /* every thing after this commands would not display
        if not use save/restore context */
@@ -128,26 +128,26 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl)
     HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
     HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }
@@ -238,7 +238,7 @@ FTVOID disp_bitmap (FTU32 para)
             if (PALETTED8 == bmp_header[i].format) {
                 dispPal8((j-bmp_header[i].wide/2), 
                          (FT800_LCD_HIGH-bmp_header[i].high-FNT_WIDE), 
-                         bmp_header[i].lut_src, i);
+                         bmp_header[i].lut_src, i, 0);
             } else {
                 HAL_CmdBufIn(PALETTE_SOURCE(bmp_header[i].lut_src));
                 HAL_CmdBufIn(VERTEX2F((j-bmp_header[i].wide/2)*FT800_PIXEL_UNIT,
