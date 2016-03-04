@@ -84,17 +84,11 @@ FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_add
 
 FTINDEF FTVOID cmdbufImageWrite (FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
 {
-#define CMD_BLOCK_LEN (CMDBUF_SIZE/2)
-	FTU32 i = 0, l = 0;
-
     HAL_CmdToReg(CMD_LOADIMAGE);
 	HAL_CmdToReg(disp_addr);
 	HAL_CmdToReg(opt);
 
-	for (i = 0; i < file_len; i += l) {
-		l = ((file_len - i) > CMD_BLOCK_LEN)?CMD_BLOCK_LEN:(file_len - i);
-		HAL_CmdWait(appResToDes(resHDL, HAL_Read32(REG_CMD_WRITE), i, l, resWrEveCmd));
-	}
+	appResToDes(resHDL, 0, 0, file_len, resWrEveCmd);
 }
 
 FTINDEF FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)

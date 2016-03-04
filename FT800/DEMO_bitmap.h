@@ -11,13 +11,16 @@
 #define DISPBP_RGB332 ROOT_PATH"bitmap\\RGB332.raw"
 #define DISPBP_RGB565 ROOT_PATH"bitmap\\RGB565.raw"
 #define DISPBP_ARGB4 ROOT_PATH"bitmap\\ARGB4.raw"
-#define DISPBP_ARGB1555 ROOT_PATH"bitmap\\ARGB1555.raw"
+/* use zlib compressed file to test the INFLATE function */
+#define DISPBP_ARGB1555 ROOT_PATH"bitmap\\ARGB1555.bin"
 #define DISPBP_L8 ROOT_PATH"bitmap\\L8.raw"
 #ifdef DEF_81X
 #define DISPBP_PALETTE8 ROOT_PATH"bitmap\\Pal8_inx.raw"
 #define DISPBP_PALETTE8_LUT ROOT_PATH"bitmap\\Pal8_lut.raw"
-#define DISPBP_PALETTE565 ROOT_PATH"bitmap\\Pal565_inx.raw"
-#define DISPBP_PALETTE565_LUT ROOT_PATH"bitmap\\Pal565_lut.raw"
+/* use zlib compressed file to test the INFLATE function */
+#define DISPBP_PALETTE565 ROOT_PATH"bitmap\\Pal565_inx.bin"
+/* use zlib compressed file to test the INFLATE function */
+#define DISPBP_PALETTE565_LUT ROOT_PATH"bitmap\\Pal565_lut.bin"
 #define DISPBP_PALETTE4444 ROOT_PATH"bitmap\\Pal4444_inx.raw"
 #define DISPBP_PALETTE4444_LUT ROOT_PATH"bitmap\\Pal4444_lut.raw"
 #else
@@ -155,37 +158,8 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
 
 FTVOID FillBmpLayoutSize(bmpHDR_st bmpHD)
 {
-    FTU32 linestride;
+    FTU32 linestride = appGetLinestride(bmpHD);
 
-    switch (bmpHD.format) {
-        case L1:
-            linestride = bmpHD.wide/8;
-            break;
-        case L2:
-            linestride = bmpHD.wide/4;
-            break;
-        case L4:
-            linestride = bmpHD.wide/2;
-            break;
-        case L8:
-        case ARGB2:
-        case RGB332:
-#ifdef DEF_81X
-        case PALETTED8:
-        case PALETTED565:
-        case PALETTED4444:
-#else
-        case PALETTED:
-#endif 
-            linestride = bmpHD.wide;
-            break;
-        case ARGB4:
-        case RGB565:
-        case ARGB1555:
-        default:
-            linestride = bmpHD.wide*2;
-            break;
-    }
     HAL_CmdBufIn(BITMAP_LAYOUT(bmpHD.format,linestride,bmpHD.high));
 #ifdef DEF_81X
     HAL_CmdBufIn(BITMAP_LAYOUT_H(linestride >> 10,bmpHD.high>>9));

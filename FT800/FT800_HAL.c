@@ -545,6 +545,14 @@ FTVOID HAL_McuCmdBufInit (FTVOID)
 #endif
 }
 
+/*
+  |---------desLen-------|
+  |>>>>>>!>>>>>>>>>>>>>>>|
+pDes  desNow        pDes+desLen
+
+  the loop space may be located in EVE's cmd buffer or EVE's RAM_G
+  so make the address as input variable
+ */
 FTU32 HAL_EVELoopMemWr (FTU32 pDes, FTU32 desNow, FTU32 desLen, FTU8 * inSrc, FTU32 inLen)
 {
 	FTU32 l;

@@ -23,7 +23,7 @@ typedef struct wrFuncPara_ {
 wrFuncPara fPara = {0};
 
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)
-FTU8 file_buff[FT800_BLOCK_SIZE] = {0};
+FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
 #endif
 
 #if defined(CAL_NEEDED)
@@ -198,6 +198,42 @@ appRet_en appWaitCal (FTVOID)
 
 	return APP_OK; 
 }
+FTU32 appGetLinestride(bmpHDR_st bmpHD)
+{
+    FTU32 linestride = 0;
+
+    switch (bmpHD.format) {
+        case L1:
+            linestride = bmpHD.wide/8;
+            break;
+        case L2:
+            linestride = bmpHD.wide/4;
+            break;
+        case L4:
+            linestride = bmpHD.wide/2;
+            break;
+        case L8:
+        case ARGB2:
+        case RGB332:
+#ifdef DEF_81X
+        case PALETTED8:
+        case PALETTED565:
+        case PALETTED4444:
+#else
+        case PALETTED:
+#endif 
+            linestride = bmpHD.wide;
+            break;
+        case ARGB4:
+        case RGB565:
+        case ARGB1555:
+        default:
+            linestride = bmpHD.wide*2;
+            break;
+    }
+
+    return linestride;
+}
 /* 
  * call back routine for multi-platform
  * read data from Src (MCU, EVE, Flash, SD Card) to Des (MCU, EVE, Flash, SD Card)
@@ -249,43 +285,35 @@ FTVOID resWrBuf (FTU32 para)
  * call back routine for multi-platform
  * read data from Src (MCU, EVE, Flash, SD Card) to Des (EVE-CMD, EVE-DLP, EVE-RAM_G)
  * block by block
+ * in loop buffer in EVE (CMD buffer), or RAM_G, or DLP
  * set the length as return
  */
-FTVOID resWrEve (FTU32 para)
+FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
 {
-	wrFuncPara *wfp = (wrFuncPara *) para;
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
-	/* make sure the data length into EVE is 4bytes aligned */
-	FTU32 l = BYTES4ALIGN(wfp->len);
-	FTU8 * p = 0;
+wrFuncPara *wfp = (wrFuncPara *) para;
+/* make sure the data length into EVE is 4bytes aligned */
+FTU32 i,block,l,file_len = BYTES4ALIGN(wfp->len);
+FTU8 * p = 0;
 
-	p = (FTU8 *)malloc(l);
+    if (isCmdLoopBuf) {
+        block = CMDBUF_SIZE/2;
+    } else {
+        block = MCU_BLOCK_SIZE;
+    }
+
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+	p = (FTU8 *)malloc(block);
 	if (p == 0) {
 		DBGPRINT;
+		wfp->len = 0;
 		return;
 	}
-	/* clean up the buffer, in case need to set '0' to tail */
-	memset(p,0,l);
-	fseek(wfp->res,wfp->Src,SEEK_SET);
-	/* only read real length of file */
-	fread(p,1,wfp->len,wfp->res);
-	/* read the 4 bytes align length */
-	appBlockWrite(wfp->Des, p, l, FT800_BLOCK_SIZE);
-	wfp->len = l;
-	free(p);
 #elif defined(STM32F4)
-	/* make sure the data length into EVE is 4bytes aligned */
-	FTU32 l = BYTES4ALIGN(wfp->len);
-	/* read the 4 bytes align length */
-	(FTVOID)appBlockWrite(wfp->Des, (FTU8 *)(wfp->res+wfp->Src), l, FT800_BLOCK_SIZE);
-	wfp->len = l;
-#else/* Arduino and FT9XXEV */
-	/* make sure the data length into EVE is 4bytes aligned */
-	FTU32 i,j,l = FT800_BLOCK_SIZE,x = BYTES4ALIGN(wfp->len);
-	FTU8 * p = 0;
+    p = wfp->res+wfp->Src;
+#else
 	p = file_buff;
-
-#if !defined(FT9XXEV)
+#if 0
+/* it may not be a necessary step, but leave it here for now */
 	/* only accept increasly read
 	 * make sure not over read the previous reading */
 	if (wfp->res.offset > wfp->Src) {
@@ -294,94 +322,95 @@ FTVOID resWrEve (FTU32 para)
 		return;
 	}
 #endif
+#endif
 
-	for (i = 0; i < x; ) {
-		/* clean up buffer for the next read */
-		memset(p,0,FT800_BLOCK_SIZE);
-#if defined(FT9XXEV)
-		f_lseek(wfp->res,wfp->Src+i);
-		/* j reuse to get the real read out length */
-		f_read(wfp->res, (FTVOID *)p,l,&j);
-		if (j == 0) {
-			/* after that j may still zero (file read up)
+	for (i = 0; i < file_len; i += l, wfp->Src += l) {
+		l = ((file_len - i) > block)?block:(file_len - i);
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+        fseek(wfp->res,wfp->Src,SEEK_SET);
+        fread(p,1,l,wfp->res);
+#elif defined(FT9XXEV)
+		f_lseek(wfp->res,wfp->Src);
+		f_read(wfp->res, (FTVOID *)p,l,&l);
+		if (l == 0) {
+			/* after that l may be zero (file read up)
 			   or it's the none 4 bytes align tail */
-			j = x-i;
+			l = file_len-i;
 		}
-		if (j) {
-			HAL_Write8Src(wfp->Des+i, p, j);
-		}
-		i += j;
+#elif defined(STM32F4)
+        p = wfp->res+wfp->Src;
 #else
 		wfp->res.readsector(p);
-		l = ((x - i) > FT800_BLOCK_SIZE)?FT800_BLOCK_SIZE:(x - i);
-		HAL_Write8Src(wfp->Des+i, p, l);
-		i += l;
 #endif
+        if (isCmdLoopBuf) {
+            HAL_CmdWait(HAL_EVELoopMemWr(RAM_CMD, HAL_Read32(REG_CMD_WRITE), CMDBUF_SIZE, p, l));
+        } else {
+            HAL_Write8Src(wfp->Des+i, p, l);
+        }
 	}
-		
+    wfp->len = file_len;
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+	free(p);
 #endif
 }
-/* 
- * call back routine for multi-platform
- * read data from Src (MCU, EVE, Flash, SD Card) to Des (EVE-CMD)
- * in loop buffer in EVE (CMD buffer)
- * set the length as return
- */
+FTVOID resWrEve (FTU32 para)
+{
+    return resEveMemOperation(para, 0);
+}
 FTVOID resWrEveCmd (FTU32 para)
 {
-	wrFuncPara *wfp = (wrFuncPara *) para;
+    return resEveMemOperation(para, 1);
+}
+FTVOID resIsZlib(FTU32 para)
+{
+/*
+ zLib compression header
+ +---+---+
+ |CMF|FLG|
+ +---+---+
+
+78 01 - No Compression/low
+78 9C - Default Compression
+78 DA - Best Compression 
+*/
+wrFuncPara *wfp = (wrFuncPara *) para;
+/* set it 512 is for Arduino sector size, actually 2 is enough */
+FTU8 header[512] = {0};
+#if !defined(STM32F4)
 
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
-	/* make sure the data length into EVE is 4bytes aligned */
-	FTU32 l = BYTES4ALIGN(wfp->len);
-	FTU8 * p = 0;
-
-	p = (FTU8 *)malloc(l);
-	if (p == 0) {
-		DBGPRINT;
-		wfp->len = 0;
-		return;
-	}
-	fseek(wfp->res,wfp->Src,SEEK_SET);
-	fread(p,1,wfp->len,wfp->res);
-	wfp->len = HAL_EVELoopMemWr(RAM_CMD, wfp->Des, CMDBUF_SIZE, p, l);
-	free(p);
-#elif defined(STM32F4)
-	/* make sure the data length into EVE is 4bytes aligned */
-	FTU32 l = BYTES4ALIGN(wfp->len);
-
-	wfp->len = HAL_EVELoopMemWr(RAM_CMD, wfp->Des, CMDBUF_SIZE, (FTU8 *)(wfp->res+wfp->Src), l);
-#else/* Arduino and FT9XXEV */
-	FTU32 i,j,l = FT800_BLOCK_SIZE,x = BYTES4ALIGN(wfp->len);
-	FTU8 * p = 0;
-	p = file_buff;
-
-#if !defined(FT9XXEV)
-	/* only accept increasly read
-	 * make sure not over read the previous reading */
-	if (wfp->res.offset > wfp->Src) {
-		DBGPRINT;
-		/* for EVE CMD write purpose */
-		wfp->len = wfp->Des;
-		return;
-	}
-#endif
-
-	for (i = 0; i < x; ) {
-#if defined(FT9XXEV)
-		f_lseek(wfp->res,wfp->Src+i);
-		/* '&j' is useless, just re-use j to fill up the f_read para */
-		f_read(wfp->res, (FTVOID *)p,l,&j);
+    fseek(wfp->res,wfp->Src,SEEK_SET);
+    fread(header,1,2,wfp->res);
+#elif defined(FT9XXEV)
+    FTU32 l = 0;
+    f_lseek(wfp->res,wfp->Src);
+    f_read(wfp->res, (FTVOID *)header,2,&l);
 #else
-		wfp->res.readsector(p);
+    wfp->res.readsector(p);
 #endif
-		l = ((x - i) > FT800_BLOCK_SIZE)?FT800_BLOCK_SIZE:(x - i);
-		wfp->Des = HAL_EVELoopMemWr(RAM_CMD, wfp->Des, CMDBUF_SIZE, p, l);
-		i += l;
-	}
-	/* for EVE CMD write purpose */
-	wfp->len = wfp->Des;
+#else 
+    header[0] = *(FTU8 *)(wfp->res+wfp->Src);
+    header[1] = *(FTU8 *)(wfp->res+wfp->Src+1);
 #endif
+    if (header[0] == 0x78) {
+        if (header[1] == 0x9C) {
+            /* make sure command buffer clean */
+            HAL_BufToReg(RAM_CMD,0);
+            /* then start sending the command */
+            HAL_CmdToReg(CMD_INFLATE);
+            HAL_CmdToReg(wfp->Des);
+            return resWrEveCmd(para);
+        } else {
+            /* 
+               so far as I know
+               our tools only generate default compressed file
+             */
+            wfp->len = 0;
+            return; 
+        }
+    }
+
+    return resWrEve(para);
 }
 
 FTU32 appResOpen (FTU8 *path)
@@ -490,7 +519,6 @@ FTVOID appResClose (FTU32 resHDL)
 
 #endif
 }
-
 /* the chkExceed flag provid the flexibility while using puzzle overlap function */
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen)
 {
@@ -508,8 +536,8 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 		DBGPRINT;
 		return 0;
 	}
-		
-	appResToDes(resHDL,inAddr,0,Len,resWrEve);
+	
+    Len = appResToDes(resHDL,inAddr,0,Len,resIsZlib);
 
 	if (outAddr) {
 		appResToDes(resHDL,(FTU32)outAddr,0,outLen,resWrBuf);
@@ -524,8 +552,15 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 	FTU32 i, src;
 
 	for (i = 0, src = ramgAddr; i < nums; i++) {
-		pbmpHD[i].len = appFileToRamG(pbmpHD[i].path,src,1,0,0);
-		if (pbmpHD[i].len == 0) {
+		if (appFileToRamG(pbmpHD[i].path,src,1,0,0)) {
+            /* 
+               when using zlib compressed file (*.bin)
+               the actual decompressed size would not
+               the return value of appFileToRamG
+               so calculate the output (decompressed) size by image format
+             */
+            pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
+        } else {
 			DBGPRINT;
 			return APP_ERR_LEN;
 		}
@@ -535,8 +570,10 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
             PALETTED565 == pbmpHD[i].format || 
             PALETTED4444 == pbmpHD[i].format) {
             pbmpHD[i].lut_src = src;
-            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
-            if (pbmpHD[i].len_lut == 0) {
+            if (appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0)) {
+                /* same reason as above, lookup table alway less than 1K */
+                pbmpHD[i].len_lut = 1024;
+            } else {
                 DBGPRINT;
                 return APP_ERR_LEN;
             }
@@ -546,8 +583,10 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 #else
         if (PALETTED == pbmpHD[i].format) {
             pbmpHD[i].lut_src = RAM_PAL;
-            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
-            if (pbmpHD[i].len_lut == 0) {
+            if (appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0)) {
+                /* same reason as above, lookup table alway less than 1K */
+                pbmpHD[i].len_lut = 1024;
+            } else {
                 DBGPRINT;
                 return APP_ERR_LEN;
             }    
@@ -624,11 +663,6 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 		return APP_ERR_HDL_EXC;
 	}
 
-	/* you may use other way to copy BMP file to RAM_G
-	 * if use this application, 
-	 * better under the condition of co-processor finished previous operation*/
-	//HAL_BufToReg(RAM_CMD,0);
-
     if (APP_OK != appLoadBmp(ramgAddr,pbmpHD,nums) ) {
         return APP_ERR_LEN;
     }
@@ -638,15 +672,5 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 	return APP_OK;
 }
 
-FTVOID appBlockWrite (FTU32 des, FTU8 *psrc, FTU32 len, FTU32 block)
-{
-	FTU32 i = 0,l = (len >= block)?block:len;
-	while (l) {
-		HAL_Write8Src(des+i,psrc+i,l);
-		i += l;
-		l = len - i;
-		l = (l >= block)?block:l;
-	}
-}
 
 

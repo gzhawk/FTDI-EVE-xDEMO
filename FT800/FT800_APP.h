@@ -13,11 +13,11 @@
  * FT9xx  : totally got 64K memory
  */
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
-#define FT800_BLOCK_SIZE      (10*1024)
+#define MCU_BLOCK_SIZE      (10*1024)
 #else
 /* limited by sdcard sector size
  * should be the same as SDC_SECTOR_SIZE if sdcard.h be used */
-#define FT800_BLOCK_SIZE      (512)
+#define MCU_BLOCK_SIZE      (512)
 #endif
 
 /* Attention, so far as I know, Arduino platform may force the number to 0
@@ -195,8 +195,7 @@ FTU32 appResOpen (FTU8 *path);
 FTU32 appResSize (FTU32 resHDL);
 FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeFunc);
 FTVOID appResClose (FTU32 resHDL);
-FTVOID appBlockWrite (FTU32 des, FTU8 *psrc, FTU32 len, FTU32 block);
-
+FTU32 appGetLinestride(bmpHDR_st bmpHD);
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
 FTVOID arduino_simugpio(FTU8 flag);
 FTVOID arduino_sdcardInit (FTVOID);

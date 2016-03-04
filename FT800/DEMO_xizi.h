@@ -80,6 +80,16 @@ typedef struct moving_ {
 	FTU16 W;
 	FTU16 H;
 }moving_st;
+FTVOID BlockWrite (FTU32 des, FTU8 *psrc, FTU32 len, FTU32 block)
+{
+	FTU32 i = 0,l = (len >= block)?block:len;
+	while (l) {
+		HAL_Write8Src(des+i,psrc+i,l);
+		i += l;
+		l = len - i;
+		l = (l >= block)?block:l;
+	}
+}
 FTU32 file_add_gram(FTC8 *path, FTU32 inAddr, FTU32 sadd, FTU32 len)
 {
 	FILE *fp;
@@ -90,7 +100,7 @@ FTU32 file_add_gram(FTC8 *path, FTU32 inAddr, FTU32 sadd, FTU32 len)
 	buf = (unsigned char *)malloc(len);
 	fread(buf, 1, len, fp);
 	fclose(fp);
-	appBlockWrite(inAddr, buf, len, FT800_BLOCK_SIZE);
+	BlockWrite(inAddr, buf, len, MCU_BLOCK_SIZE);
 	free(buf);
 	return len;
 }
