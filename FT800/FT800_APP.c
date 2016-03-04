@@ -373,25 +373,25 @@ FTVOID resIsZlib(FTU32 para)
 78 9C - Default Compression
 78 DA - Best Compression 
 */
-wrFuncPara *wfp = (wrFuncPara *) para;
-/* set it 512 is for Arduino sector size, actually 2 is enough */
-FTU8 header[512] = {0};
-#if !defined(STM32F4)
-
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+    wrFuncPara *wfp = (wrFuncPara *) para;
+#if defined(STM32F4)
+    FTU8 header[2] = {0};
+    header[0] = *(FTU8 *)(wfp->res+wfp->Src);
+    header[1] = *(FTU8 *)(wfp->res+wfp->Src+1);
+#elif defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+    FTU8 header[2] = {0};
     fseek(wfp->res,wfp->Src,SEEK_SET);
     fread(header,1,2,wfp->res);
 #elif defined(FT9XXEV)
+    FTU8 header[2] = {0};
     FTU32 l = 0;
     f_lseek(wfp->res,wfp->Src);
     f_read(wfp->res, (FTVOID *)header,2,&l);
-#else
+#else /* Arduino */
+    FTU8 header[512] = {0};
     wfp->res.readsector(p);
 #endif
-#else 
-    header[0] = *(FTU8 *)(wfp->res+wfp->Src);
-    header[1] = *(FTU8 *)(wfp->res+wfp->Src+1);
-#endif
+
     if (header[0] == 0x78) {
         if (header[1] == 0x9C) {
             /* make sure command buffer clean */
@@ -599,48 +599,23 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 
 FTVOID FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-	FTU32 i, src, linestride;
+	FTU32 i, src;
 
 	for (i = 0, src = ramgAddr; i < nums; i++) {
-        switch (pbmpHD[i].format) {
-            case L1:
-                linestride = pbmpHD[i].wide/8;
-                break;
-            case L2:
-                linestride = pbmpHD[i].wide/4;
-                break;
-            case L4:
-                linestride = pbmpHD[i].wide/2;
-                break;
-            case L8:
-            case ARGB2:
-            case RGB332:
-#ifdef DEF_81X
-            case PALETTED8:
-            case PALETTED565:
-            case PALETTED4444:
-#else
-            case PALETTED:
-#endif 
-                linestride = pbmpHD[i].wide;
-                break;
-            case ARGB4:
-            case RGB565:
-            case ARGB1555:
-            default:
-                linestride = pbmpHD[i].wide*2;
-                break;
-        }
 		HAL_DlpBufIn(BITMAP_HANDLE(i+bmpHdl));
 		HAL_DlpBufIn(BITMAP_SOURCE(src));
-        HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,linestride,pbmpHD[i].high));
+		HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
 #ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_LAYOUT_H(linestride >> 10,pbmpHD[i].high>>9));
+        	HAL_DlpBufIn(BITMAP_LAYOUT_H(linestride >> 10,pbmpHD[i].high>>9));
 #endif       
-		/* don't know the different between NEAREST and BILINEAR, here just use NEAREST */
+		/* 
+		 select NEAREST or BILINEAR base on your image and requirement
+		 NEAREST: make the image shap clear
+		 BILINEAR: make the image shap smooth
+		 */
 		HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
 #ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
+        	HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
 #endif         
 		src += pbmpHD[i].len;
 #ifdef DEF_81X
