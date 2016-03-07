@@ -606,7 +606,7 @@ FTVOID FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 		HAL_DlpBufIn(BITMAP_SOURCE(src));
 		HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
 #ifdef DEF_81X
-        	HAL_DlpBufIn(BITMAP_LAYOUT_H(linestride >> 10,pbmpHD[i].high>>9));
+        HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(pbmpHD[i]) >> 10,pbmpHD[i].high>>9));
 #endif       
 		/* 
 		 select NEAREST or BILINEAR base on your image and requirement
