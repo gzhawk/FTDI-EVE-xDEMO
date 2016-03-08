@@ -395,7 +395,7 @@ FTVOID resIsZlib(FTU32 para)
     if (header[0] == 0x78) {
         if (header[1] == 0x9C) {
             /* make sure command buffer clean */
-            HAL_BufToReg(RAM_CMD,0);
+            HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
             /* then start sending the command */
             HAL_CmdToReg(CMD_INFLATE);
             HAL_CmdToReg(wfp->Des);
