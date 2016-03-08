@@ -244,8 +244,8 @@ FTVOID resWrBuf (FTU32 para)
 {
 	wrFuncPara *wfp = (wrFuncPara *) para;
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+	fseek(wfp->res,wfp->Src,SEEK_SET);
 	if (wfp->len > 0) {
-		fseek(wfp->res,wfp->Src,SEEK_SET);
 		fread((FTVOID *)wfp->Des,1,wfp->len,wfp->res);
 	}
 #elif defined(STM32F4)
@@ -255,8 +255,8 @@ FTVOID resWrBuf (FTU32 para)
 	}
 #elif defined(FT9XXEV)
 	FTU32 l;
+	f_lseek(wfp->res,wfp->Src);
 	if (wfp->len > 0) {
-		f_lseek(wfp->res,wfp->Src);
 		f_read(wfp->res, (FTVOID *)wfp->Des,wfp->len,&l);
 	}
 #else/* Arduino */
@@ -324,21 +324,18 @@ FTU8 * p = 0;
 #endif
 #endif
 
-	for (i = 0; i < file_len; i += l, wfp->Src += l) {
+	for (i = 0; i < file_len; i += l) {
 		l = ((file_len - i) > block)?block:(file_len - i);
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
-        fseek(wfp->res,wfp->Src,SEEK_SET);
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)        
         fread(p,1,l,wfp->res);
 #elif defined(FT9XXEV)
-		f_lseek(wfp->res,wfp->Src);
-		f_read(wfp->res, (FTVOID *)p,l,&l);
-		if (l == 0) {
-			/* after that l may be zero (file read up)
-			   or it's the none 4 bytes align tail */
-			l = file_len-i;
-		}
+        /* 
+         f_read need to pass a variable to last para 
+         just reuse wfp->len for it, nothing special meaning
+         */
+		f_read(wfp->res, (FTVOID *)p,l,&(wfp->len));
 #elif defined(STM32F4)
-        p = wfp->res+wfp->Src;
+        p += l;
 #else
 		wfp->res.readsector(p);
 #endif
@@ -380,16 +377,17 @@ FTVOID resIsZlib(FTU32 para)
     header[1] = *(FTU8 *)(wfp->res+wfp->Src+1);
 #elif defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
     FTU8 header[2] = {0};
-    fseek(wfp->res,wfp->Src,SEEK_SET);
     fread(header,1,2,wfp->res);
+    fseek(wfp->res,wfp->Src,SEEK_SET);
 #elif defined(FT9XXEV)
     FTU8 header[2] = {0};
     FTU32 l = 0;
-    f_lseek(wfp->res,wfp->Src);
     f_read(wfp->res, (FTVOID *)header,2,&l);
+    f_lseek(wfp->res,wfp->Src);
 #else /* Arduino */
     FTU8 header[512] = {0};
     wfp->res.readsector(p);
+    wfp->res.seek(wfp->Src);
 #endif
 
     if (header[0] == 0x78) {
