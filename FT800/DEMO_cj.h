@@ -296,7 +296,9 @@ FTVOID cj_swt (FTU8 Tag)
 
 FTVOID cj_pwm_compare (FTU8 num, FTU8 ratio)
 {
+#if defined(FT9XXEV)
 	pwm_compare(num,(PWM_COUNT_INIT/100)*ratio);
+#endif
 }
 
 FTVOID cj_pwm_init (FTVOID)
@@ -326,7 +328,16 @@ FTVOID cj_pwm_init (FTVOID)
 
 #endif
 }
-
+FTVOID cj_pwm_toggle(FTU8 off_on, FTU8 a, FTU8 b)
+{
+#if defined(FT9XXEV)
+    if (off_on) {
+        pwm_add_toggle(a,b);
+    } else {
+        pwm_remove_toggle(a,b);
+    }
+#endif
+}
 FTVOID cj_pwm_sw (FTU8 Tag)
 {
 #define TOGGLE_ON 65535
@@ -334,28 +345,28 @@ FTVOID cj_pwm_sw (FTU8 Tag)
 		case eT_PWM1_SW:
 			if (motor_pwm.pwm1.motor_off_on) {
 				motor_pwm.pwm1.motor_off_on = 0;
-				pwm_remove_toggle(0,0);
+				cj_pwm_toggle(0,0,0);
 			} else {
 				motor_pwm.pwm1.motor_off_on = TOGGLE_ON;
-				pwm_add_toggle(0,0);
+				cj_pwm_toggle(1,0,0);
 			}
 			break;
 		case eT_PWM2_SW:
 			if (motor_pwm.pwm2.motor_off_on) {
 				motor_pwm.pwm2.motor_off_on = 0;
-				pwm_remove_toggle(1,1);
+				cj_pwm_toggle(0,1,1);
 			} else {
 				motor_pwm.pwm2.motor_off_on = TOGGLE_ON;
-				pwm_add_toggle(1,1);
+				cj_pwm_toggle(1,1,1);
 			}
 			break;
 		case eT_PWM3_SW:
 			if (motor_pwm.pwm3.motor_off_on) {
 				motor_pwm.pwm3.motor_off_on = 0;
-				pwm_remove_toggle(2,2);
+				cj_pwm_toggle(0,2,2);
 			} else {
 				motor_pwm.pwm3.motor_off_on = TOGGLE_ON;
-				pwm_add_toggle(2,2);
+				cj_pwm_toggle(1,2,2);
 			}
 			break;
 		default:

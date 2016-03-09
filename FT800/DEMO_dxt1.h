@@ -39,6 +39,9 @@ app_para_t appGP = {0};
 #define DXT1_HDL_NUMS   (2)
 #define DXT1_TLT_FONT   (25)
 
+#define DXT1_PIC_W      480
+#define DXT1_PIC_H      272
+
 #define S7_W 160
 #define S7_H 136
 
@@ -180,20 +183,20 @@ FTINDEF FTVOID dxt1Display (FTU8 fn, FTU32 hdl, FTU32 addr, FTU8 t)
 	HAL_CmdBufIn(CLEAR(1,1,1));
 
 	if (fn != '7') {
-		dxt1Info(hdl, addr, 0, 0, FT800_LCD_WIDTH, FT800_LCD_HIGH);
+		dxt1Info(hdl, addr, 0, 0, DXT1_PIC_W, DXT1_PIC_H);
 	} else {
 		dxt1Info(hdl, addr, -1*S7_W/4, -1*S7_H/4, S7_W, S7_H);
-		dxt1Info(hdl, addr, FT800_LCD_WIDTH-S7_W-20, FT800_LCD_HIGH-S7_H-20, S7_W, S7_H);
+		dxt1Info(hdl, addr, DXT1_PIC_W-S7_W-20, DXT1_PIC_H-S7_H-20, S7_W, S7_H);
 
 		HAL_CmdBufIn(COLOR_RGB(0,0,0xFF));
 		CoCmd_TEXT(S7_W/4*3,S7_H/4*3/2,DXT1_TLT_FONT-2,0,"Any size, negative coordinate");
-		CoCmd_TEXT(50,FT800_LCD_HIGH-S7_H/2-20,DXT1_TLT_FONT-2,0,"Any size, positive coordinate");
+		CoCmd_TEXT(50,DXT1_PIC_H-S7_H/2-20,DXT1_TLT_FONT-2,0,"Any size, positive coordinate");
 	}
 
 	if (t) {
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,DXT1_TLT_FONT,OPT_CENTERX,"Tap any place go next screen");
+		CoCmd_TEXT(DXT1_PIC_W/2,DXT1_PIC_H/2,DXT1_TLT_FONT,OPT_CENTERX,"Tap any place go next screen");
 	} else {
-		CoCmd_SPINNER(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,OPT_CENTER,0);
+		CoCmd_SPINNER(DXT1_PIC_W/2,DXT1_PIC_H/2,OPT_CENTER,0);
 	}
 
 	HAL_CmdBufIn(DISPLAY());

@@ -25,3 +25,6 @@ FT800/STM32F4/img/xdemo.bin
 FT800/STM32F4/img/xdemo.elf
 res/cdata.bin
 res/cdata.bin
+*.opensdf
+*.ipch
+res/cdata.bin

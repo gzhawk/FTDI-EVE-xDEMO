@@ -352,11 +352,11 @@ FTU8 * p = 0;
 }
 FTVOID resWrEve (FTU32 para)
 {
-    return resEveMemOperation(para, 0);
+	resEveMemOperation(para, 0);
 }
 FTVOID resWrEveCmd (FTU32 para)
 {
-    return resEveMemOperation(para, 1);
+    resEveMemOperation(para, 1);
 }
 FTVOID resIsZlib(FTU32 para)
 {
@@ -397,7 +397,13 @@ FTVOID resIsZlib(FTU32 para)
             /* then start sending the command */
             HAL_CmdToReg(CMD_INFLATE);
             HAL_CmdToReg(wfp->Des);
-            return resWrEveCmd(para);
+			resWrEveCmd(para);
+            /* 
+             give a special length for the return routine
+             to do some special handle for zlib file
+             */
+            wfp->len = ZLIB_LEN;
+            return;
         } else {
             /* 
                so far as I know
@@ -408,7 +414,7 @@ FTVOID resIsZlib(FTU32 para)
         }
     }
 
-    return resWrEve(para);
+    resWrEve(para);
 }
 
 FTU32 appResOpen (FTU8 *path)
@@ -550,14 +556,17 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 	FTU32 i, src;
 
 	for (i = 0, src = ramgAddr; i < nums; i++) {
-		if (appFileToRamG(pbmpHD[i].path,src,1,0,0)) {
+        pbmpHD[i].len = appFileToRamG(pbmpHD[i].path,src,1,0,0);
+		if (pbmpHD[i].len) {
             /* 
                when using zlib compressed file (*.bin)
                the actual decompressed size would not
                the return value of appFileToRamG
                so calculate the output (decompressed) size by image format
              */
-            pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
+		    if (ZLIB_LEN == pbmpHD[i].len) {
+                pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
+            }
         } else {
 			DBGPRINT;
 			return APP_ERR_LEN;
@@ -568,9 +577,12 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
             PALETTED565 == pbmpHD[i].format || 
             PALETTED4444 == pbmpHD[i].format) {
             pbmpHD[i].lut_src = src;
-            if (appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0)) {
+            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
+            if (pbmpHD[i].len_lut) {
                 /* same reason as above, lookup table alway less than 1K */
-                pbmpHD[i].len_lut = 1024;
+                if (ZLIB_LEN == pbmpHD[i].len_lut) {
+                    pbmpHD[i].len_lut = 1024;
+                }
             } else {
                 DBGPRINT;
                 return APP_ERR_LEN;
@@ -581,9 +593,12 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 #else
         if (PALETTED == pbmpHD[i].format) {
             pbmpHD[i].lut_src = RAM_PAL;
-            if (appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0)) {
+            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
+            if (pbmpHD[i].len_lut) {
                 /* same reason as above, lookup table alway less than 1K */
-                pbmpHD[i].len_lut = 1024;
+                if (ZLIB_LEN == pbmpHD[i].len_lut) {
+                    pbmpHD[i].len_lut = 1024;
+                }
             } else {
                 DBGPRINT;
                 return APP_ERR_LEN;

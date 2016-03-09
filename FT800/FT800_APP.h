@@ -37,6 +37,7 @@
 #define FT800_PIC_MEM_ADDR    RAM_G
 #define FT800_FONT_INTERNAL   (16)
 
+#define ZLIB_LEN              (0xFFFFFFFF)
 typedef struct bmpHDR_ {
 	FTC8  *path;
 	FTC8  *path_lut; //for palette only
