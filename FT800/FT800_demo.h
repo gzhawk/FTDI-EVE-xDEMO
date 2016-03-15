@@ -3,7 +3,7 @@
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2015/May
-*/
+ */
 
 /* ONLY enable ONE of them per times */
 #define DEMO_EVEUI
@@ -194,8 +194,8 @@
 /* make it goes to end when nothing be defined */
 AppFunc Apps[] = {0};
 typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
+    FTU32 appIndex;
+    FTU32 appPara;
 }app_para_t;
 app_para_t appGP = {0};
 #endif

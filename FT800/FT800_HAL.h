@@ -3,19 +3,23 @@
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/May
-*/
+ */
 
 #ifndef _FT800_HAL_H_
 #define _FT800_HAL_H_
 
 #define WVGA_WIDTH  800
 #define WVGA_HIGH   480
+
 #define WQVGA_WIDTH 480
 #define WQVGA_HIGH  272
+
 #define QVGA_WIDTH  320
 #define QVGA_HIGH   240
+
 #define HVGA_WIDTH  320
 #define HVGA_HIGH   480
+
 #if defined(LCD_WVGA)
 #define FT800_LCD_WIDTH WVGA_WIDTH
 #define FT800_LCD_HIGH  WVGA_HIGH
@@ -30,33 +34,32 @@
 #define FT800_LCD_HIGH  WQVGA_HIGH
 #endif
 
-#define EVE_ID_REG            0xC0001
-#define FT800_ID              0x7C
+#define EVE_ID_REG            (0xC0001)
+#define FT800_ID              (0x7C)
 #define FT800_CMD_WAIT_MAX    50
 #define FT800_DLP_WAIT_MAX    100
 #define FT800_TOUCH_THRESHOLD 1800
 #define FT800_PIXEL_UNIT      (16)
 
-#define EVE_DLP_SIZE        (8*1024)
-#define REG_FLAG_CLN       (0xFFFFFFFF)
+#define EVE_DLP_SIZE          (8*1024)
+#define REG_FLAG_CLN          (0xFFFFFFFF)
 #define FT800_TRACK_VALUE_MAX (0xFFFF)
 #define FT800_TRANSFORM_MAX   (0x10000)
 #define FTU32_LEN             4
 #define FTU16_LEN             2
 #define FTU8_LEN              1
 
+#define FT800_SPI_DUMMY       (0x04)
+
 typedef enum {
-	EVE_SSPI = 0,
-	EVE_DSPI,
-	EVE_QSPI
+    EVE_SSPI = 0,
+    EVE_DSPI,
+    EVE_QSPI
 }EVE_SPI_NUM;
-
-#define FT800_SPI_DUMMY       0x04
-
 typedef enum FT800_CMD_EXE_st {
-	CMD_BUF_START = 0,
-	CMD_BUF,
-	CMD_BUF_END
+    CMD_BUF_START = 0,
+    CMD_BUF,
+    CMD_BUF_END
 } FT800_CMD_EXE;
 typedef struct FT800_LCD_st {
     FT16 Width;
@@ -75,6 +78,7 @@ typedef struct FT800_LCD_st {
     FT16 Cspread;
     FT16 Dither;	
 } FT800_LCD;
+
 FTVOID HAL_Get_EVE_ID (FTVOID);
 FTVOID HAL_Cfg ( FTU8 cfg );
 FTU8 HAL_Read8 ( FTU32 addr );

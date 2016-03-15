@@ -3,7 +3,7 @@
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/Oct
-*/
+ */
 
 #ifndef _FT800_PLATFORM_H_
 #define _FT800_PLATFORM_H_
@@ -12,23 +12,28 @@
 /*
  * Version: A.B.C.D
  * A: Basic version number, increase it when modify happen on core function
-      (FT800, APP, HAL, etc.), or add a new MCU platform, 
-	  leave 'B' part unchange and clear the 'C' part when 'A' part change.
+ (FT800, APP, HAL, etc.), or add a new MCU platform, 
+ leave 'B' part unchange and clear the 'C' part when 'A' part change.
  * B: significant structure change version number, 
-      increase it when significant changed
+ increase it when significant changed
  * C: Demo version number, increase it when new demo be added in
  * D: Modify tracking number, each modify in code should increase the number, 
-      it should be clear to 0 when 'B' change
+ it should be clear to 0 when 'B' change
  * 
  *    for example: 3.X.11.5, 
-                   3  - support 3 MCU platform
-				   X  - from A ~ Z, software structure change
-				   11 - it has 11 demos
-				   5  - 5 small changes/modify
+ 3  - support 3 MCU platform
+ X  - from A ~ Z, software structure change
+ 11 - it has 11 demos
+ 5  - 5 small changes/modify
  *
  */
 #define FT800_VER "5.A.28.8"
 
+/*
+ * In SampleApp, it use a better way, you may use it if you like:
+ * x = (x+3)&0xFFC;
+ * but I keep using below stupid way
+ */
 #define BYTES4ALIGN(l) ((l)%4)?((l)+(4-(l)%4)):(l)
 
 /*
@@ -64,7 +69,7 @@
  * different EVE     : FT80X, FT81X
  * Cap or Res touch  : CAP_MULTI/CAP_NONMULTI/RES
 #define DEF_CAP_MULTI
-*/
+ */
 #define DEF_CAP_NONMULTI
 
 /* 

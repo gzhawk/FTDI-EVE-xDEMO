@@ -475,41 +475,41 @@
 
 
 typedef enum {
-	FT_GPU_INTERNAL_OSC = 0x48, //default
-	FT_GPU_EXTERNAL_OSC = 0x44,
+    FT_GPU_INTERNAL_OSC = 0x48, //default
+    FT_GPU_EXTERNAL_OSC = 0x44,
 }FT_GPU_PLL_SOURCE_T;
 typedef enum {
-	FT_GPU_PLL_48M = 0x62,  //default
-	FT_GPU_PLL_36M = 0x61,
-	FT_GPU_PLL_24M = 0x64,
+    FT_GPU_PLL_48M = 0x62,  //default
+    FT_GPU_PLL_36M = 0x61,
+    FT_GPU_PLL_24M = 0x64,
 }FT_GPU_PLL_FREQ_T;
 
 typedef enum {
-	FT_GPU_ACTIVE_M =  0x00,  
-	FT_GPU_STANDBY_M = 0x41,//default
-	FT_GPU_SLEEP_M =   0x42,
-	FT_GPU_POWERDOWN_M = 0x50,
+    FT_GPU_ACTIVE_M =  0x00,  
+    FT_GPU_STANDBY_M = 0x41,//default
+    FT_GPU_SLEEP_M =   0x42,
+    FT_GPU_POWERDOWN_M = 0x50,
 }FT_GPU_POWER_MODE_T;
 
 #define FT_GPU_CORE_RESET   0x68
 
 typedef struct FT_Gpu_Fonts
 {
-	/* All the values are in bytes */
-	/* Width of each character font from 0 to 127 */
-	FTU8	FontWidth[FT_GPU_NUMCHARPERFONT];
-	/* Bitmap format of font wrt bitmap formats supported by FT800 - L1, L4, L8 */
-	FTU32	FontBitmapFormat;
-	/* Font line stride in FT800 ROM */
-	FTU32	FontLineStride;
-	/* Font width in pixels */
-	FTU32	FontWidthInPixels;
-	/* Font height in pixels */
-	FTU32	FontHeightInPixels;
-	/* Pointer to font graphics raw data */
-	FTU32	PointerToFontGraphicsData;
+    /* All the values are in bytes */
+    /* Width of each character font from 0 to 127 */
+    FTU8	FontWidth[FT_GPU_NUMCHARPERFONT];
+    /* Bitmap format of font wrt bitmap formats 
+     * supported by FT800 - L1, L4, L8 */
+    FTU32	FontBitmapFormat;
+    /* Font line stride in FT800 ROM */
+    FTU32	FontLineStride;
+    /* Font width in pixels */
+    FTU32	FontWidthInPixels;
+    /* Font height in pixels */
+    FTU32	FontHeightInPixels;
+    /* Pointer to font graphics raw data */
+    FTU32	PointerToFontGraphicsData;
 }FT_Gpu_Fonts_t;
 
 #endif /* #ifndef _FT_GPU_H_ */
-
 
