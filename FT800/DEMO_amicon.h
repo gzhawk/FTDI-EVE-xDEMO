@@ -103,7 +103,7 @@ typedef enum icon_grp {
 } icon_grp_e;
 
 bmpHDR_st bmpHD[BKGND_ICON_GROUP] = {
-	{PATH_AM_ICON,	ARGB4,	0,	140,	140},
+	{PATH_AM_ICON,	0,0,ARGB4,	0,0,	140,	140},
 };
 
 typedef enum fire_icon_grp {

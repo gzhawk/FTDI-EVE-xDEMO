@@ -4,7 +4,7 @@
 	Email : born.jiang@ftdichip.com
 	Date  : 2014/Mar.
 */
-#ifdef DEMO_FVIDEO_INVENSYS
+#ifdef DEMO_FV_INVENSYS
 
 typedef struct app_para_st {
 	FTU32 appIndex;

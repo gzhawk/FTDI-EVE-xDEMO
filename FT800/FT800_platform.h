@@ -8,7 +8,118 @@
 #ifndef _FT800_PLATFORM_H_
 #define _FT800_PLATFORM_H_
 
-/*---------------------------------------------------------All platform define*/
+/* --------------------------------------------ONLY enable ONE of them per times
+#define DEMO_EVEUI
+#define DEMO_AVI
+#define DEMO_JPGDISP
+#define DEMO_DISPRAW
+#define DEMO_FONT
+#define DEMO_BITMAP
+#define DEMO_BKGND
+#define DEMO_AUDIO
+#define DEMO_DRAGICON
+#define DEMO_DXT1
+#define DEMO_FVIDEO
+#define DEMO_RIPPLE
+ * code for customer: useful
+#define DEMO_CJ
+#define DEMO_STELIGENT
+#define DEMO_LIERDA
+#define DEMO_MIDEA_W
+#define DEMO_WELLING
+#define DEMO_XIZI
+#define DEMO_GRG
+ * code for customer: useless
+#define DEMO_LITTLESWAN
+#define DEMO_BSH
+#define DEMO_COOBOT
+#define DEMO_PUZZLE
+#define DEMO_MIDEA
+#define DEMO_XIZI_BKGND
+ * coded by Born
+#define DEMO_AMICON
+#define DEMO_DIAL
+#define DEMO_FV_INVENSYS
+*/
+
+/*-----------------------------------------------------------Demo Related define
+ * DEF_81X      //when using FT81X, or DEMO run as FT80X 
+ * CAP_MULTI    //Cap touch with multiple touch control, or DEMO run as res TCP 
+ * CAP_NONMULTI //Cap touch with single touch control, or DEMO run as res TCP 
+ * LCD_QVGA     //320x240
+ * LCD_HVGA     //320x480 for FTDI ME8XXA_HV35R module
+ * LCD_WQVGA    //480x272
+ * LCD_WVGA     //800x480 only FT81X have WVGA
+ */
+/* not support STM32 */
+#if !defined(STM32F4)
+/*-----------------------------------Arduino, FT9XX, MSVC platform, None STM32*/
+#if (defined(DEMO_DIAL) || \
+    defined(DEMO_BSH) || \
+    defined(DEMO_GRG) || \
+    defined(DEMO_PUZZLE) || \
+    defined(DEMO_MIDEA) || \
+    defined(DEMO_FVIDEO_INVENSYS) || \
+    defined(DEMO_AMICON) || \
+    defined(DEMO_XIZI_BKGND) || \
+    defined(DEMO_FVIDEO) || \
+    defined(DEMO_BKGND) || \
+    defined(DEMO_DXT1) || \
+    defined(DEMO_DISPRAW) || \
+    defined(DEMO_FONT) || \
+    defined(DEMO_WELLING) || \
+    defined(DEMO_COOBOT))
+#define LCD_WQVGA
+#endif
+
+/*-------------------------------------------FT9XX, MSVC platform, None STM32 */
+#if (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
+
+#if (defined(DEMO_AVI) || \
+    defined(DEMO_BITMAP) || \
+    defined(DEMO_LIERDA)) || \
+    defined(DEMO_CJ) || \
+    defined(DEMO_JPGDISP) || \
+    defined(DEMO_LITTLESWAN) || \
+    defined(DEMO_STELIGENT)
+#define DEF_81X
+#define DEF_CAP_NONMULTI
+#define LCD_WVGA
+#endif
+
+#if (defined(DEMO_MIDEA_W))
+#define DEF_81X
+#define LCD_WQVGA
+#endif
+
+#endif
+
+/*--------------------------------------------------MSVC platform, None STM32 */
+#if (defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
+
+#if defined(DEMO_XIZI)
+#define LCD_WQVGA
+#endif
+
+#if defined(DEMO_RIPPLE)
+#define DEF_81X
+#define DEF_CAP_NONMULTI
+#define LCD_WVGA
+#endif
+#endif
+
+#endif
+
+/*------------------------------------------------Android, FT9XX, MSVC, STM32 */
+#if defined(DEMO_EVEUI) || \
+    defined(DEMO_AUDIO) || \
+    defined(DEMO_DRAGICON)
+#define DEF_81X
+#define DEF_CAP_NONMULTI
+#define LCD_WVGA
+#endif
+
+/*---------------------------------------------------Universal platform define*/
 /*
  * Version: A.B.C.D
  * A: Basic version number, increase it when modify happen on core function
@@ -27,7 +138,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.28.8"
+#define FT800_VER "5.A.29.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -40,11 +151,6 @@
  * !!! define this length base on your own system mem !!!
  */
 #define USE_STATIC_MEM_LEN 512 
-
-/* 
- * enable it when using FT81X 
- */
-#define DEF_81X
 
 /* 
  * too limit resource on Arduino platform, 
@@ -64,28 +170,12 @@
 #define CAL_NEEDED
 
 /* 
- * enable or disable this define for:
- * different LCD size: WQVGA, QVGA, WVGA
- * different EVE     : FT80X, FT81X
- * Cap or Res touch  : CAP_MULTI/CAP_NONMULTI/RES
-#define DEF_CAP_MULTI
- */
-#define DEF_CAP_NONMULTI
-
-/* 
- * set the LCD screen based on your real connected LCD
-#define LCD_QVGA //320x240
-#define LCD_HVGA //320x480 for FTDI ME8XXA_HV35R module
-#define LCD_WQVGA //480x272
- */
-#define LCD_WVGA //800x480 only FT81X have WVGA
-
-/* 
  * SPI, DSPI or QSPI supported
  * only FT81X can set to 2 or 4
  * also, need to know if your MCU use what kind of SPI
  */
 #define EVE_SPI_TYPE 1
+
 
 /*-------------------------------------------------------------MSVC2010EXPRESS*/
 #ifdef MSVC2010EXPRESS
