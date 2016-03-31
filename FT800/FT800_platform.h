@@ -31,6 +31,7 @@
 #define DEMO_GRG
  * code for customer: useless
 #define DEMO_LITTLESWAN
+#define DEMO_ALLYTECH
 #define DEMO_BSH
 #define DEMO_COOBOT
 #define DEMO_PUZZLE
@@ -41,6 +42,8 @@
 #define DEMO_DIAL
 #define DEMO_FV_INVENSYS
 */
+
+#define DEMO_EVEUI
 
 /*-----------------------------------------------------------Demo Related define
  * DEF_81X      //when using FT81X, or DEMO run as FT80X 
@@ -79,6 +82,7 @@
     defined(DEMO_BITMAP) || \
     defined(DEMO_LIERDA)) || \
     defined(DEMO_CJ) || \
+    defined(DEMO_ALLYTECH) || \
     defined(DEMO_JPGDISP) || \
     defined(DEMO_LITTLESWAN) || \
     defined(DEMO_STELIGENT)
@@ -138,7 +142,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.29.0"
+#define FT800_VER "5.A.30.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

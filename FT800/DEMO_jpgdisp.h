@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_JPGDISP
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
 #define PATH_JPG_A ROOT_PATH"jpgdisp\\a.jpg"
 #define PATH_JPG_B ROOT_PATH"jpgdisp\\b.jpg" /* higher compressed with smoothing effect */

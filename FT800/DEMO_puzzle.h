@@ -82,13 +82,6 @@ bitmap_st ani_bitmap[ANIMATION_NUM] = {
 	{PUZZLE_PATH"set00.raw",    164,203,126,62}, 
 	{PUZZLE_PATH"help00.raw",   294,203,126,62}
 };
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 
 appRet_en loadBitmap (FTVOID)
 {

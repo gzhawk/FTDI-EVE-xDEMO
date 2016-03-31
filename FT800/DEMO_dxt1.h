@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_DXT1
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
 #define PATH_SCN_C0 ROOT_PATH"dxt1\\s1_c0.raw"
 #define PATH_SCN_C1 ROOT_PATH"dxt1\\s1_c1.raw"

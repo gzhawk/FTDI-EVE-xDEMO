@@ -6,14 +6,6 @@
 */
 #ifdef DEMO_LIERDA
 
-
-typedef struct app_para_st {
-	FTU32 appIndex; /* use it for switching to UI routine */
-	FTU32 appPara; /* use it for interchange data between each UI routine */
-}app_para_t;
-
-app_para_t appGP = {0};
-
 /* go Apps[] define to count the number */
 typedef enum APPINDEX_e {
 	I_LOCK = 0,

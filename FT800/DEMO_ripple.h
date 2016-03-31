@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_RIPPLE
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #define PATH_DISP ROOT_PATH"ripple\\X1.jpg"
 
 #define FIFOSIZE        (100*1024)/* make sure this size larger than all JPG file size */

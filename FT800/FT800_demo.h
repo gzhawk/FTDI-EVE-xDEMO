@@ -5,6 +5,21 @@
     Date  : 2015/May
  */
 
+/*
+ * structure define for sub routine
+ * appIndex: sub routine index
+ * appPara: sub routine parameter (if has)
+ */
+typedef struct app_para_st {
+	FTU32 appIndex;
+	FTU32 appPara;
+}app_para_t;
+
+/*
+ * global variable for sub routine
+ */
+app_para_t appGP = {0};
+
 #if defined(DEMO_EVEUI)
 #include "DEMO_eveui.h"
 #elif defined(DEMO_AUDIO)
@@ -61,6 +76,10 @@
 #include "DEMO_bkgnd.h"
 #elif defined(DEMO_FVIDEO)
 #include "DEMO_fvideo.h"
+#elif defined(DEMO_ALLYTECH)
+#include "DEMO_allytech.h"
 #else
 #error "define the DEMO in FT800_platform.h!"
 #endif
+
+

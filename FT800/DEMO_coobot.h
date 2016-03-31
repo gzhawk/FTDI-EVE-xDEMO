@@ -6,16 +6,6 @@
 */
 #ifdef DEMO_COOBOT
 
-/*
- * structure and data 
- * to control the calling sequence and parameter exchange
- * between your internal routine
- */
-typedef struct app_para_st {
-	FTU32 appIndex; /* routine index in Apps[] */
-	FTU32 appPara; /* parameter data's pointer address */
-}app_para_t;
-
 enum speed_e {
 	SPD_WRTE = 0,
 	SPD_READ,
@@ -166,8 +156,6 @@ coobot_t UIData = {
 	DEFAULT_PWR,
 	DEFAULT_ERR
 };
-
-app_para_t appGP = {0, (FTU32)&UIData};
 
 FTINDEF FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
 {
@@ -492,6 +480,8 @@ FTVOID coobot_startup (FTU32 para)
 {	
 	/* for debugging */
 	appGP.appIndex = 3;
+	/* for input number transfer between subroutine */
+	appGP.appPara = (FTU32)&UIData;
 #if !defined(STM32F4)
 	/* load bitmap resources data into FT800 */
 	if(APP_OK != appBmpToRamG(0, 0, bmpLogoHD, ICON_NUM)) {

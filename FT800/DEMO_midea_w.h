@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_MIDEA_W
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #define FIFOSIZE        (18*1024)/* make sure this size larger than JPG file size */
 #define FIFOADDR        (FT800_RAMG_SIZE - FIFOSIZE)
 

@@ -12,13 +12,6 @@
 */
 #ifdef DEMO_FONT
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #define FONT_1 6
 #define FONT_2 7
 #define FONT_2_W 60

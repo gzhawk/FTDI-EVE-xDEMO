@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_AVI
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #define PATH_AVI ROOT_PATH"avi\\x.avi"
 
 /* your avi frame, NOT your LCD resolution */

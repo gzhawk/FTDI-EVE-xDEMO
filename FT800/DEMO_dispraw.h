@@ -12,13 +12,6 @@
 #define DISPRAW_PATH ROOT_PATH"test.raw"
 #endif
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 FTVOID dispraw (FTU32 para)
 {
 	bmpHDR_st bmp_header = {

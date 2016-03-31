@@ -7,15 +7,6 @@
 
 #ifdef DEMO_GRG
 
-#ifndef _FT800_GRG_H_
-#define _FT800_GRG_H_
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 /* 
  * The sequence below HAS to be the SAME 
  * as function point be put in Apps 
@@ -1212,6 +1203,5 @@ AppFunc Apps[] = {
 	/* Leave this NULL at the buttom of this array */
 	NULL
 };
-#endif
 #endif
 

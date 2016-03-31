@@ -7,13 +7,6 @@
 #ifdef DEMO_AMICON
 #include <math.h>
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 typedef struct halo_para_st {
 	FTU32 r;
 	FT32 linewidth;

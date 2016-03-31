@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_FV_INVENSYS
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
 #define PATH_V1_C0 ROOT_PATH"Invensys\\h000_c0.raw" //fvideo
 #define PATH_V1_C1 ROOT_PATH"Invensys\\h000_c1.raw"

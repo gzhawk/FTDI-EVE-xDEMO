@@ -6,16 +6,6 @@
 */
 #ifdef DEMO_WELLING
 
-/*
- * structure and data 
- * to control the calling sequence and parameter exchange
- * between your internal routine
- */
-typedef struct app_para_st {
-	FTU32 appIndex; /* routine index in Apps[] */
-	FTU32 appPara; /* parameter data's pointer address */
-}app_para_t;
-
 enum speed_e {
 	SPD_WRTE = 0,
 	SPD_READ,
@@ -145,8 +135,6 @@ welling_t UIData = {
 	DEFAULT_PWR,
 	DEFAULT_ERR
 };
-
-app_para_t appGP = {0, (FTU32)&UIData};
 
 FTINDEF FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
 {
@@ -372,7 +360,12 @@ FTINDEF FTVOID welling_filling (FTVOID)
 FTVOID welling_data_handle (FTU32 para)
 {
 	FTU8 touch;
-	static FTU8 count = 0;
+	static FTU8 count = 0, init = 0;
+
+	if (init == 0) {
+		appGP.appPara = (FTU32)&UIData;
+		init = 1;
+	}
 
 	touch = HAL_Read8(REG_TOUCH_TAG);
 

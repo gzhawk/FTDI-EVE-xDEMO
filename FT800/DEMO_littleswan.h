@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_LITTLESWAN
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
 #define PATH_DISP ROOT_PATH"littleswan\\X1.jpg"
 #define P_LEN 30

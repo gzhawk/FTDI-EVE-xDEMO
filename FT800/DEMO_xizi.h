@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_XIZI
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
 #define PATH_SCN1_C0 ROOT_PATH"xizi\\1-background_c0.raw"
 #define PATH_SCN1_C1 ROOT_PATH"xizi\\1-background_c1.raw"

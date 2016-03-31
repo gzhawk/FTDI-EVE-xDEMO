@@ -6,13 +6,6 @@
 */
 #ifdef DEMO_BSH
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
-
 #define BSH_TLT_FONT 6//31
 #define BSH_TLT_LEN  10
 

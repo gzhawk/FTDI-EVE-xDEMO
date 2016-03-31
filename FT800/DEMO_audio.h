@@ -10,12 +10,6 @@
 #define FT800_AUD_WINDOW_SIZE (3*FT800_AUD_BLOCK_SIZE)
 #define FT800_AUD_MEM_ADDR    RAM_G
 
-typedef struct app_para_st {
-	FTU32 appIndex;
-	FTU32 appPara;
-}app_para_t;
-
-app_para_t appGP = {0};
 #define WAV_HEAD_LEN  44
 #define WAV_HEAD_DLEN 40
 #define WAV_HEAD_PCM  20

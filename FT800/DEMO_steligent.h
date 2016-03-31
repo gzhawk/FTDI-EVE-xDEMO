@@ -6,17 +6,6 @@
 */
 #ifdef DEMO_STELIGENT
 
-/*
- * structure and data 
- * to control the calling sequence and parameter exchange
- * between your internal routine
- */
-typedef struct app_para_st {
-	FTU32 appIndex; /* routine index in Apps[] */
-	FTU32 appPara; /* parameter data's pointer address */
-}app_para_t;
-app_para_t appGP = {0};
-
 /* for multi touch and track touch use */
 FTU8 trigger = 0;
 FTU8 pre_tag = 0;
