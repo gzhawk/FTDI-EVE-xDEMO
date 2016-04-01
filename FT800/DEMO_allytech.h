@@ -111,7 +111,7 @@ FTVOID allytech_bitmap (FTU32 para)
 	HAL_CmdBufIn(VERTEX2F((w+bmp_header[2].wide/2)*16,(bmp_header[1].high+40)*16));
     HAL_CmdBufIn(END());
 	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40,22,OPT_CENTERX,"you should keep changing this part");
-	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40+20,22,OPT_CENTERX,"accordinting to the real engin speed");
+	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40+20,22,OPT_CENTERX,"according to the real engin speed");
 	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40+40,22,OPT_CENTERX,"I don't have that much pics, only use two pics to simulate");
     
     HAL_CmdBufIn(DISPLAY());
