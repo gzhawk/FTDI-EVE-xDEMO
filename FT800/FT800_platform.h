@@ -142,7 +142,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.30.0"
+#define FT800_VER "5.A.30.1"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

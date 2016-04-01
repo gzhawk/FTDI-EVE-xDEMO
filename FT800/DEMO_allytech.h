@@ -103,16 +103,38 @@ FTVOID allytech_bitmap (FTU32 para)
 
     HAL_CmdBufIn(END());
 
+    /* description part */
+	HAL_CmdBufIn(LINE_WIDTH(20));
+	HAL_CmdBufIn(COLOR_RGB(0,255,0));
+	HAL_CmdBufIn(BEGIN(LINES));
+	HAL_CmdBufIn(VERTEX2F((w+bmp_header[2].wide/2)*16,bmp_header[0].high*16));
+	HAL_CmdBufIn(VERTEX2F((w+bmp_header[2].wide/2)*16,(bmp_header[1].high+40)*16));
+    HAL_CmdBufIn(END());
+	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40,22,OPT_CENTERX,"you should keep changing this part");
+	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40+20,22,OPT_CENTERX,"accordinting to the real engin speed");
+	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40+40,22,OPT_CENTERX,"I don't have that much pics, only use two pics to simulate");
+    
     HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);
 
     HAL_BufToReg(RAM_CMD,0);
+
+    /* moving forward or backward control */
 	if (w >= MOVE_END) {
-		w = MOVE_START;
 		FTDELAY(1500);
-	} else {
-		w++;
+        /* reuse the flag */
+        flag = 2;
+	} else if (w <= MOVE_START) {
+		FTDELAY(1500);
+        /* reuse the flag */
+        flag = 1;
 	}
+    
+    if (flag == 1) {
+        w++;
+    } else {
+        w--;
+    }
 
 	appGP.appIndex = 0;
 }
