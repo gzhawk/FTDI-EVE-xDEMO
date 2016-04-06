@@ -6,23 +6,43 @@
 */
 #ifdef DEMO_ALLYTECH
 
-#define BACK_INX ROOT_PATH"allytech\\back-inx.bin"
-#define BACK_LUT ROOT_PATH"allytech\\back-lut.bin"
-#define BG_INX ROOT_PATH"allytech\\bg-inx.bin"
-#define BG_LUT ROOT_PATH"allytech\\bg-lut.bin"
-#define N0_INX ROOT_PATH"allytech\\n0-inx.bin"
-#define N0_LUT ROOT_PATH"allytech\\n0-lut.bin"
-#define N40_INX ROOT_PATH"allytech\\n40-inx.bin"
-#define N40_LUT ROOT_PATH"allytech\\n40-lut.bin"
+#error "it just a temp sample for customer"
+#error "need to have some change in APP.c and APP.h to make it work"
 
-#define BITMAP_NUM   (4)
+/* meter background */
+FTU8 BG_INX[] = ROOT_PATH"allytech\\bg-inx.bin";
+FTU8 BG_LUT[] = ROOT_PATH"allytech\\bg-lut.bin";
+/* full needle effect */
+FTU8 FN1_INX[] = ROOT_PATH"allytech\\n64-inx.bin";
+FTU8 FN1_LUT[] = ROOT_PATH"allytech\\n64-lut.bin";
+FTU8 FN2_INX[] = ROOT_PATH"allytech\\n80-inx.bin";
+FTU8 FN2_LUT[] = ROOT_PATH"allytech\\n80-lut.bin";
+/* partical needle effect */
+FTU8 PN_INX[] = ROOT_PATH"allytech\\n00-inx.bin";
+FTU8 PN_LUT[] = ROOT_PATH"allytech\\n00-lut.bin";
+
+#define BITMAP_NUM   (5)
+#define STOP_PEROID  (1200)
+#define PATH_INDEX   (20)
 
 bmpHDR_st bmp_header[BITMAP_NUM] = {
-	{BACK_INX,BACK_LUT,0,PALETTED8,0,0,800,84},
-	{BG_INX,BG_LUT,0,PALETTED8,0,0,796,147},
-    {N0_INX,N0_LUT,0,PALETTED8,0,0,47,61},
-    {N40_INX,N40_LUT,0,PALETTED8,0,0,8,58}
+	{BG_INX,BG_LUT,0,PALETTED8,0,0,800,84},
+    {FN1_INX,FN1_LUT,0,PALETTED8,0,0,598,97},
+    {PN_INX,PN_LUT,0,PALETTED8,0,0,48,97},
+	{FN2_INX,FN2_LUT,0,PALETTED8,0,0,598,97},
+	{PN_INX,PN_LUT,0,PALETTED8,0,0,48,97}//for frame swap
 };
+
+FTU32 g_speed = 0;
+FTU32 needle_cut[81] = {
+120,128,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,598,452,0,0,0,0,
+0,0,0,0,0,0,0,0,0,534,598};
 
 FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
 {
@@ -57,19 +77,69 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
+FTVOID allytech_speed (FTU32 para)
+{
+#define SPEED_START 0
+#define SPEED_END   80
+
+    static FTU8 nFlag = 0;
+
+	appGP.appPara = (FTU32)&g_speed;
+	appGP.appIndex = 1;
+	if (para) {
+		g_speed = *(FTU32 *)para;
+	} else {
+		/* at the very beginning */
+		g_speed = 0;
+		return;
+	}
+
+    /* moving forward or backward control */
+	if (g_speed == SPEED_END) {
+        nFlag = 1;
+	} else if (g_speed == SPEED_START) {
+        nFlag = 0;
+	}
+
+
+    if (nFlag == 1) {
+		g_speed--;
+    } else {
+        g_speed++;
+    }
+
+    switch (g_speed) {
+        case 2:
+            g_speed = 64;
+            break;
+        case 66:
+            g_speed = 79;
+            break;
+        case 78:
+            g_speed = 65;
+            break;
+        case 63:
+            g_speed = 1;
+            break;
+        default:
+            break;
+    }
+}
+
 FTVOID allytech_bitmap (FTU32 para)
 {
-#define MOVE_END 400
-#define MOVE_START 100
+#define NUM_BLUE     64
+#define NUM_RED      80
+#define SHADOW_X     35//(800 - 598)/2
 	static FTU8 flag = 0;
-	static FTU32 w = MOVE_START;
+	static FTU32 needle = 0,i_shadow = 1,i_needle = 2;
+    FTU32 speed = *(FTU32 *)para;
 
 	/* never mind, it's for debug,
-	 * this part just for this routine jump out the outside caller when error happen */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
+	 * this part just for this routine jump out 
+     * the outside caller when error happen */
+	appGP.appIndex = 2;
 
-	/* only load the file once */
 	if (flag == 0) {
 		/* load bitmap resources data into FT800 */
 		if(APP_OK != appBmpToRamG(0, RAM_G, bmp_header, BITMAP_NUM)){
@@ -87,59 +157,50 @@ FTVOID allytech_bitmap (FTU32 para)
 	/* meter background */
 	dispPal8(0,0,bmp_header[0].lut_src,0,0);
 
-	/* shadow cutted area */
-	HAL_CmdBufIn(SAVE_CONTEXT());
-	HAL_CmdBufIn(SCISSOR_XY(0,0));
-	HAL_CmdBufIn(SCISSOR_SIZE(w,bmp_header[1].high));
-	dispPal8(0,0,bmp_header[1].lut_src,1,0);
-	HAL_CmdBufIn(RESTORE_CONTEXT());
-
-	/* needle cutted area */
-	if (w < MOVE_END) {
-		dispPal8(w,0,bmp_header[2].lut_src,2,0);
-	} else {
-		dispPal8(MOVE_END,0,bmp_header[3].lut_src,3,0);
-	}
-
-    HAL_CmdBufIn(END());
-
-    /* description part */
-	HAL_CmdBufIn(LINE_WIDTH(20));
-	HAL_CmdBufIn(COLOR_RGB(0,255,0));
-	HAL_CmdBufIn(BEGIN(LINES));
-	HAL_CmdBufIn(VERTEX2F((w+bmp_header[2].wide/2)*16,bmp_header[0].high*16));
-	HAL_CmdBufIn(VERTEX2F((w+bmp_header[2].wide/2)*16,(bmp_header[1].high+40)*16));
-    HAL_CmdBufIn(END());
-	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40,22,OPT_CENTERX,"you should keep changing this part");
-	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40+20,22,OPT_CENTERX,"according to the real engin speed");
-	CoCmd_TEXT(w+bmp_header[2].wide/2,bmp_header[1].high+40+40,22,OPT_CENTERX,"I don't have that much pics, only use two pics to simulate");
-    
-    HAL_CmdBufIn(DISPLAY());
-	HAL_CmdBufIn(CMD_SWAP);
-
-    HAL_BufToReg(RAM_CMD,0);
-
-    /* moving forward or backward control */
-	if (w >= MOVE_END) {
-		FTDELAY(1500);
-        /* reuse the flag */
-        flag = 2;
-	} else if (w <= MOVE_START) {
-		FTDELAY(1500);
-        /* reuse the flag */
-        flag = 1;
-	}
-    
-    if (flag == 1) {
-        w++;
+	/* shadow cutted area: load full shadow, blue or red */
+    if (speed <= NUM_BLUE) {
+		i_shadow = 1;
     } else {
-        w--;
+		i_shadow = 3;
     }
 
+	/* shadow cutted area: show the cutted part */
+    HAL_CmdBufIn(SAVE_CONTEXT());
+    HAL_CmdBufIn(SCISSOR_XY(SHADOW_X,0));
+    HAL_CmdBufIn(SCISSOR_SIZE(needle_cut[speed],bmp_header[i_shadow].high));
+    dispPal8(SHADOW_X,0,bmp_header[i_shadow].lut_src,i_shadow,0);
+    HAL_CmdBufIn(RESTORE_CONTEXT());
+
+	/* needle cutted area */
+	if (i_needle == 2) {
+		i_needle = 4;
+	} else {
+		i_needle = 2;
+	}
+	if (speed != NUM_BLUE && speed != NUM_RED) {
+        bmp_header[i_needle].path[PATH_INDEX] = '0'+speed/10;
+        bmp_header[i_needle].path[PATH_INDEX+1] = '0'+speed%10;
+		bmp_header[i_needle].path_lut[PATH_INDEX] = '0'+speed/10;
+        bmp_header[i_needle].path_lut[PATH_INDEX+1] = '0'+speed%10;
+        if (APP_OK != appLoadBmp(bmp_header[i_needle].lut_src-bmp_header[i_needle].len,&bmp_header[i_needle],1) ) {
+            return;
+        }
+		dispPal8(SHADOW_X+needle_cut[speed],0,bmp_header[i_needle].lut_src,i_needle,0);
+	}
+
+    HAL_CmdBufIn(END());
+    HAL_CmdBufIn(DISPLAY());
+	HAL_CmdBufIn(CMD_SWAP);
+    HAL_BufToReg(RAM_CMD,0);
+
+    needle = speed;
 	appGP.appIndex = 0;
+
+	FTDELAY(STOP_PEROID);
 }
 
 AppFunc Apps[] = {
+    allytech_speed, 
 	allytech_bitmap,
 	/* Leave this NULL at the buttom of this array */
 	NULL
