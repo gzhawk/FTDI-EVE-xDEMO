@@ -192,6 +192,11 @@ typedef FTVOID (* AppFunc) (FTU32);
                                     HAL_CmdBufIn((FTU32)(f)); \
                                     HAL_CmdBufIn((FTU32)(s))
 
+#define CoCmd_MEMCPY(des,src,len)   HAL_CmdBufIn(CMD_MEMCPY); \
+                                    HAL_CmdBufIn(des); \
+                                    HAL_CmdBufIn(src); \
+                                    HAL_CmdBufIn(len)
+
 #define CoCmd_APPEND(addr, nums)    HAL_CmdBufIn(CMD_APPEND); \
                                     HAL_CmdBufIn(addr); \
                                     HAL_CmdBufIn(nums)

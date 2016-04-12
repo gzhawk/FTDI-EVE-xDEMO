@@ -30,7 +30,11 @@ FTU8 jpeg_d[] = ROOT_PATH"njtoyo\\D00.jpg";
 #define FIFOADDR         (RAM_G)
 #define BMPADDR          (FIFOADDR+FIFOSIZE+BUF_GAP)
 
-#define EVE_CODE_ADDR      (BMPADDR_4+BMPSIZE)
+#define EVE_C_ADDR       (BMPADDR+4*BMPSIZE)
+#define EVE_C_MAXSIZE    (FT800_RAMG_SIZE-EVE_C_ADDR)
+
+#define FPS_OFFSET_Y     0
+#define FPS_OFFSET_X     80
 
 bmpHDR_st jpeg_bmp[4] = {
     {(FTC8 *)jpeg_a,0,0,RGB565,BMPSIZE,0,320,240},
@@ -63,7 +67,6 @@ jpeg_play_st jpeg_play_list[4] = {
 #elif defined(FT9XXEV)
 #define FILE_INDEX 8
 FTU8 frame_rate[4] = {0};
-FTU8 tick = '|';
 #else
 #error "not for this platform"
 #endif
@@ -101,7 +104,6 @@ void timerISR(void)
 
     if (timer_is_interrupted(timer_select_a) == 1)
     {
-        tick = (tick == '|')?'-':'|';
         for (i = 0; i < 4; i++) {
             j = (*(FTU8 *)(jpeg_bmp[i].path + FILE_INDEX) - '0')*10;
             j += (*(FTU8 *)(jpeg_bmp[i].path + FILE_INDEX + 1) - '0')%10;
@@ -216,26 +218,11 @@ FTU8 dump4jpeg (FTVOID)
 
     return 0;
 }
-
-FTVOID disp4jpeg (FTU32 para)
+FTU32 Code_fixed (FTVOID)
 {
-#define FPS_OFFSET_Y 0
-#define FPS_OFFSET_X 80
-
-    static FTU32 preDLaddr = 0;
     FTU8 i;
 
-    appGP.appIndex = 2;
-
-    if (preDLaddr == 0) {
-        FillBmpDL(0, BMPADDR, jpeg_bmp, 4);
-        preDLaddr = 1;
-    }
-
-    if (dump4jpeg()) {
-        DBGPRINT;
-        return;
-    }
+    FillBmpDL(0, BMPADDR, jpeg_bmp, 4);
 
     HAL_CmdBufIn(CMD_DLSTART);
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
@@ -256,13 +243,21 @@ FTVOID disp4jpeg (FTU32 para)
     HAL_CmdBufIn(END());
 
     HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
+    HAL_BufToReg(RAM_CMD,0);
 
+    return HAL_Read32(REG_CMD_DL);
+}
+FTVOID Code_realtime (FTU32 start_addr)
+{
+    FTU8 i;
+
+    HAL_CmdBufIn(CMD_DLSTART);
+    CoCmd_APPEND(EVE_C_ADDR,start_addr);
     for (i = 0; i < 4; i++) {
         CoCmd_TEXT(jpeg_play_list[i].txt.X,
                 jpeg_play_list[i].txt.Y,25,
                 OPT_CENTERX,&jpeg_bmp[i].path[FILE_INDEX-1]);
 #if defined(DEF_TIMER)
-        CoCmd_TEXT(800/2,0,25,OPT_CENTERX,&tick);
         CoCmd_TEXT(jpeg_play_list[i].pic.X,
                 jpeg_play_list[i].pic.Y,25,
                 0,"FPS:");
@@ -274,6 +269,40 @@ FTVOID disp4jpeg (FTU32 para)
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);
+
+}
+FTVOID disp4jpeg (FTU32 para)
+{
+    static FTU32 preDLaddr = 0;
+
+    appGP.appIndex = 2;
+
+    if (dump4jpeg()) {
+        DBGPRINT;
+        return;
+    }
+
+    /* little trick to reduce the loading of SPI when RAM_G got extra space:
+       store the fixed/unchange part of the code from displist in EVE into RAM_G
+       in EVE at the beginning, then append the previous stored code in RAM_G
+       from RAM_G back into displist when next screen is going to show.
+       By this way, no SPI transfer for fixed/unchange part during the display
+     */
+    if (preDLaddr == 0) {
+        preDLaddr = Code_fixed();
+        
+        if (EVE_C_MAXSIZE <= preDLaddr) {
+            /* previous code size should not larger than
+               the left space in RAM_G */
+            DBGPRINT;
+            return;
+        }
+
+        CoCmd_MEMCPY(EVE_C_ADDR,RAM_DL,preDLaddr);
+        HAL_BufToReg(RAM_CMD,0);
+    }
+
+    Code_realtime(preDLaddr);
 
     appGP.appIndex = 1;
 }
