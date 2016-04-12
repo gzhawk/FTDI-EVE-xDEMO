@@ -78,6 +78,10 @@ app_para_t appGP = {0};
 #include "DEMO_fvideo.h"
 #elif defined(DEMO_ALLYTECH)
 #include "DEMO_allytech.h"
+#elif defined(DEMO_ALLY_FONT)
+#include "DEMO_allytech_font.h"
+#elif defined(DEMO_NJTOYO)
+#include "DEMO_njtoyo.h"
 #else
 #error "define the DEMO in FT800_platform.h!"
 #endif

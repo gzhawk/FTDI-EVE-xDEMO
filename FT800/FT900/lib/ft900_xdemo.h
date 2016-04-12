@@ -5,13 +5,14 @@
 
 #include "ft900.h"
 #include "ff.h"
-typedef char           FTC8;
+typedef const char     FTC8;
 typedef signed char    FT8;
 typedef unsigned char  FTU8;
 typedef short          FT16;
 typedef unsigned short FTU16;
 typedef int            FT32;
 typedef unsigned int   FTU32;
+typedef unsigned long  FTU64;
 #define FTVOID void
 
 #define USED_CMD_BUF

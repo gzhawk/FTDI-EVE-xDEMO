@@ -6,31 +6,28 @@
 */
 #ifdef DEMO_ALLYTECH
 
-#error "it just a temp sample for customer"
-#error "need to have some change in APP.c and APP.h to make it work"
-
 /* meter background */
-FTU8 BG_INX[] = ROOT_PATH"allytech\\bg-inx.bin";
-FTU8 BG_LUT[] = ROOT_PATH"allytech\\bg-lut.bin";
+FTU8 bg_inx[] = ROOT_PATH"allytech\\bg-inx.bin";
+FTU8 bg_lut[] = ROOT_PATH"allytech\\bg-lut.bin";
 /* full needle effect */
-FTU8 FN1_INX[] = ROOT_PATH"allytech\\n64-inx.bin";
-FTU8 FN1_LUT[] = ROOT_PATH"allytech\\n64-lut.bin";
-FTU8 FN2_INX[] = ROOT_PATH"allytech\\n80-inx.bin";
-FTU8 FN2_LUT[] = ROOT_PATH"allytech\\n80-lut.bin";
+FTU8 fn1_inx[] = ROOT_PATH"allytech\\n64-inx.bin";
+FTU8 fn1_lut[] = ROOT_PATH"allytech\\n64-lut.bin";
+FTU8 fn2_inx[] = ROOT_PATH"allytech\\n80-inx.bin";
+FTU8 fn2_lut[] = ROOT_PATH"allytech\\n80-lut.bin";
 /* partical needle effect */
-FTU8 PN_INX[] = ROOT_PATH"allytech\\n00-inx.bin";
-FTU8 PN_LUT[] = ROOT_PATH"allytech\\n00-lut.bin";
+FTU8 pn_inx[] = ROOT_PATH"allytech\\n00-inx.bin";
+FTU8 pn_lut[] = ROOT_PATH"allytech\\n00-lut.bin";
 
 #define BITMAP_NUM   (5)
 #define STOP_PEROID  (1200)
 #define PATH_INDEX   (20)
 
 bmpHDR_st bmp_header[BITMAP_NUM] = {
-	{BG_INX,BG_LUT,0,PALETTED8,0,0,800,84},
-    {FN1_INX,FN1_LUT,0,PALETTED8,0,0,598,97},
-    {PN_INX,PN_LUT,0,PALETTED8,0,0,48,97},
-	{FN2_INX,FN2_LUT,0,PALETTED8,0,0,598,97},
-	{PN_INX,PN_LUT,0,PALETTED8,0,0,48,97}//for frame swap
+	{(FTC8 *)bg_inx,(FTC8 *)bg_lut,0,PALETTED8,0,0,800,84},
+    {(FTC8 *)fn1_inx,(FTC8 *)fn1_lut,0,PALETTED8,0,0,598,97},
+    {(FTC8 *)pn_inx,(FTC8 *)pn_lut,0,PALETTED8,0,0,48,97},
+	{(FTC8 *)fn2_inx,(FTC8 *)fn2_lut,0,PALETTED8,0,0,598,97},
+	{(FTC8 *)pn_inx,(FTC8 *)pn_lut,0,PALETTED8,0,0,48,97}//for frame swap
 };
 
 FTU32 g_speed = 0;
@@ -178,10 +175,10 @@ FTVOID allytech_bitmap (FTU32 para)
 		i_needle = 2;
 	}
 	if (speed != NUM_BLUE && speed != NUM_RED) {
-        bmp_header[i_needle].path[PATH_INDEX] = '0'+speed/10;
-        bmp_header[i_needle].path[PATH_INDEX+1] = '0'+speed%10;
-		bmp_header[i_needle].path_lut[PATH_INDEX] = '0'+speed/10;
-        bmp_header[i_needle].path_lut[PATH_INDEX+1] = '0'+speed%10;
+        pn_inx[PATH_INDEX] = '0'+speed/10;
+        pn_inx[PATH_INDEX+1] = '0'+speed%10;
+		pn_lut[PATH_INDEX] = '0'+speed/10;
+        pn_lut[PATH_INDEX+1] = '0'+speed%10;
         if (APP_OK != appLoadBmp(bmp_header[i_needle].lut_src-bmp_header[i_needle].len,&bmp_header[i_needle],1) ) {
             return;
         }

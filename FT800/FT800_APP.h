@@ -191,11 +191,18 @@ typedef FTVOID (* AppFunc) (FTU32);
                                     HAL_CmdBufIn(CMD_SETFONT); \
                                     HAL_CmdBufIn((FTU32)(f)); \
                                     HAL_CmdBufIn((FTU32)(s))
+
+#define CoCmd_APPEND(addr, nums)    HAL_CmdBufIn(CMD_APPEND); \
+                                    HAL_CmdBufIn(addr); \
+                                    HAL_CmdBufIn(nums)
+
 FTVOID resWrBuf (FTU32 para);
 FTVOID resWrEve (FTU32 para);
 FTVOID resWrEveCmd (FTU32 para);
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen);
 appRet_en appWaitCal (FTVOID);
+FTVOID FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
+appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 FTU32 appResOpen (FTU8 *path);
 FTU32 appResSize (FTU32 resHDL);

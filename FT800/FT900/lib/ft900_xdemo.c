@@ -1,6 +1,11 @@
 
-#include "ft900_xdemo.h"
-void ft9xx_gpio_test (unsigned char flag)
+#include "FT800_platform.h"
+
+#if defined(DEF_TIMER)
+extern FTVOID timerISR(FTVOID);
+#endif
+
+FTVOID ft9xx_gpio_test (FTU8 flag)
 {
 	if (flag) {
 		gpio_write(FT9XX_TST, 0);
@@ -20,7 +25,7 @@ void ft9xx_gpio_test (unsigned char flag)
 		gpio_write(FT9XX_TST, 1);
 	}
 }
-void ft9xx_ili9488_cmd (unsigned char *pdata, unsigned int num)
+FTVOID ft9xx_ili9488_cmd (FTU8 *pdata, FTU32 num)
 {
 	FT9XX_ILI9488_CS_LOW;
 	FT9XX_ILI9488_DCX_LOW;
@@ -33,9 +38,9 @@ void ft9xx_ili9488_cmd (unsigned char *pdata, unsigned int num)
 
 	FT9XX_ILI9488_CS_HIGH;
 }
-void ft9xx_init_ili9488 (void)
+FTVOID ft9xx_init_ili9488 (FTVOID)
 {
-	unsigned char tmp[5] = {0};
+	FTU8 tmp[5] = {0};
 
 	tmp[0] = 1;
 	tmp[1] = 0;
@@ -95,7 +100,7 @@ void ft9xx_init_ili9488 (void)
 	tmp[1] = 0xb0;
 	ft9xx_ili9488_cmd(tmp,2);
 }
-void ft9xx_int_print (char *p)
+FTVOID ft9xx_int_print (char *p)
 {
 	sys_enable(sys_device_uart0);
 	gpio_function(FT9XX_UART0_TX, pad_uart0_txd); /* UART0 TXD */
@@ -111,7 +116,36 @@ void ft9xx_int_print (char *p)
 	uart_puts(UART0,p);
 	uart_puts(UART0,"\n");
 }
-void ft9xx_init (void)
+FTVOID ft9xx_int_timer (FTVOID)
+{
+#if defined(DEF_TIMER)
+/* The Timer Prescaler will divide the 100MHz Master clock down to 2kHz */
+#define TIMER_PRESCALER (50000)
+#define TIMER_M_SEC     (100000/TIMER_PRESCALER)
+#define TIMER_SEC       (1000*TIMER_M_SEC)
+#define TIMER_PRI       (17) //why this number? I don't know, copy from sample.
+    /* Enable Timers... */
+    sys_enable(sys_device_timer_wdt);
+    /* Set up the Timer tick to be 0.5 ms... */
+    timer_prescaler(TIMER_PRESCALER);
+    /* Set up Timer A to be triggered 1 second */
+    timer_init(timer_select_a,              /* Device */
+               TIMER_SEC,                   /* Initial Value */
+               timer_direction_down,        /* Count Direction */
+               timer_prescaler_select_on,   /* Prescaler Select */
+               timer_mode_continuous);      /* Timer Mode */
+
+    /* Enable the timers... */
+    timer_enable_interrupt(timer_select_a);
+
+    /* Register the interrupt... */
+    interrupt_attach(interrupt_timers, TIMER_PRI, timerISR);
+
+    /* Start all the timers at the same time... */
+    timer_start(timer_select_a);
+#endif
+}
+FTVOID ft9xx_init (FTVOID)
 {
 	interrupt_enable_globally();
 
@@ -139,9 +173,11 @@ void ft9xx_init (void)
 	gpio_write(FT9XX_ILI9488_CS, 1);
 	gpio_write(FT9XX_SPI_CS_P, 1);
 	gpio_write(FT9XX_ILI9488_DCX, 1);
+
+    ft9xx_int_timer();
 }
 
-void ft9xx_spi_init (unsigned char spi_type, unsigned int spi_div)
+FTVOID ft9xx_spi_init (FTU8 spi_type, FTU32 spi_div)
 {
 	/* limitation check */
 	if (spi_type == 0 || spi_type == 3 || spi_type > 4) {
@@ -204,11 +240,11 @@ void ft9xx_spi_init (unsigned char spi_type, unsigned int spi_div)
 	gpio_write(FT9XX_SPI_MOSI, 1);
 }
 
-void ft9xx_sdc_init (void)
+FTVOID ft9xx_sdc_init (FTVOID)
 {
 #define SDC_TRY_RUN 10
 #define SDC_TRY_WAIT 10
-	unsigned char i = 0;
+	FTU8 i = 0;
 
 	sys_enable(sys_device_sd_card);	
 	sdhost_init();
@@ -254,18 +290,18 @@ void ft9xx_sdc_init (void)
 	return;
 }
 /* a stub function for libfatfs.a */
-unsigned long get_fattime (void)
+FTU64 get_fattime (FTVOID)
 {
 	return 0;
 }
 
-void ft9xx_invaild_tag (const char *dataPath)
+FTVOID ft9xx_invaild_tag (FTC8 *dataPath)
 {
 	uart_puts(UART0,"\ninvalid the tag");
 	f_unlink((const TCHAR*)dataPath);
 }
 
-unsigned char ft9xx_is_tag_vaild (FIL *f_hdl, const char *dPath)
+FTU8 ft9xx_is_tag_vaild (FIL *f_hdl, FTC8 *dPath)
 {
 	if (FR_OK != f_open(f_hdl, (const TCHAR*)dPath, FA_READ)) {
 		uart_puts(UART0,"\ntag invalid");
@@ -275,9 +311,9 @@ unsigned char ft9xx_is_tag_vaild (FIL *f_hdl, const char *dPath)
 	return 1;
 }
 
-void ft9xx_save_cdata (FIL *f_hdl, const char *dataPath, unsigned char *p)
+FTVOID ft9xx_save_cdata (FIL *f_hdl, FTC8 *dataPath, FTU8 *p)
 {
-	unsigned int i;
+	FTU32 i;
 
 	/* TODO: use FA_CREATE_NEW would make it works,
 	   but I just not able to write data to the file
@@ -289,11 +325,11 @@ void ft9xx_save_cdata (FIL *f_hdl, const char *dataPath, unsigned char *p)
 		return;
 	}
 
-	f_write(f_hdl, (void *)p,FT800_CAL_PARA_NUM*4,&i);
+	f_write(f_hdl, (FTVOID *)p,FT800_CAL_PARA_NUM*4,&i);
 	f_close(f_hdl);
 }
 
-void ft9xx_restore_cdata (FIL *f_hdl, const char *dPath, void *p)
+FTVOID ft9xx_restore_cdata (FIL *f_hdl, FTC8 *dPath, FTVOID *p)
 {
 	FTU32 i;
 
@@ -302,7 +338,7 @@ void ft9xx_restore_cdata (FIL *f_hdl, const char *dPath, void *p)
 	f_close(f_hdl);
 }
 
-void ft9xx_vaild_tag (void)
+FTVOID ft9xx_vaild_tag (FTVOID)
 {
 	/* already save it to file, the file is the 'tag' */
 	/* give some time to file system to finish operation */
