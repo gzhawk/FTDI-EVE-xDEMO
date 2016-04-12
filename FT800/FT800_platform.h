@@ -29,9 +29,11 @@
 #define DEMO_WELLING
 #define DEMO_XIZI
 #define DEMO_GRG
+#define DEMO_NJTOYO
  * code for customer: useless
 #define DEMO_LITTLESWAN
 #define DEMO_ALLYTECH
+#define DEMO_ALLY_FONT
 #define DEMO_BSH
 #define DEMO_COOBOT
 #define DEMO_PUZZLE
@@ -45,7 +47,7 @@
 
 #define DEMO_EVEUI
 
-/*-----------------------------------------------------------Demo Related define
+/*-------------------------------------------------Demo Related hardware setting
  * DEF_81X      //when using FT81X, or DEMO run as FT80X 
  * CAP_MULTI    //Cap touch with multiple touch control, or DEMO run as res TCP 
  * CAP_NONMULTI //Cap touch with single touch control, or DEMO run as res TCP 
@@ -53,6 +55,11 @@
  * LCD_HVGA     //320x480 for FTDI ME8XXA_HV35R module
  * LCD_WQVGA    //480x272
  * LCD_WVGA     //800x480 only FT81X have WVGA
+ * EVE_SPI_TYPE //SPI, DSPI or QSPI supported, only FT81X can set to 2 or 4
+ *              //also, need to know if your MCU use what kind of SPI
+
+
+
  */
 /* not support STM32 */
 #if !defined(STM32F4)
@@ -73,6 +80,8 @@
     defined(DEMO_WELLING) || \
     defined(DEMO_COOBOT))
 #define LCD_WQVGA
+#define EVE_SPI_TYPE 1
+#define HW_DEFINED
 #endif
 
 /*-------------------------------------------FT9XX, MSVC platform, None STM32 */
@@ -85,15 +94,27 @@
     defined(DEMO_ALLYTECH) || \
     defined(DEMO_JPGDISP) || \
     defined(DEMO_LITTLESWAN) || \
+    defined(DEMO_NJTOYO) || \
     defined(DEMO_STELIGENT)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
+
+#if (defined(DEMO_NJTOYO) && defined(FT9XXEV))
+#define DEF_TIMER
+#define EVE_SPI_TYPE 4
+#else
+#define EVE_SPI_TYPE 1
+#endif
+
+#define HW_DEFINED
 #endif
 
 #if (defined(DEMO_MIDEA_W))
 #define DEF_81X
 #define LCD_WQVGA
+#define EVE_SPI_TYPE 1
+#define HW_DEFINED
 #endif
 
 #endif
@@ -103,12 +124,17 @@
 
 #if defined(DEMO_XIZI)
 #define LCD_WQVGA
+#define EVE_SPI_TYPE 1
+#define HW_DEFINED
 #endif
 
-#if defined(DEMO_RIPPLE)
+#if defined(DEMO_RIPPLE) || \
+    defined(DEMO_ALLY_FONT)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
+#define EVE_SPI_TYPE 1
+#define HW_DEFINED
 #endif
 #endif
 
@@ -121,6 +147,13 @@
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
+#define EVE_SPI_TYPE 1
+#define HW_DEFINED
+#endif
+
+/*------------------------------------------prevent undefined hardware setting */
+#if !defined(HW_DEFINED)
+#error "define your hardware setting for your DEMO"
 #endif
 
 /*---------------------------------------------------Universal platform define*/
@@ -142,7 +175,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.30.2"
+#define FT800_VER "5.A.32.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -172,14 +205,6 @@
  * you may bypass the calibration phase
  */
 #define CAL_NEEDED
-
-/* 
- * SPI, DSPI or QSPI supported
- * only FT81X can set to 2 or 4
- * also, need to know if your MCU use what kind of SPI
- */
-#define EVE_SPI_TYPE 1
-
 
 /*-------------------------------------------------------------MSVC2010EXPRESS*/
 #ifdef MSVC2010EXPRESS
