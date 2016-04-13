@@ -36,6 +36,8 @@ FTU8 jpeg_d[] = ROOT_PATH"njtoyo\\D00.jpg";
 #define FPS_OFFSET_Y     0
 #define FPS_OFFSET_X     80
 
+#define DESCRIPTION_H    20
+
 bmpHDR_st jpeg_bmp[4] = {
     {(FTC8 *)jpeg_a,0,0,RGB565,BMPSIZE,0,320,240},
     {(FTC8 *)jpeg_b,0,0,RGB565,BMPSIZE,0,320,240},
@@ -117,7 +119,9 @@ void timerISR(void)
     }
 }
 #endif
-FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
+FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,
+                               FTU32 disp_addr,FTU32 opt,FTU32 resHDL, 
+                               FTU32 file_len)
 {
 	FTU32 mfifo_rd, mfifo_wr;
 
@@ -152,7 +156,8 @@ FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_add
 	return file_len;
 }
 
-FTINDEF FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoSize)
+FTINDEF FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, 
+                          FTU32 fifoAddr, FTU32 fifoSize)
 {
 	FTU32 resHDL, Len;
 
@@ -169,10 +174,6 @@ FTINDEF FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifo
 		return 0;
 	}
 
-    /*
-     * Command Buffer: |---------------not used for Image file buffer--------------|
-     * RAMG          : |---***display area***---***media fifo JPEG file data***---|
-     */
     mfifoImageWrite(fifoAddr,fifoSize,ramgAddr,OPT_MEDIAFIFO,resHDL,Len);
 
 	appResClose(resHDL);
@@ -204,11 +205,10 @@ FTU8 dump4jpeg (FTVOID)
 {
     FTU32 len,i;
 
-    pressTHENrelease();
-
     for (i = 0; i < 4; i++) {
         if (jpeg_play_list[i].play) {
-            len = ImageToRamG((FTU8 *)jpeg_bmp[i].path,BMPADDR + i*BMPSIZE,FIFOADDR,FIFOSIZE);
+            len = ImageToRamG((FTU8 *)jpeg_bmp[i].path,
+                              BMPADDR + i*BMPSIZE,FIFOADDR,FIFOSIZE);
             if (len == 0) {
                 DBGPRINT;
                 return 1;
@@ -243,6 +243,31 @@ FTU32 Code_fixed (FTVOID)
     HAL_CmdBufIn(END());
 
     HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
+
+#if defined(DEF_TIMER)
+    CoCmd_TEXT(320,0,21,0,"Touch the JPEG");
+    CoCmd_TEXT(320,DESCRIPTION_H,21,0,"trigger start/stop");
+    CoCmd_TEXT(320,3*DESCRIPTION_H,21,0,"Single JPEG run speed:");
+    CoCmd_TEXT(320,4*DESCRIPTION_H,21,0,"A > B > C > D");
+    CoCmd_TEXT(320,5*DESCRIPTION_H,21,0,"Reason: slow file system.");
+    CoCmd_TEXT(320,6*DESCRIPTION_H,21,0,"better file system or file");
+    CoCmd_TEXT(320,7*DESCRIPTION_H,21,0,"seeking method would");
+    CoCmd_TEXT(320,8*DESCRIPTION_H,21,0,"have better speed,");
+    CoCmd_TEXT(320,9*DESCRIPTION_H,21,0,"not EVE processing slow.");
+    CoCmd_TEXT(320,11*DESCRIPTION_H,21,0,"So stop others. only");
+    CoCmd_TEXT(320,12*DESCRIPTION_H,21,0,"check the A FPS");
+    CoCmd_TEXT(320,13*DESCRIPTION_H,21,0,"to see a roughly speed");
+    if (EVE_SPI_TYPE == 4) {
+        CoCmd_TEXT(320,15*DESCRIPTION_H,21,0,"SPI: Quad");
+    } else if (EVE_SPI_TYPE == 2) {
+        CoCmd_TEXT(320,15*DESCRIPTION_H,21,0,"SPI: Dual");
+    } else {
+        CoCmd_TEXT(320,15*DESCRIPTION_H,21,0,"SPI: Single");
+    }
+    CoCmd_TEXT(320,16*DESCRIPTION_H,21,0,"Space left in RAM_G: (K)");
+    CoCmd_NUMBER(320,17*DESCRIPTION_H,21,0,EVE_C_MAXSIZE/1024);
+    CoCmd_TEXT(320,18*DESCRIPTION_H,21,0,"Codes num in RAM_G:");
+#endif
     HAL_BufToReg(RAM_CMD,0);
 
     return HAL_Read32(REG_CMD_DL);
@@ -264,6 +289,7 @@ FTVOID Code_realtime (FTU32 start_addr)
         CoCmd_NUMBER(jpeg_play_list[i].pic.X+FPS_OFFSET_X,
                 jpeg_play_list[i].pic.Y,25,
                 0,frame_rate[i]);
+        CoCmd_NUMBER(320,19*DESCRIPTION_H,21,0,start_addr);
 #endif
     }
     HAL_CmdBufIn(DISPLAY());
@@ -303,6 +329,8 @@ FTVOID disp4jpeg (FTU32 para)
     }
 
     Code_realtime(preDLaddr);
+
+    pressTHENrelease();
 
     appGP.appIndex = 1;
 }

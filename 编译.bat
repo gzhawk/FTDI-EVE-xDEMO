@@ -68,7 +68,6 @@ pause
 cd img
 python onewire.py loadflash xdemo.bin
 cd ..\..\..
-pause
 goto SkipRunme
 
 :Arduino
