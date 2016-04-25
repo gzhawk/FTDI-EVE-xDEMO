@@ -1017,13 +1017,8 @@ FTVOID HAL_FT800_BootupDisp ( FTU32 count )
             CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE*2,
                     CAL_FONT,OPT_CENTERX,"system hange due to memory limit!");
         } else {
-#if defined(CAL_NEEDED)
             CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE*2,
                     CAL_FONT,OPT_CENTERX,"press and hold to force in calibration");
-#else
-            CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE*2,
-                    CAL_FONT,OPT_CENTERX,"no calibration in this demo");
-#endif
             CoCmd_NUMBER(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE,
                     CAL_FONT,OPT_CENTERX,count);
         }
@@ -1101,8 +1096,12 @@ FTVOID HAL_FT800_LCDConfig ( FTVOID )
            sometime it may need to set to larger number (2,3)
            some smaller number (set to 1), may case under run issue 
            while too much commands needs to be executed*/
-        928,88,0,48, 
-        525,32,0,3, 
+        /* 
+        this setting seems better than right side
+        in real pratice of AllyTech project
+         */
+        1058,40,0,20,//928,88,0,48, 
+        525,25,0,10,//525,32,0,3, 
         2,0,1,0,1};
 #elif defined(LCD_QVGA)
         408,70,0,10, 

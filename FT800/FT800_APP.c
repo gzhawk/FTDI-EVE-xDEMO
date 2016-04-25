@@ -26,7 +26,6 @@ wrFuncPara fPara = {0};
 FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
 #endif
 
-#if defined(CAL_NEEDED)
 FTINDEF appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
 {
     FTU32 ret_addr;
@@ -109,11 +108,9 @@ FTINDEF appRet_en appCalForce (FTC8 *dataPath)
     }
     return APP_OK;
 }
-#endif
 
 FTINDEF appRet_en appCal (FTU8 force, FTC8 *dPath)
 {
-#if defined(CAL_NEEDED)
     FTU32 CData[FT800_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
@@ -157,7 +154,6 @@ FTINDEF appRet_en appCal (FTU8 force, FTC8 *dPath)
         i++;
         reg += FTU32_LEN;
     }
-#endif
     return APP_OK;
 }
 
@@ -172,6 +168,7 @@ appRet_en appWaitCal (FTVOID)
         ret = appCal(i,CDATA_PATH);
     } while (ret != APP_OK);
 
+#if defined(CAL_NEEDED)
     /* wait for a while, 
      * let user decide if need to force calibration
      * or see some debug information */
@@ -196,7 +193,7 @@ appRet_en appWaitCal (FTVOID)
             ret = appCal(i,CDATA_PATH);
         } while (ret != APP_OK);
     }
-
+#endif
     return APP_OK; 
 }
 FTU32 appGetLinestride(bmpHDR_st bmpHD)
