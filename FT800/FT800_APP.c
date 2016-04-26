@@ -159,6 +159,7 @@ FTINDEF appRet_en appCal (FTU8 force, FTC8 *dPath)
 
 appRet_en appWaitCal (FTVOID)
 {
+#if defined(CAL_NEEDED)
     FTU8 i = 0;
     appRet_en ret;
 
@@ -168,7 +169,6 @@ appRet_en appWaitCal (FTVOID)
         ret = appCal(i,CDATA_PATH);
     } while (ret != APP_OK);
 
-#if defined(CAL_NEEDED)
     /* wait for a while, 
      * let user decide if need to force calibration
      * or see some debug information */
