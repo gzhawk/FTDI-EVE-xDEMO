@@ -1153,6 +1153,19 @@ FTVOID HAL_FT800_LCDConfig ( FTVOID )
     /* start to display */
     HAL_Write8(REG_PCLK,lcd.PCLK);
 
+    /* set the backlight to highest */
+    HAL_Write8(REG_PWM_DUTY,128);
+
+    /* set the RGB output bit */
+    /* 
+        R:8,7,6
+        G:5,4,3
+        B:2,1,0
+        default: 6x6x6
+        0: 8x8x8
+    HAL_Write32(REG_OUTBITS,0);
+     */
+
     /* mute sound to avoid pop sound */
     HAL_Write16(REG_SOUND,0x0060);
     HAL_Write8(REG_PLAY,0x01);

@@ -80,6 +80,8 @@ app_para_t appGP = {0};
 #include "DEMO_allytech.h"
 #elif defined(DEMO_ALLY_FONT)
 #include "DEMO_allytech_font.h"
+#elif defined(DEMO_ALLY_ROTATE)
+#include "DEMO_allytech_rotate.h"
 #elif defined(DEMO_NJTOYO)
 #include "DEMO_njtoyo.h"
 #else

@@ -34,6 +34,7 @@
 #define DEMO_LITTLESWAN
 #define DEMO_ALLYTECH
 #define DEMO_ALLY_FONT
+#define DEMO_ALLY_ROTATE
 #define DEMO_BSH
 #define DEMO_COOBOT
 #define DEMO_PUZZLE
@@ -95,6 +96,7 @@
     defined(DEMO_JPGDISP) || \
     defined(DEMO_LITTLESWAN) || \
     defined(DEMO_NJTOYO) || \
+    defined(DEMO_ALLY_ROTATE) || \
     defined(DEMO_STELIGENT)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
@@ -175,7 +177,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.32.3"
+#define FT800_VER "5.A.33.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
