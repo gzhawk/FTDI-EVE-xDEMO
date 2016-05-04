@@ -959,8 +959,12 @@ FTVOID HAL_FT800_SetSPI (FTU32 type)
 #define SYS_HANG (0)
 FTVOID HAL_FT800_BootupDisp ( FTU32 count )
 {
-    FTPRINT("\r\n");
-    FTPRINT("System show info");
+    static FTU8 init = 0;
+    if (init == 0) {
+        FTPRINT("\r\n");
+        FTPRINT("System show info");
+        init = 1;
+    }
     do {
         HAL_CmdBufIn(CMD_DLSTART);
         HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));

@@ -4,7 +4,71 @@
 #if defined(DEF_TIMER)
 extern FTVOID timerISR(FTVOID);
 #endif
-
+FTVOID ft9xx_fatfs_dbg_info(FRESULT ret)
+{
+	switch (ret) {
+        case FR_OK:
+            uart_puts(UART0,"OK");
+            break;
+        case FR_DISK_ERR:
+            uart_puts(UART0,"disk error");
+            break;
+        case FR_INT_ERR:
+            uart_puts(UART0,"interrupt error");
+            break;
+        case FR_INVALID_OBJECT:
+            uart_puts(UART0,"invalid object");
+            break;
+        case FR_TIMEOUT:
+            uart_puts(UART0,"timeout");
+            break;
+        case FR_NO_FILE:				/* (4) Could not find the file */
+            uart_puts(UART0,"no file");
+            break;
+        case FR_NO_PATH:				/* (5) Could not find the path */
+            uart_puts(UART0,"no path");
+            break;
+        case FR_INVALID_NAME:		/* (6) The path name format is invalid */
+            uart_puts(UART0,"invalid name");
+            break;
+        case FR_DENIED:				/* (7) Access denied due to prohibited access or directory full */
+            uart_puts(UART0,"denied");
+            break;
+        case FR_EXIST:				/* (8) Access denied due to prohibited access */
+            uart_puts(UART0,"exist");
+            break;
+        case FR_WRITE_PROTECTED:		/* (10) The physical drive is write protected */
+            uart_puts(UART0,"protected");
+            break;
+        case FR_INVALID_DRIVE:		/* (11) The logical drive number is invalid */
+            uart_puts(UART0,"invalid drive");
+            break;
+        case FR_NOT_ENABLED:			/* (12) The volume has no work area */
+            uart_puts(UART0,"not enabled");
+            break;
+        case FR_NO_FILESYSTEM:		/* (13) There is no valid FAT volume */
+            uart_puts(UART0,"no filesystem");
+            break;
+        case FR_MKFS_ABORTED:		/* (14) The f_mkfs() aborted due to any parameter error */
+            uart_puts(UART0,"mkfs aborted");
+            break;
+        case FR_LOCKED:				/* (16) The operation is rejected according to the file sharing policy */
+            uart_puts(UART0,"locked");
+            break;
+        case FR_NOT_ENOUGH_CORE:		/* (17) LFN working buffer could not be allocated */
+            uart_puts(UART0,"not enough core");
+            break;
+        case FR_TOO_MANY_OPEN_FILES:	/* (18) Number of open files > _FS_SHARE */
+            uart_puts(UART0,"too many open files");
+            break;
+        case FR_INVALID_PARAMETER:	/* (19) Given parameter is invalid */
+            uart_puts(UART0,"invalid parameter");
+            break;
+        default:
+            uart_puts(UART0,"unknown error");
+            break;
+    }
+}
 FTVOID ft9xx_gpio_test (FTU8 flag)
 {
 	if (flag) {
@@ -297,35 +361,49 @@ FTU64 get_fattime (FTVOID)
 
 FTVOID ft9xx_invaild_tag (FTC8 *dataPath)
 {
-	uart_puts(UART0,"\ninvalid the tag");
-	f_unlink((const TCHAR*)dataPath);
+	uart_puts(UART0,"\ninvalid the tag...");
+    ft9xx_fatfs_dbg_info(f_unlink((const TCHAR*)dataPath));
 }
 
 FTU8 ft9xx_is_tag_vaild (FIL *f_hdl, FTC8 *dPath)
 {
+    FTU8 tag[] = CALD_TAG_DATA, p[CALD_TAG_LEN];
+    FTU32 i;
+
 	if (FR_OK != f_open(f_hdl, (const TCHAR*)dPath, FA_READ)) {
-		uart_puts(UART0,"\ntag invalid");
+		uart_puts(UART0,"\nno c data file");
 		return 0;
 	}
-	f_close(f_hdl);
-	return 1;
+
+    f_read(f_hdl, p,4,&i);
+
+	uart_puts(UART0,"\nis the tag vaild...");
+    if (memcmp(tag,p,CALD_TAG_LEN)) {
+        uart_puts(UART0,"invaild");
+        f_close(f_hdl);
+        return 0;
+    } else {
+        uart_puts(UART0,"vaild");
+        f_close(f_hdl);
+        return 1;
+    }
 }
 
 FTVOID ft9xx_save_cdata (FIL *f_hdl, FTC8 *dataPath, FTU8 *p)
 {
 	FTU32 i;
+    FTU8 tag[] = CALD_TAG_DATA;
 
-	/* TODO: use FA_CREATE_NEW would make it works,
-	   but I just not able to write data to the file
-	   so just use FA_WRITE make it return error not create file*/
-	if (FR_OK != f_open(f_hdl, (const TCHAR*)dataPath, FA_WRITE)) {
+	if (FR_OK != f_open(f_hdl, (const TCHAR*)dataPath, FA_WRITE | FA_CREATE_NEW)) {
 		uart_puts(UART0,"\nfail to open c data file");
-		/* don't stop the bootup, 
-		   if only can not open file */
 		return;
 	}
+    
+    uart_puts(UART0,"\nwrite tag to file...");
+    ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)tag,4,&i));
+    uart_puts(UART0,"\nwrite c data to file...");
+    ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)p,FT800_CAL_PARA_NUM*4,&i));
 
-	f_write(f_hdl, (FTVOID *)p,FT800_CAL_PARA_NUM*4,&i);
 	f_close(f_hdl);
 }
 
@@ -333,14 +411,16 @@ FTVOID ft9xx_restore_cdata (FIL *f_hdl, FTC8 *dPath, FTVOID *p)
 {
 	FTU32 i;
 
+    uart_puts(UART0,"\nrestore c data from file...");
 	f_open(f_hdl, (const TCHAR*)dPath, FA_READ);
-	f_read(f_hdl, p,FT800_CAL_PARA_NUM*4,&i);
+    f_lseek(f_hdl, CALD_TAG_LEN);
+    ft9xx_fatfs_dbg_info(f_read(f_hdl, p,FT800_CAL_PARA_NUM*4,&i));
 	f_close(f_hdl);
 }
 
 FTVOID ft9xx_vaild_tag (FTVOID)
 {
-	/* already save it to file, the file is the 'tag' */
+	/* already save tag to file together with c data */
 	/* give some time to file system to finish operation */
 	delayms(100);
 }
