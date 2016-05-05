@@ -102,7 +102,9 @@
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 
-#if (defined(DEMO_NJTOYO) && defined(FT9XXEV))
+#if ((defined(DEMO_NJTOYO) || \
+      defined(DEMO_AVI)) && \
+      defined(FT9XXEV))
 #define DEF_TIMER
 #define EVE_SPI_TYPE 4
 #else
@@ -177,7 +179,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.33.2"
+#define FT800_VER "5.A.33.3"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
