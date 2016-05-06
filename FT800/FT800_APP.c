@@ -10,7 +10,7 @@
 #include "FT800_APP.h"
 
 #define FONT_CAL 27
-#define FORCE_WAIT_COUNT 5
+#define FORCE_WAIT_COUNT 3
 #define FORCE_WAIT_TIME 500
 
 typedef struct wrFuncPara_ {
