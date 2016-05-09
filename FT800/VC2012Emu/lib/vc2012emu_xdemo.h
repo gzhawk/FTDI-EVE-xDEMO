@@ -56,33 +56,31 @@ typedef uint32_t argb8888;
 
 #define FTRANDOM(M) (rand()%(M))
 
-/* TODO: at this point I fixed use FT8XXEMU_EmulatorFT811 to the emulator, may improve it later */
 #ifdef DEF_81X
-#define FTEMU int main(FT32 argc,FT8 *argv[]) \
-              { \
-				  FT8XXEMU_EmulatorParameters params; \
-				  FT8XXEMU_defaults(FT8XXEMU_VERSION_API, &params, FT8XXEMU_EmulatorFT810); \
-				  params.Flags &= (~FT8XXEMU_EmulatorEnableDynamicDegrade & \
-						           ~FT8XXEMU_EmulatorEnableRegPwmDutyEmulation); \
-				  params.Setup = setup; \
-				  params.Loop = loop; \
-				  FT8XXEMU_run(FT8XXEMU_VERSION_API, &params); \
-				  return 0; \
-			  }
+#if defined(DEF_CAP_NONMULTI) || defined(DEF_CAP_MULTI)
+#define EVEMODE FT8XXEMU_EmulatorFT811
 #else
-#define FTEMU int main(FT32 argc,FT8 *argv[]) \
-              { \
-				  FT8XXEMU_EmulatorParameters params; \
-				  FT8XXEMU_defaults(FT8XXEMU_VERSION_API, &params, FT8XXEMU_EmulatorFT800); \
-				  params.Flags &= (~FT8XXEMU_EmulatorEnableDynamicDegrade & \
-						           ~FT8XXEMU_EmulatorEnableRegPwmDutyEmulation); \
-				  params.Setup = setup; \
-				  params.Loop = loop; \
-				  FT8XXEMU_run(FT8XXEMU_VERSION_API, &params); \
-				  return 0; \
-			  }
+#define EVEMODE FT8XXEMU_EmulatorFT810
+#endif
+#else
+#if defined(DEF_CAP_NONMULTI) || defined(DEF_CAP_MULTI)
+#define EVEMODE FT8XXEMU_EmulatorFT801
+#else
+#define EVEMODE FT8XXEMU_EmulatorFT800
+#endif
 #endif
 
+#define FTEMU int main(FT32 argc,FT8 *argv[]) \
+              { \
+				  FT8XXEMU_EmulatorParameters params; \
+				  FT8XXEMU_defaults(FT8XXEMU_VERSION_API, &params, EVEMODE); \
+				  params.Flags &= (~FT8XXEMU_EmulatorEnableDynamicDegrade & \
+						           ~FT8XXEMU_EmulatorEnableRegPwmDutyEmulation); \
+				  params.Setup = setup; \
+				  params.Loop = loop; \
+				  FT8XXEMU_run(FT8XXEMU_VERSION_API, &params); \
+				  return 0; \
+			  }
 #define FTRES FILE*
 
 #define FTIOCNTRL

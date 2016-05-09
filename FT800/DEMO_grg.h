@@ -689,7 +689,6 @@ static FTVOID walk (datetime_st *pT, FTU32 init)
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
 		iTick = (FTU32)GetTickCount();
 #elif defined(STM32F4)
-		/* TODO: just to make the compile works */
 		iTick = 0;
 #else
  		iTick = (FTU32)millis();
