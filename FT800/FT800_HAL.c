@@ -563,10 +563,10 @@ FTU32 HAL_EVELoopMemWr (FTU32 pDes, FTU32 desNow, FTU32 desLen, FTU8 * inSrc, FT
     FTU32 l;
 
     if (inLen >= desLen) {
-        DBGPRINT;
+        FTPRINT("\neve loop wr: inLen >= desLen");
         return desNow;
     } else if (inLen == 0) {
-        DBGPRINT;
+        FTPRINT("\neve loop wr: inLen == 0");
         return desNow;
     }
 
@@ -601,14 +601,14 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
 {
     if (mcuCMDBuf) {
         if (mcuCMDBufSize <= mcuCMDindex) {
-            DBGPRINT;
+            FTPRINT("\nmcu cmd buf: mcuCMDBufSize <= mcuCMDindex");
             return;
         }
         /* don't need to check it every time it entry
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_CMD;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD) {
-            DBGPRINT;
+            FTPRINT("\nmcu cmd buf: mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD");
             return;
         }
         */
@@ -688,14 +688,14 @@ FTVOID HAL_DlpBufIn (FTU32 Dlp)
 {
     if (mcuCMDBuf) {
         if (EVE_DLP_SIZE <= (mcuDLindex + mcuCMDindex)) {
-            DBGPRINT;
+            FTPRINT("\nmcu dlp buf: EVE_DLP_SIZE <= (mcuDLindex + mcuCMDindex)");
             return;
         }
         /* don't need to check it every time it entry 
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_DL;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL) {
-            DBGPRINT;
+            FTPRINT("\nmcu dlp buf: mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL");
             return;
         }
         */
@@ -728,7 +728,7 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum)
     if (reg == RAM_CMD) {
         if (mcuCMDBuf) {
             if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != reg) {
-                DBGPRINT;
+                FTPRINT("\nmcu to eve: cmd tag invalid");
                 return;
             }
 
@@ -741,7 +741,7 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum)
     } else {
         if (mcuCMDBuf) {
             if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != reg) {
-                DBGPRINT;
+                FTPRINT("\nmcu to eve: dlp tag invalid");
                 return;
             }
 

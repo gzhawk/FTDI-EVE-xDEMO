@@ -260,11 +260,12 @@ FTVOID resWrBuf (FTU32 para)
     FTU32 i,l;
     FTU8 p[SDC_SECTOR_SIZE] = {0};
 
-    /* only accept increasly read
-     * make sure not over read the previous reading */
+    /* only accept forward read
+     * make sure not backward over read 
+     * the previous finished read info */
     if (wfp->res.offset > wfp->Src) {
         wfp->len = 0;
-        DBGPRINT;
+        FTPRINT("\nresWrBuf: backward reading");
         return;
     }
 
@@ -301,7 +302,7 @@ FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
     p = (FTU8 *)malloc(block);
     if (p == 0) {
-        DBGPRINT;
+        FTPRINT("\neve mem: no memory");
         wfp->len = 0;
         return;
     }
@@ -314,7 +315,7 @@ FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
     /* only accept increasly read
      * make sure not over read the previous reading */
     if (wfp->res.offset > wfp->Src) {
-        DBGPRINT;
+        FTPRINT("\neve mem: offset error");
         wfp->len = 0;
         return;
     }
@@ -420,14 +421,14 @@ FTU32 appResOpen (FTU8 *path)
 
     if(NULL == path)
     {  
-        DBGPRINT;
+        FTPRINT("\nappResOpen: path null");
         return 0;
     }
 
     pFile = fopen((FTC8 *)path,"rb");
     if(NULL == pFile)
     {  
-        DBGPRINT;
+        FTPRINT("\nappResOpen: file open error");
         return 0;
     }
 
@@ -442,7 +443,7 @@ FTU32 appResOpen (FTU8 *path)
 #elif defined(FT9XXEV)
     wrFuncPara *pwfp = 0;
     if (FR_OK != f_open(&FT9xxFile, (const TCHAR*)path, FA_READ)) {
-        DBGPRINT;
+        FTPRINT("\nappResOpen: file open error");
         return 0;
     }
     pwfp = &fPara;
@@ -456,7 +457,7 @@ FTU32 appResOpen (FTU8 *path)
     Reader sdC;
 
     if (0 == sdC.openfile((FT8 *)path)) {
-        DBGPRINT;
+        FTPRINT("\nappResOpen: file open error");
         return 0;
     }
 
@@ -536,14 +537,14 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 
     resHDL = appResOpen((FTU8 *)path);
     if (resHDL == 0) {
-        DBGPRINT;
+        FTPRINT("\nappFileToRamG: file open error");
         return 0;
     }
 
     Len = appResSize(resHDL);
     if (chkExceed && (FT800_RAMG_SIZE < inAddr + Len)) {
         appResClose(resHDL);
-        DBGPRINT;
+        FTPRINT("\nappFileToRamG: FT800_RAMG_SIZE < inAddr + Len");
         return 0;
     }
 
@@ -574,7 +575,7 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
                 pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
             }
         } else {
-            DBGPRINT;
+            FTPRINT("\nappLoadBmp: Len == 0");
             return APP_ERR_LEN;
         }
         src += pbmpHD[i].len;
@@ -590,7 +591,7 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
                     pbmpHD[i].len_lut = 1024;
                 }
             } else {
-                DBGPRINT;
+                FTPRINT("\nappLoadBmp: Lut Len == 0");
                 return APP_ERR_LEN;
             }
 
@@ -606,7 +607,7 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
                     pbmpHD[i].len_lut = 1024;
                 }
             } else {
-                DBGPRINT;
+                FTPRINT("\nappLoadBmp: Lut Len == 0");
                 return APP_ERR_LEN;
             }    
         }
@@ -658,7 +659,7 @@ FTVOID FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
     if (nums > FT800_BMP_EXT_HANDLE || bmpHdl >= FT800_BMP_EXT_HANDLE) {
-        DBGPRINT;
+        FTPRINT("\nappBmpToRamG: items exceed");
         return APP_ERR_HDL_EXC;
     }
 

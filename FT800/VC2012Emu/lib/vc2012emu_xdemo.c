@@ -27,7 +27,7 @@ FTVOID vc2012emu_save_cdata (FTC8 *dataPath, FTU8 *p)
 	
 	pF = fopen(dataPath,"wb");
 	if(NULL == pF) {
-		DBGPRINT;
+		FTPRINT("\nvc2012emu_save_cdata: fail to open file");
 		/* don't stop the bootup, 
 		   if only can not open file */
 		return;

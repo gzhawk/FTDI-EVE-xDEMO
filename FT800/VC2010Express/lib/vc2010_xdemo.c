@@ -15,19 +15,19 @@ FTVOID vc2010_spi_init(FTVOID)
 
 	SPI_GetNumChannels(&i);
 	while (i == 0) {
-		DBGPRINT;
+		FTPRINT("\nvc2010_spi_init: no channel");
 		/* Endless loop for error*/;	
 	}
 	
 	i = SPI_GetChannelInfo(0,&devList);
 	while (FT_OK != i) {
-		DBGPRINT;
+		FTPRINT("\nvc2010_spi_init: no channel info");
 		/* Endless loop for error*/;	
 	}
 
 	i = SPI_OpenChannel(0,&ftHandle);
 	while (FT_OK != i) {
-		DBGPRINT;
+		FTPRINT("\nvc2010_spi_init: fail to open channel");
 		/* Endless loop for error*/;	
 	}
 	
@@ -43,7 +43,7 @@ FTVOID vc2010_spi_init(FTVOID)
 
 	i = SPI_InitChannel(ftHandle,&cConf);
 	while (FT_OK != i) {
-		DBGPRINT;
+		FTPRINT("\nvc2010_spi_init: fail to init channel");
 		/* Endless loop for error*/;	
 	}
 }
@@ -71,7 +71,7 @@ FTVOID vc2010_save_cdata (FTC8 *dataPath, FTU8 *p)
 	
 	pF = fopen(dataPath,"wb");
 	if(NULL == pF) {
-		DBGPRINT;
+		FTPRINT("\nvc2010_save_cdata: fail to open file");
 		/* don't stop the bootup, 
 		   if only can not open file */
 		return;
