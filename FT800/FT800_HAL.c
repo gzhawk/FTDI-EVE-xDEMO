@@ -631,6 +631,16 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
  * It's not smart at all
  * you may refer to SampleApp for better solution
  * I'll leave this stupid routine to show how fool I am :-)
+ * one of the reason I'm doing this is:
+ * there are two loop buffer needs to be handled
+ * 1. mcu cmd buf
+ * 2. eve cmd buf
+ * both of them got and 'loop free space' need to be consider
+ * before doing any continous filling
+ * and for string, string become another 'buffer' space when
+ * continous filling into what ever mcu buffer or eve buffer
+ * to prevent too many 'if there are still free space ahead'
+ * judgement in program, I use make the action to 4 byte a shot
  */
 FTVOID HAL_CmdBufInStr (FTC8 *pstr)
 {
