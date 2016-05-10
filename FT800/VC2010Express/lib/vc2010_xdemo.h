@@ -21,7 +21,6 @@ typedef unsigned int   FTU32;
 #define FLASHU8 FTU8
 #define FLASHRD8(a) (*(FTU8 *)(a))
 
-#define FTPRINT        printf
 #define FTDELAY(mS)    Sleep(mS)
 #define FTEND          return 0
 #define ROOT_PATH "..\\..\\res\\"
@@ -32,12 +31,15 @@ typedef unsigned int   FTU32;
 #define FTINDEF static
 
 #ifdef FT800_PRINT
-#define DBGPRINT FTPRINT("\r\nError %s:%d",__FUNCTION__,__LINE__)
-#define FTPREINIT FTPRINT("\r\nVer: %s",FT800_VER)
+#define FTPRINT     printf
+#define DBGPRINT    printf("\r\nError %s:%d",__FUNCTION__,__LINE__)
+#define FTPREINIT   printf("\r\nVer: %s",FT800_VER)
 #else
+#define FTPRINT     vc2010_dumy_print
 #define DBGPRINT
-#define FTPREINIT 
+#define FTPREINIT
 #endif
+
 
 #define FTRANDOM(M) (rand()%(M))
 
@@ -69,4 +71,4 @@ FTU8 vc2010_is_tag_vaild (FTC8 *dataPath);
 FTVOID vc2010_save_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2010_restore_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2010_vaild_tag (FTVOID);
-
+FTVOID vc2010_dumy_print(char *p);

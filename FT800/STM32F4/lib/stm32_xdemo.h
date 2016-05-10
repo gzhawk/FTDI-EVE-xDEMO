@@ -34,7 +34,7 @@ typedef uint32_t     FTU32;
 #define FTPRINT   stm32f4Print 
 #define DBGPRINT  stm32f4Dbg()
 #else
-#define FTPRINT
+#define FTPRINT stm32_dumy_print
 #define DBGPRINT
 #endif
 #define FTPREINIT stm32f4Init()
@@ -62,7 +62,7 @@ typedef uint32_t     FTU32;
 #define FT800_CS_LOW (FT800_SPI_GPIO->BSRRH |= FT800_SPI_CS)
 
 extern unsigned int FILE_SADDR;
-
+void stm32_dumy_print(char * p);
 void stm32f4Print(char * p);
 void stm32f4Init(void);
 void stm32f4Delay(unsigned int nTime);

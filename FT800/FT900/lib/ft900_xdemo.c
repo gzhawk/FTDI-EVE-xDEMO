@@ -4,68 +4,72 @@
 #if defined(DEF_TIMER)
 extern FTVOID timerISR(FTVOID);
 #endif
+FTVOID ft9xx_dumy_print (char *p)
+{
+/* do nothing for dumy print */
+}
 FTVOID ft9xx_fatfs_dbg_info(FRESULT ret)
 {
 	switch (ret) {
         case FR_OK:
-            uart_puts(UART0,"OK");
+            FTPRINT("OK");
             break;
         case FR_DISK_ERR:
-            uart_puts(UART0,"disk error");
+            FTPRINT("disk error");
             break;
         case FR_INT_ERR:
-            uart_puts(UART0,"interrupt error");
+            FTPRINT("interrupt error");
             break;
         case FR_INVALID_OBJECT:
-            uart_puts(UART0,"invalid object");
+            FTPRINT("invalid object");
             break;
         case FR_TIMEOUT:
-            uart_puts(UART0,"timeout");
+            FTPRINT("timeout");
             break;
         case FR_NO_FILE:				/* (4) Could not find the file */
-            uart_puts(UART0,"no file");
+            FTPRINT("no file");
             break;
         case FR_NO_PATH:				/* (5) Could not find the path */
-            uart_puts(UART0,"no path");
+            FTPRINT("no path");
             break;
         case FR_INVALID_NAME:		/* (6) The path name format is invalid */
-            uart_puts(UART0,"invalid name");
+            FTPRINT("invalid name");
             break;
         case FR_DENIED:				/* (7) Access denied due to prohibited access or directory full */
-            uart_puts(UART0,"denied");
+            FTPRINT("denied");
             break;
         case FR_EXIST:				/* (8) Access denied due to prohibited access */
-            uart_puts(UART0,"exist");
+            FTPRINT("exist");
             break;
         case FR_WRITE_PROTECTED:		/* (10) The physical drive is write protected */
-            uart_puts(UART0,"protected");
+            FTPRINT("protected");
             break;
         case FR_INVALID_DRIVE:		/* (11) The logical drive number is invalid */
-            uart_puts(UART0,"invalid drive");
+            FTPRINT("invalid drive");
             break;
         case FR_NOT_ENABLED:			/* (12) The volume has no work area */
-            uart_puts(UART0,"not enabled");
+            FTPRINT("not enabled");
             break;
         case FR_NO_FILESYSTEM:		/* (13) There is no valid FAT volume */
-            uart_puts(UART0,"no filesystem");
+            FTPRINT("no filesystem");
             break;
         case FR_MKFS_ABORTED:		/* (14) The f_mkfs() aborted due to any parameter error */
-            uart_puts(UART0,"mkfs aborted");
+            FTPRINT("mkfs aborted");
             break;
         case FR_LOCKED:				/* (16) The operation is rejected according to the file sharing policy */
-            uart_puts(UART0,"locked");
+            FTPRINT("locked");
             break;
         case FR_NOT_ENOUGH_CORE:		/* (17) LFN working buffer could not be allocated */
-            uart_puts(UART0,"not enough core");
+            FTPRINT("not enough core");
             break;
         case FR_TOO_MANY_OPEN_FILES:	/* (18) Number of open files > _FS_SHARE */
-            uart_puts(UART0,"too many open files");
+            FTPRINT("too many open files");
             break;
         case FR_INVALID_PARAMETER:	/* (19) Given parameter is invalid */
-            uart_puts(UART0,"invalid parameter");
+            FTPRINT("invalid parameter");
             break;
         default:
-            uart_puts(UART0,"unknown error");
+            FTPRINT("unknown error");
             break;
     }
 }
@@ -176,9 +180,8 @@ FTVOID ft9xx_int_print (char *p)
 			uart_parity_none,         /* Parity */
 			uart_stop_bits_1);        /* No. Stop Bits */
 
-	uart_puts(UART0,"\n");
-	uart_puts(UART0,p);
-	uart_puts(UART0,"\n");
+	FTPRINT("\n");
+	FTPRINT(p);
 }
 FTVOID ft9xx_int_timer (FTVOID)
 {
@@ -245,12 +248,10 @@ FTVOID ft9xx_spi_init (FTU8 spi_type, FTU32 spi_div)
 {
 	/* limitation check */
 	if (spi_type == 0 || spi_type == 3 || spi_type > 4) {
-		uart_puts(UART0,"\n");
-		uart_puts(UART0,"SPI type error");
+		FTPRINT("\nSPI type error");
 		return;	
 	} else if (spi_type == 4 && spi_div < 8) {
-		uart_puts(UART0,"\n");
-		uart_puts(UART0,"QSPI div too small");
+		FTPRINT("\nQSPI div too small");
 		return;	
 	}
 
@@ -332,23 +333,23 @@ FTVOID ft9xx_sdc_init (FTVOID)
 
 	while ((SDC_TRY_RUN != ++i) && (sdhost_card_detect() != SDHOST_CARD_INSERTED)) {
 		delayms(SDC_TRY_WAIT);
-		uart_puts(UART0,".");
+		FTPRINT(".");
 	}
 
 	if(i < SDC_TRY_RUN) {
 		if (f_mount(&FT9xxFatFs, "", 0) != FR_OK) {
-			uart_puts(UART0,"\nMount Disk Fail");
+			FTPRINT("\nMount Disk Fail");
 		} else {
 			/* this lib seems not set the fs_type 
 			   even it successful mounted */
 			if (FT9xxFatFs.fs_type) { 
-				uart_puts(UART0,"\nMount Disk Success");
+				FTPRINT("\nMount Disk Success");
 			} else {
-				uart_puts(UART0,"\nDisk Found");
+				FTPRINT("\nDisk Found");
 			}
 		}
 	} else {
-		uart_puts(UART0,"\nNo SD Card");
+		FTPRINT("\nNo SD Card");
 	}
 		
 	return;
@@ -361,7 +362,7 @@ FTU64 get_fattime (FTVOID)
 
 FTVOID ft9xx_invaild_tag (FTC8 *dataPath)
 {
-	uart_puts(UART0,"\ninvalid the tag...");
+	FTPRINT("\ninvalid the tag...");
     ft9xx_fatfs_dbg_info(f_unlink((const TCHAR*)dataPath));
 }
 
@@ -371,19 +372,19 @@ FTU8 ft9xx_is_tag_vaild (FIL *f_hdl, FTC8 *dPath)
     FTU32 i;
 
 	if (FR_OK != f_open(f_hdl, (const TCHAR*)dPath, FA_READ)) {
-		uart_puts(UART0,"\nno c data file");
+		FTPRINT("\nno c data file");
 		return 0;
 	}
 
     f_read(f_hdl, p,4,&i);
 
-	uart_puts(UART0,"\nis the tag vaild...");
+	FTPRINT("\nis the tag vaild...");
     if (memcmp(tag,p,CALD_TAG_LEN)) {
-        uart_puts(UART0,"invaild");
+        FTPRINT("invaild");
         f_close(f_hdl);
         return 0;
     } else {
-        uart_puts(UART0,"vaild");
+        FTPRINT("vaild");
         f_close(f_hdl);
         return 1;
     }
@@ -395,13 +396,13 @@ FTVOID ft9xx_save_cdata (FIL *f_hdl, FTC8 *dataPath, FTU8 *p)
     FTU8 tag[] = CALD_TAG_DATA;
 
 	if (FR_OK != f_open(f_hdl, (const TCHAR*)dataPath, FA_WRITE | FA_CREATE_NEW)) {
-		uart_puts(UART0,"\nfail to open c data file");
+		FTPRINT("\nfail to open c data file");
 		return;
 	}
     
-    uart_puts(UART0,"\nwrite tag to file...");
+    FTPRINT("\nwrite tag to file...");
     ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)tag,4,&i));
-    uart_puts(UART0,"\nwrite c data to file...");
+    FTPRINT("\nwrite c data to file...");
     ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)p,FT800_CAL_PARA_NUM*4,&i));
 
 	f_close(f_hdl);
@@ -411,7 +412,7 @@ FTVOID ft9xx_restore_cdata (FIL *f_hdl, FTC8 *dPath, FTVOID *p)
 {
 	FTU32 i;
 
-    uart_puts(UART0,"\nrestore c data from file...");
+    FTPRINT("\nrestore c data from file...");
 	f_open(f_hdl, (const TCHAR*)dPath, FA_READ);
     f_lseek(f_hdl, CALD_TAG_LEN);
     ft9xx_fatfs_dbg_info(f_read(f_hdl, p,FT800_CAL_PARA_NUM*4,&i));

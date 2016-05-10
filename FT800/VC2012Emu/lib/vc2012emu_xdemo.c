@@ -1,5 +1,9 @@
 #include "vc2012emu_xdemo.h"
 
+FTVOID vc2012emu_dumy_print (char *p)
+{
+/* do nothing */
+}
 FTVOID vc2012emu_invaild_tag (FTC8 *dataPath)
 {
 	remove(dataPath);

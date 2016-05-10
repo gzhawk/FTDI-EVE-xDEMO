@@ -114,8 +114,7 @@ FTINDEF appRet_en appCal (FTU8 force, FTC8 *dPath)
     FTU32 CData[FT800_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
-    FTPRINT("\r\n");
-    FTPRINT("FT800 calibration");
+    FTPRINT("\nFT800 calibration");
 #if defined(MSVC2012EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
     if (force || (dPath == NULL)) {
 #else
@@ -307,7 +306,7 @@ FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
         return;
     }
 #elif defined(STM32F4)
-    p = wfp->res+wfp->Src;
+    p = (FTU8 *)wfp->res+wfp->Src;
 #else
     p = file_buff;
 /* it may not be a necessary step, but leave it here for now */
@@ -374,7 +373,7 @@ FTVOID resIsZlib(FTU32 para)
     f_lseek(wfp->res,wfp->Src);
 #else /* Arduino */
     FTU8 header[512] = {0};
-    wfp->res.readsector(p);
+    wfp->res.readsector(header);
     wfp->res.seek(wfp->Src);
 #endif
     /*

@@ -387,25 +387,12 @@ class Reader {
 #define TST_CMD_LEN 6
 #define TST_MSG_LEN 4
 
-
+FTVOID arduino_dumy_print (char * p);
 FTVOID arduino_simugpio(FTU8 flag);
-
-
 FTVOID arduino_sdcardInit (FTVOID);
-
-
 FTU8 arduino_is_tag_vaild (FTVOID);
-
-
 FTVOID arduino_invaild_tag (FTVOID);
-
-
 FTVOID arduino_save_cdata (FTU8 *p);
-
-
 FTVOID arduino_restore_cdata (FTU8 *p);
-
-
 FTVOID arduino_vaild_tag (FTVOID);
-
 

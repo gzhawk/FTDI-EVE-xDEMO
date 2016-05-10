@@ -25,11 +25,16 @@ typedef unsigned long  FTU64;
 
 #define ROOT_PATH 
 #define CDATA_PATH "cdata.bin"
+#ifdef FT800_PRINT
 /* if stdio.h be included, printf is usable, 
    but uart_puts would cost less image space */
 #define FTPRINT(a) uart_puts(UART0,a) 
 #define DBGPRINT uart_puts(UART0,"\r\n"); \
                  uart_puts(UART0,__FILE__)
+#else
+#define FTPRINT ft9xx_dumy_print
+#define DBGPRINT
+#endif
 #define FTPREINIT ft9xx_int_print(FT800_VER)
 #define FTDELAY   delayms
 
@@ -91,6 +96,7 @@ typedef unsigned long  FTU64;
 unsigned char spi_dummy;
 FATFS FT9xxFatFs;
 FIL FT9xxFile;
+FTVOID ft9xx_dumy_print (char *p);
 void ft9xx_init_ili9488 (void);
 void ft9xx_init (void);
 void ft9xx_spi_init (unsigned char spi_type, unsigned int spi_div);

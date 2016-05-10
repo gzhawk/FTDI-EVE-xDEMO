@@ -2,6 +2,11 @@
 
 sdcard SD;
 
+FTVOID arduino_dumy_print (char * p)
+{
+/* do nothing */
+}
+
 FTVOID dos83(FTU8 dst[SDC_NAME_LEN+SDC_NAME_EXT_LEN], FT8 *ps)
 {
 	FTU8 i = 0;

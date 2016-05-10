@@ -1,6 +1,10 @@
 
 #include "..\..\FT800_platform.h"
 
+FTVOID vc2010_dumy_print(char *p)
+{
+/*do nothing*/
+}
 FTVOID vc2010_spi_init(FTVOID)
 {
     ChannelConfig cConf;

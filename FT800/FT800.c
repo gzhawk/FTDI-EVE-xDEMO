@@ -40,8 +40,7 @@ FTU8 verify (FTVOID)
 
 FTVOID ft800_init (FTVOID)
 {
-    FTPRINT("\r\n");
-    FTPRINT("FT800 init ");
+    FTPRINT("\nFT800 init ");
     do {
         HAL_Path_Config();
 
@@ -64,16 +63,14 @@ FTVOID ft800_init (FTVOID)
 
     HAL_FT800_LCDConfig();
 
-    FTPRINT("\r\n");
-    FTPRINT("Done!");
+    FTPRINT("\nDone!");
 }
 
 FTVOID run_apps (FTVOID)
 {
     appWaitCal();
 
-    FTPRINT("\r\n");
-    FTPRINT("FT800 run app");
+    FTPRINT("\nFT800 run app");
     while (Apps[appGP.appIndex]) {
         Apps[appGP.appIndex](appGP.appPara);
     }
@@ -85,8 +82,7 @@ FTVOID run_apps (FTVOID)
  */
 FTVOID end_loop (FTVOID)
 {
-    FTPRINT("\r\n");
-    FTPRINT("App End");
+    FTPRINT("\nApp End");
 
     HAL_FT800_EndDisp();
 }

@@ -36,7 +36,6 @@ typedef uint32_t argb8888;
 #define FLASHU8 FTU8
 #define FLASHRD8(a) (*(FTU8 *)(a))
 
-#define FTPRINT        printf
 #define FTDELAY(mS)    Sleep(mS)
 #define FTEND
 #define ROOT_PATH "..\\..\\res\\"
@@ -47,9 +46,11 @@ typedef uint32_t argb8888;
 #define FTINDEF static
 
 #ifdef FT800_PRINT
-#define DBGPRINT FTPRINT("\r\nError %s:%d",__FUNCTION__,__LINE__)
-#define FTPREINIT FTPRINT("\r\nVer: %s",FT800_VER)
+#define FTPRINT     printf
+#define DBGPRINT    printf("\r\nError %s:%d",__FUNCTION__,__LINE__)
+#define FTPREINIT   printf("\r\nVer: %s",FT800_VER)
 #else
+#define FTPRINT     vc2012emu_dumy_print
 #define DBGPRINT
 #define FTPREINIT 
 #endif
@@ -91,4 +92,4 @@ FTU8 vc2012emu_is_tag_vaild (FTC8 *dataPath);
 FTVOID vc2012emu_save_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2012emu_restore_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2012emu_vaild_tag (FTVOID);
-
+FTVOID vc2012emu_dumy_print (char *p);

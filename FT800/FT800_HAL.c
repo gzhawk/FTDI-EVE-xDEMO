@@ -604,14 +604,14 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
             DBGPRINT;
             return;
         }
-
+        /* don't need to check it every time it entry
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_CMD;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD) {
             DBGPRINT;
             return;
         }
-
+        */
         mcuCMDBuf[mcuCMDindex/FTU32_LEN] = Cmd;
         mcuCMDindex += FTU32_LEN;
         if (mcuCMDindex == mcuCMDBufSize) {
@@ -691,14 +691,14 @@ FTVOID HAL_DlpBufIn (FTU32 Dlp)
             DBGPRINT;
             return;
         }
-
+        /* don't need to check it every time it entry 
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_DL;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL) {
             DBGPRINT;
             return;
         }
-
+        */
         mcuCMDBuf[mcuCMDindex/FTU32_LEN] = Dlp;
         mcuCMDindex += FTU32_LEN;
         if (mcuCMDindex == mcuCMDBufSize) {
@@ -971,8 +971,7 @@ FTVOID HAL_FT800_BootupDisp ( FTU32 count )
 {
     static FTU8 init = 0;
     if (init == 0) {
-        FTPRINT("\r\n");
-        FTPRINT("System show info");
+        FTPRINT("\nSystem show info");
         init = 1;
     }
     do {

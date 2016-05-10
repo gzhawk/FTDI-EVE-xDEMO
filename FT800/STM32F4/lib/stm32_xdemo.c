@@ -31,6 +31,10 @@ unsigned int TimingDelay;
 unsigned short VirtAddVarTab[NB_OF_VAR];
 unsigned int FILE_SADDR = 0;
 
+void stm32_dumy_print(char * p)
+{
+/* do nothing */
+}
 void stm32getfileaddr (void)
 {
 	/* for STM32F407VG internal flash start from 0x8000000 */
