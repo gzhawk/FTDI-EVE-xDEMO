@@ -148,9 +148,9 @@ call FT800\VC2010Express\FT800.vcxproj
 goto SkipRunme
 
 :VC2012
-rename FT800\FT800.c FT800.cpp
-rename FT800\FT800_APP.c FT800_APP.cpp
-rename FT800\FT800_HAL.c FT800_HAL.cpp
+rename FT800\FT800.cpp FT800.c
+rename FT800\FT800_APP.cpp FT800_APP.c
+rename FT800\FT800_HAL.cpp FT800_HAL.c
 call FT800\VC2012Emu\FT800.vcxproj
 goto SkipRunme
 

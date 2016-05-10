@@ -67,10 +67,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\FT800.cpp" />
-    <ClCompile Include="..\FT800_APP.cpp" />
-    <ClCompile Include="..\FT800_HAL.cpp" />
-    <ClCompile Include="lib\vc2012emu_xdemo.cpp" />
+    <ClCompile Include="..\FT800.c" />
+    <ClCompile Include="..\FT800_APP.c" />
+    <ClCompile Include="..\FT800_HAL.c" />
+    <ClCompile Include="lib\vc2012emu_xdemo.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

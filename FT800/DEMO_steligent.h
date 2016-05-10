@@ -702,28 +702,33 @@ FTVOID touch_control (FTU8 tag)
 	switch (pre_tag) {
 		/* track touch action */
 		case eT_M_TOP:
-			return touch_top();
+			touch_top();
+			return;
 		case eT_M_C1_PRBS:
 		case eT_M_C2_PRBS:
 		case eT_M_C3_PRBS:
 		case eT_M_C4_PRBS:
 		case eT_M_CA_PRBS:
-			return touch_prbs(pre_tag);
+			touch_prbs(pre_tag);
+			return;
 		/* multi touch action */
 		case eT_M_CA_POLY:
-			return touch_all_polarity(&pre_tag);
+			touch_all_polarity(&pre_tag);
+			return;
 		case eT_M_C1_GT:
 		case eT_M_C2_GT:
 		case eT_M_C3_GT:
 		case eT_M_C4_GT:
 		case eT_M_CA_GT:
-			return touch_gt(&pre_tag);
+			touch_gt(&pre_tag);
+			return;
 		case eT_M_C1_AMP:
 		case eT_M_C2_AMP:
 		case eT_M_C3_AMP:
 		case eT_M_C4_AMP:
 		case eT_M_CA_AMP:
-			return touch_amp(&pre_tag);
+			touch_amp(&pre_tag);
+			return;
 		/* single touch action */
 		case eT_M_C1_POLY:
 		case eT_M_C2_POLY:
