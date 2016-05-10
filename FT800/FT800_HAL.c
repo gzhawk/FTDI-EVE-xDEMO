@@ -604,14 +604,13 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
             FTPRINT("\nmcu cmd buf: mcuCMDBufSize <= mcuCMDindex");
             return;
         }
-        /* don't need to check it every time it entry
+        /* set the cmd tag */
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_CMD;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD) {
             FTPRINT("\nmcu cmd buf: mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD");
             return;
         }
-        */
         mcuCMDBuf[mcuCMDindex/FTU32_LEN] = Cmd;
         mcuCMDindex += FTU32_LEN;
         if (mcuCMDindex == mcuCMDBufSize) {
@@ -691,14 +690,13 @@ FTVOID HAL_DlpBufIn (FTU32 Dlp)
             FTPRINT("\nmcu dlp buf: EVE_DLP_SIZE <= (mcuDLindex + mcuCMDindex)");
             return;
         }
-        /* don't need to check it every time it entry 
+        /* set the dlp tag */
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_DL;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL) {
             FTPRINT("\nmcu dlp buf: mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL");
             return;
         }
-        */
         mcuCMDBuf[mcuCMDindex/FTU32_LEN] = Dlp;
         mcuCMDindex += FTU32_LEN;
         if (mcuCMDindex == mcuCMDBufSize) {
