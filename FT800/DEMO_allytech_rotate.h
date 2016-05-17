@@ -25,10 +25,6 @@
 /* partical needle effect */
 #define PN_INX ROOT_PATH"allyrotate\\ndl-inx.bin"
 #define PN_LUT ROOT_PATH"allyrotate\\ndl-lut.bin"
-/*
-#define PN_INX ROOT_PATH"allyrotate\\ndlx-inx.bin"
-#define PN_LUT ROOT_PATH"allyrotate\\ndlx-lut.bin"
-*/
 
 /* small number */
 #define NUM_SMALL ROOT_PATH"allyrotate\\num-s.bin"
@@ -63,7 +59,6 @@ bmpHDR_st bmp_header[PIC_NUM] = {
     {CUT3_INX,   CUT3_LUT,   0,PALETTED8,   0,0,800,130},
     {SHADOW_INX, SHADOW_LUT, 0,PALETTED8,   0,0,701,200},
 	{PN_INX,     PN_LUT,     0,PALETTED8,   0,0,6,56},
-	//{PN_INX,     PN_LUT,     0,PALETTED8,   0,0,8,56},
     {NUM_SMALL,  0,          0,ARGB4,       0,0,10,140},
 };
 typedef struct s_edge_str_ {
@@ -264,20 +259,14 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
     HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
     HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     /* while using previous stencil function need to add this */
@@ -442,61 +431,8 @@ FTVOID fill10edge(FTVOID)
     printf("{%d,%d,%d,%d}",speed_needle[i].X,speed_needle[i].O_Y,
             speed_needle[i].scale,speed_needle[i].angle);
 }
-FTVOID ally_rotate (FTU32 para)
+FTU32 ally_fixed_background (FTVOID)
 {
-	static FTU8 init = 0;
-    FTU32 speed = *(FTU32 *)para;
-    FTU16 x,y;
-
-	/* 
-      this part just for this routine jump out 
-      the outside caller when error happen 
-     */
-	appGP.appIndex = 2;
-
-	if (!init) {
-		/* load bitmap resources data into FT800 */
-		if(APP_OK != appBmpToRamG(0, RAM_G, bmp_header, PIC_NUM)){
-			DBGPRINT;
-			return;
-		}
-        /* special treatment for number bitmap to use cell */
-        HAL_DlpBufIn(BITMAP_HANDLE(I_NUM_S));
-        HAL_DlpBufIn(BITMAP_LAYOUT(bmp_header[I_NUM_S].format,appGetLinestride(bmp_header[I_NUM_S]),bmp_header[I_NUM_S].high/10));
-#ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(bmp_header[I_NUM_S]) >> 10,(bmp_header[I_NUM_S].high/10)>>9));
-#endif       
-        HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmp_header[I_NUM_S].wide,(bmp_header[I_NUM_S].high/10)));
-#ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_SIZE_H(bmp_header[I_NUM_S].wide >> 9,(bmp_header[I_NUM_S].high/10)>>9));
-#endif 
-        /* special treatment for shadow bitmap to use cell */
-        HAL_DlpBufIn(BITMAP_HANDLE(I_SHADOW));
-        HAL_DlpBufIn(BITMAP_LAYOUT(bmp_header[I_SHADOW].format,appGetLinestride(bmp_header[I_SHADOW]),bmp_header[I_SHADOW].high/2));
-#ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(bmp_header[I_SHADOW]) >> 10,(bmp_header[I_SHADOW].high/2)>>9));
-#endif       
-        HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmp_header[I_SHADOW].wide,(bmp_header[I_SHADOW].high/2)));
-#ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_SIZE_H(bmp_header[I_SHADOW].wide >> 9,(bmp_header[I_SHADOW].high/2)>>9));
-#endif         
-        /* special treatment for rotate bitmap
-           need to use BILINEAR
-           high > wide: use high in both side
-           high < wide: use wide in both side*/
-        HAL_DlpBufIn(BITMAP_HANDLE(I_NDL));
-        HAL_DlpBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,bmp_header[I_NDL].high*2,bmp_header[I_NDL].high*2));
-#ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_SIZE_H((bmp_header[I_NDL].high*2) >> 9,(bmp_header[I_NDL].high*2)>>9));
-#endif         
-        HAL_DlpBufIn(DISPLAY());
-        HAL_BufToReg(RAM_DL,0);
-#if AUTO_FILL
-        fill10edge();
-#endif
-        init = 1;
-	}
-
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
 	HAL_CmdBufIn(CLEAR(1,1,1));
@@ -534,9 +470,26 @@ FTVOID ally_rotate (FTU32 para)
     /* background: cut3 */
     dispPal8(CUTED_X,bmp_header[I_CUT1].high+bmp_header[I_CUT2].high,bmp_header[I_CUT3].lut_src, I_CUT3, 0);
 
-    /* shadow left edge strip */
+#if AUTO_FILL
+    CoCmd_TEXT(400,240,23,OPT_CENTERX,"auto filling parameter");
+#else
+    CoCmd_TEXT(400,240,23,OPT_CENTERX,"manual filling parameter");
+#endif
     HAL_CmdBufIn(COLOR_MASK(0,0,0,0));
     HAL_CmdBufIn(BEGIN(EDGE_STRIP_L));
+
+    HAL_BufToReg(RAM_CMD,0);
+
+    return HAL_Read32(REG_CMD_DL);
+}
+FTVOID ally_realtime_background (FTU32 speed, FTU32 start_addr, FTU32 code_size)
+{
+    FTU16 x,y;
+
+    HAL_CmdBufIn(CMD_DLSTART);
+    CoCmd_APPEND(start_addr,code_size);
+
+    /* shadow left edge strip */
     HAL_CmdBufIn(VERTEX2F(getHX(speed,shadow_edge)*FT800_PIXEL_UNIT,SHADOW_Y*FT800_PIXEL_UNIT));
     HAL_CmdBufIn(VERTEX2F(getLX(speed,shadow_edge)*FT800_PIXEL_UNIT,(SHADOW_Y+100)*FT800_PIXEL_UNIT));
 
@@ -568,18 +521,99 @@ FTVOID ally_rotate (FTU32 para)
     HAL_CmdBufIn(CELL(speed%10));
     HAL_CmdBufIn(VERTEX2F((x+bmp_header[I_NUM_S].wide)*FT800_PIXEL_UNIT,
                           y*FT800_PIXEL_UNIT));
-#if AUTO_FILL
-    CoCmd_TEXT(400,240,23,OPT_CENTERX,"auto filling parameter");
-#else
-    CoCmd_TEXT(400,240,23,OPT_CENTERX,"manual filling parameter");
-#endif
 
     HAL_CmdBufIn(END());
 
     HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);
 	HAL_BufToReg(RAM_CMD,0);
-	
+}
+FTU32 ally_get_bitmap_tail(bmpHDR_st *p, FTU32 n)
+{
+    FTU32 i,l;
+
+    for (i = 0, l = 0; i < n; i++) {
+        if (p[i].path) {
+            l += p[i].len;
+        }
+        if (p[i].path_lut) {
+            l += p[i].len_lut;
+        }
+    }
+    return l;
+}
+FTVOID ally_special_treatment(FTVOID)
+{
+    /* special treatment for number bitmap to use cell */
+    HAL_DlpBufIn(BITMAP_HANDLE(I_NUM_S));
+    HAL_DlpBufIn(BITMAP_LAYOUT(bmp_header[I_NUM_S].format,appGetLinestride(bmp_header[I_NUM_S]),bmp_header[I_NUM_S].high/10));
+#ifdef DEF_81X
+    HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(bmp_header[I_NUM_S]) >> 10,(bmp_header[I_NUM_S].high/10)>>9));
+#endif       
+    HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmp_header[I_NUM_S].wide,(bmp_header[I_NUM_S].high/10)));
+#ifdef DEF_81X
+    HAL_DlpBufIn(BITMAP_SIZE_H(bmp_header[I_NUM_S].wide >> 9,(bmp_header[I_NUM_S].high/10)>>9));
+#endif 
+    /* special treatment for shadow bitmap to use cell */
+    HAL_DlpBufIn(BITMAP_HANDLE(I_SHADOW));
+    HAL_DlpBufIn(BITMAP_LAYOUT(bmp_header[I_SHADOW].format,appGetLinestride(bmp_header[I_SHADOW]),bmp_header[I_SHADOW].high/2));
+#ifdef DEF_81X
+    HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(bmp_header[I_SHADOW]) >> 10,(bmp_header[I_SHADOW].high/2)>>9));
+#endif       
+    HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmp_header[I_SHADOW].wide,(bmp_header[I_SHADOW].high/2)));
+#ifdef DEF_81X
+    HAL_DlpBufIn(BITMAP_SIZE_H(bmp_header[I_SHADOW].wide >> 9,(bmp_header[I_SHADOW].high/2)>>9));
+#endif         
+    /* special treatment for rotate bitmap
+       need to use BILINEAR
+       high > wide: use high in both side
+       high < wide: use wide in both side*/
+    HAL_DlpBufIn(BITMAP_HANDLE(I_NDL));
+    HAL_DlpBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,bmp_header[I_NDL].high*2,bmp_header[I_NDL].high*2));
+#ifdef DEF_81X
+    HAL_DlpBufIn(BITMAP_SIZE_H((bmp_header[I_NDL].high*2) >> 9,(bmp_header[I_NDL].high*2)>>9));
+#endif         
+    HAL_DlpBufIn(DISPLAY());
+    HAL_BufToReg(RAM_DL,0);
+}
+FTVOID ally_rotate (FTU32 para)
+{
+	static FTU32 preDLsize = 0, code_start_addr;
+
+	/* 
+      this part just for this routine jump out 
+      the outside caller when error happen 
+     */
+	appGP.appIndex = 2;
+
+	if (!preDLsize) {
+		/* load bitmap resources data into FT800 */
+		if(APP_OK != appBmpToRamG(0, RAM_G, bmp_header, PIC_NUM)){
+			DBGPRINT;
+			return;
+		}
+
+		/* do some special treatment for image rotate */
+        ally_special_treatment();
+#if AUTO_FILL
+		/* automatically fill the needle moving track data */
+        fill10edge();
+#endif
+		/* generate display list for 'never change' part of backgroudn */
+        preDLsize = ally_fixed_background();
+
+		/* calculate the offset in RAM_G for previous generated display list */
+        code_start_addr = ally_get_bitmap_tail(bmp_header, PIC_NUM);
+
+		/* copy the display list into specific offset in RAM_G */
+        CoCmd_MEMCPY(code_start_addr,RAM_DL,preDLsize);
+
+		/* execute above command */
+        HAL_BufToReg(RAM_CMD,0);
+	}
+    
+    ally_realtime_background(*(FTU32 *)para,code_start_addr,preDLsize);
+
 	appGP.appIndex = 0;
 	
 	return;
