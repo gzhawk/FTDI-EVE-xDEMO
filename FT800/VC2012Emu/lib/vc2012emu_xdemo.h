@@ -13,6 +13,8 @@ typedef signed short   FT16;
 typedef unsigned short FTU16;
 typedef signed int     FT32;
 typedef unsigned int   FTU32;
+typedef signed long    FT64;
+typedef unsigned long  FTU64;
 #define FTVOID void
 
 #ifdef _MSC_VER

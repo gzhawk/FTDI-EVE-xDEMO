@@ -29,7 +29,38 @@
 
 FTU32 g_frame = 1;
 FTU32 g_fps = 0;
+void timerISR(void)
+{
+#if defined(FT9XXEV)
+    if (timer_is_interrupted(timer_select_a) == 1)
+    {
+        g_fps = g_frame;
+        g_frame = 0;
+        return;
+    }
+#else
+    static FTU64 oldTick = 0;
+    FTU64 newTick = GetTickCount();
 
+    if (newTick >= oldTick) {
+        if (newTick - oldTick > 1000) {
+			oldTick = (newTick - oldTick)/1000;
+            g_fps = g_frame/oldTick;
+            g_frame = 0;
+            oldTick = newTick;
+            return;
+        }
+    } else {
+        if (newTick + (0xFFFFFFFFFFFFFFFF - oldTick) > 1000) {
+			oldTick = (newTick + (0xFFFFFFFFFFFFFFFF - oldTick))/1000;
+            g_fps = g_frame/oldTick;
+            g_frame = 0;
+            oldTick = newTick;
+            return;
+        }
+    }
+#endif
+}
 FTINDEF FTVOID Display (FTU32 opt, FTU32 start, FTU32 frame, FTU32 fIndex, FTU32 fLen)
 {
     FTU32 w,max = (fLen>65535)?65535:fLen,prog = (fLen>65535)?(fIndex/(fLen/65535)):fIndex;
@@ -55,37 +86,40 @@ FTINDEF FTVOID Display (FTU32 opt, FTU32 start, FTU32 frame, FTU32 fIndex, FTU32
 			CoCmd_SETMATRIX;
 			
 			HAL_CmdBufIn(VERTEX2F(0,0));
-			HAL_CmdBufIn(VERTEX2F(400*FT800_PIXEL_UNIT,240*FT800_PIXEL_UNIT));
-			HAL_CmdBufIn(VERTEX2F(200*FT800_PIXEL_UNIT,120*FT800_PIXEL_UNIT));
+			HAL_CmdBufIn(VERTEX2F(AVI_FRAME_WIDE/2*FT800_PIXEL_UNIT,AVI_FRAME_HIGH/2*FT800_PIXEL_UNIT));
+			HAL_CmdBufIn(VERTEX2F(AVI_FRAME_WIDE/4*FT800_PIXEL_UNIT,AVI_FRAME_HIGH/4*FT800_PIXEL_UNIT));
 		    HAL_CmdBufIn(RESTORE_CONTEXT());
 		}
 		HAL_CmdBufIn(END());
 
 		HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
 		if (start) {
-			CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3,25,OPT_CENTERX,"MEDIAFIFO (full screen)");
+			CoCmd_TEXT(AVI_FRAME_WIDE/2,AVI_FRAME_HIGH/3,25,OPT_CENTERX,"MEDIAFIFO (full screen)");
 		} else {
-			CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,25,OPT_CENTERX,"MEDIAFIFO (zoom out,duplicate,overlap)");
+			CoCmd_TEXT(AVI_FRAME_WIDE/2,AVI_FRAME_HIGH/2,25,OPT_CENTERX,"MEDIAFIFO (zoom out,duplicate,overlap)");
 		}
 		CoCmd_TEXT(0,0,25,0,"FPS:");
 		CoCmd_NUMBER(80,0,25,0,g_fps);
 		CoCmd_BGCOLOR((149<<16)|(149<<8)|149);
 		HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
-        w = FT800_LCD_WIDTH*5/7;
-		CoCmd_PROGRESS((FT800_LCD_WIDTH - w)/2,FT800_LCD_HIGH*7/8,w,20,OPT_FLAT,prog,max);
+        w = AVI_FRAME_WIDE*5/7;
+		CoCmd_PROGRESS((AVI_FRAME_WIDE - w)/2,AVI_FRAME_HIGH*7/8,w,20,OPT_FLAT,prog,max);
 	} else {
 		if (start) {
 			HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-			CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,25,OPT_CENTERX,"Start: CMD buffer");
+			CoCmd_TEXT(AVI_FRAME_WIDE/2,AVI_FRAME_HIGH/2,25,OPT_CENTERX,"Start: CMD buffer");
 		} else {
 			HAL_CmdBufIn(COLOR_RGB(0xFF,0,0));
-			CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,25,OPT_CENTERX,"Stop: CMD buffer");
+			CoCmd_TEXT(AVI_FRAME_WIDE/2,AVI_FRAME_HIGH/2,25,OPT_CENTERX,"Stop: CMD buffer");
 		}
 	}
 
 	HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);
 	HAL_BufToReg(RAM_CMD,0);
+#if !defined(FT9XXEV)
+    timerISR();
+#endif
 }
 
 FTINDEF FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FTU32 flag_addr, FTU32 opt,FTU32 resHDL, FTU32 file_len)
@@ -267,17 +301,7 @@ FTINDEF FTU32 AVIToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 flagAddr, FTU32 fifoAd
 	appResClose(resHDL);
 	return Len;
 }
-#if defined(DEF_TIMER)
-void timerISR(void)
-{
-    if (timer_is_interrupted(timer_select_a) == 1)
-    {
-        g_fps = g_frame;
-        g_frame = 0;
-        return;
-    }
-}
-#endif
+
 /* 
  * base on my understanding, when using EVE to play AVI file:
  * 1. CMD_PLAYVIDEO, can play AVI by using CMD buffer or MEDIAFIFO

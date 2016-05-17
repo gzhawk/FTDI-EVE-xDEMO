@@ -64,11 +64,12 @@ jpeg_play_st jpeg_play_list[4] = {
 };
 
 #define TAG_START  (10)
+FTU8 frame_rate[4] = {0};
+
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
 #define FILE_INDEX 18
 #elif defined(FT9XXEV)
 #define FILE_INDEX 8
-FTU8 frame_rate[4] = {0};
 #else
 #error "not for this platform"
 #endif
@@ -98,11 +99,11 @@ FTVOID pressTHENrelease (FTVOID)
         pre_t = 0;
     } 
 }
-#if defined(DEF_TIMER)
 void timerISR(void)
 {
     static FTU8 pre_mark[4] = {0};
     FTU8 i,j;
+#if defined(FT9XXEV)
 
     if (timer_is_interrupted(timer_select_a) == 1)
     {
@@ -117,8 +118,45 @@ void timerISR(void)
             pre_mark[i] = j;
         }
     }
-}
+#else
+    static FTU64 oldTick = 0;
+    FTU64 newTick = GetTickCount();
+
+    if (newTick >= oldTick) {
+        if (newTick - oldTick > 1000) {
+			oldTick = (newTick - oldTick)/1000;
+            for (i = 0; i < 4; i++) {
+                j = (*(FTU8 *)(jpeg_bmp[i].path + FILE_INDEX) - '0')*10;
+                j += (*(FTU8 *)(jpeg_bmp[i].path + FILE_INDEX + 1) - '0')%10;
+                if (pre_mark[i] <= j) {
+                    frame_rate[i] = (j - pre_mark[i])/(FTU8)oldTick;
+                } else {
+                    frame_rate[i] = (79 - pre_mark[i] + j)/(FTU8)oldTick;
+                }
+                pre_mark[i] = j;
+            }
+            oldTick = newTick;
+            return;
+        }
+    } else {
+        if (newTick + (0xFFFFFFFFFFFFFFFF - oldTick) > 1000) {
+			oldTick = (newTick + (0xFFFFFFFFFFFFFFFF - oldTick))/1000;
+            for (i = 0; i < 4; i++) {
+                j = (*(FTU8 *)(jpeg_bmp[i].path + FILE_INDEX) - '0')*10;
+                j += (*(FTU8 *)(jpeg_bmp[i].path + FILE_INDEX + 1) - '0')%10;
+                if (pre_mark[i] <= j) {
+                    frame_rate[i] = (j - pre_mark[i])/(FTU8)oldTick;
+                } else {
+                    frame_rate[i] = (79 - pre_mark[i] + j)/(FTU8)oldTick;
+                }
+                pre_mark[i] = j;
+            }
+            oldTick = newTick;
+            return;
+        }
+    }
 #endif
+}
 FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,
                                FTU32 disp_addr,FTU32 opt,FTU32 resHDL, 
                                FTU32 file_len)
@@ -244,7 +282,6 @@ FTU32 Code_fixed (FTVOID)
 
     HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
 
-#if defined(DEF_TIMER)
     CoCmd_TEXT(320,0,21,0,"Touch the JPEG");
     CoCmd_TEXT(320,DESCRIPTION_H,21,0,"trigger start/stop");
     CoCmd_TEXT(320,3*DESCRIPTION_H,21,0,"Single JPEG run speed:");
@@ -267,7 +304,7 @@ FTU32 Code_fixed (FTVOID)
     CoCmd_TEXT(320,16*DESCRIPTION_H,21,0,"Space left in RAM_G: (K)");
     CoCmd_NUMBER(320,17*DESCRIPTION_H,21,0,EVE_C_MAXSIZE/1024);
     CoCmd_TEXT(320,18*DESCRIPTION_H,21,0,"Codes num in RAM_G:");
-#endif
+
     HAL_BufToReg(RAM_CMD,0);
 
     return HAL_Read32(REG_CMD_DL);
@@ -282,7 +319,6 @@ FTVOID Code_realtime (FTU32 start_addr)
         CoCmd_TEXT(jpeg_play_list[i].txt.X,
                 jpeg_play_list[i].txt.Y,25,
                 OPT_CENTERX,&jpeg_bmp[i].path[FILE_INDEX-1]);
-#if defined(DEF_TIMER)
         CoCmd_TEXT(jpeg_play_list[i].pic.X,
                 jpeg_play_list[i].pic.Y,25,
                 0,"FPS:");
@@ -290,12 +326,13 @@ FTVOID Code_realtime (FTU32 start_addr)
                 jpeg_play_list[i].pic.Y,25,
                 0,frame_rate[i]);
         CoCmd_NUMBER(320,19*DESCRIPTION_H,21,0,start_addr);
-#endif
     }
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);
-
+#if !defined(FT9XXEV)
+    timerISR();
+#endif
 }
 FTVOID disp4jpeg (FTU32 para)
 {
