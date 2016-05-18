@@ -106,19 +106,14 @@ FTINDEF FTVOID wrStart ( FTU32 addr )
 
 FTINDEF FTU32 cmdWait (FTVOID)
 {
-    while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ)){
-        //FTPRINT(".");
-        //FTDELAY(10);
-    }
+    while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ));
+    
     return HAL_Read32(REG_CMD_READ);
 }
 
 FTINDEF FTVOID dlpWait (FTVOID)
 {
-    while (HAL_Read8(REG_DLSWAP)) {
-        //FTPRINT(",");
-        //FTDELAY(10);
-    }
+    while (HAL_Read8(REG_DLSWAP)) ;
 
     mcuDLindex = 0;
 }
@@ -533,12 +528,15 @@ FTU32 HAL_CalResultAddr (FTVOID)
 FTVOID HAL_McuCmdBufInit (FTVOID)
 {
     mcuDLindex = 0;
+    FTPRINT("\nCMD buffer: ");
 #if defined(USED_CMD_BUF)
+    FTPRINT("yes");
     mcuCMDBuf = (FTU32 *)&mem_pool[0];
     mcuCMDBufSize = USE_STATIC_MEM_LEN;
     mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = REG_FLAG_CLN;
     mcuCMDindex = 0; 
 #else
+    FTPRINT("no");
     mcuCMDBuf = 0;
     mcuCMDBufSize = 0;
     mcuCMDindex = 0;
@@ -608,7 +606,7 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_CMD;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD) {
-            FTPRINT("\nmcu cmd buf: mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD");
+            FTPRINT("\nmcu cmd buf: tag != RAM_CMD");
             return;
         }
         mcuCMDBuf[mcuCMDindex/FTU32_LEN] = Cmd;
@@ -687,14 +685,14 @@ FTVOID HAL_DlpBufIn (FTU32 Dlp)
 {
     if (mcuCMDBuf) {
         if (EVE_DLP_SIZE <= (mcuDLindex + mcuCMDindex)) {
-            FTPRINT("\nmcu dlp buf: EVE_DLP_SIZE <= (mcuDLindex + mcuCMDindex)");
+            FTPRINT("\nmcu dlp buf: EVE_DLP_SIZE <= index");
             return;
         }
         /* set the dlp tag */
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_DL;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL) {
-            FTPRINT("\nmcu dlp buf: mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL");
+            FTPRINT("\nmcu dlp buf: tag != RAM_DL");
             return;
         }
         mcuCMDBuf[mcuCMDindex/FTU32_LEN] = Dlp;
@@ -824,15 +822,20 @@ FTVOID HAL_FT800_Active ( FTVOID )
 #define CLK_DELAY 100
 FTVOID HAL_FT800_Clock ( FTVOID )
 {
-#if !defined(TRIM_NEEDED)
+    FTPRINT("\nOSC: ");
+#if defined(TRIM_NEEDED)
+    FTPRINT("internal");
+#else
+    FTPRINT("external");
     /* Set the clk to external clock */
     HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
     FTDELAY(CLK_DELAY);
 #endif
 #ifndef DEF_81X
-    /* Switch PLL output to 48MHz */
+    /* default 48MHz, no need to config
     HAL_Cfg(FT_GPU_PLL_48M);  
     FTDELAY(CLK_DELAY);
+    */
 #endif
 }
 
@@ -969,7 +972,7 @@ FTVOID HAL_FT800_BootupDisp ( FTU32 count )
 {
     static FTU8 init = 0;
     if (init == 0) {
-        FTPRINT("\nSystem show info");
+        FTPRINT("\nBootup info");
         init = 1;
     }
     do {

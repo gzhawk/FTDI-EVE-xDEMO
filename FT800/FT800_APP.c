@@ -114,7 +114,7 @@ FTINDEF appRet_en appCal (FTU8 force, FTC8 *dPath)
     FTU32 CData[FT800_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
-    FTPRINT("\nFT800 calibration");
+    FTPRINT("\nCalibration");
 #if defined(MSVC2012EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
     if (force || (dPath == NULL)) {
 #else

@@ -21,14 +21,17 @@
 
 FTU8 verify (FTVOID)
 {
-    FTU8 count = RETRY_COUNT, id;
-    do {
-        id = HAL_Read8(REG_ID);
+    FTU8 count = RETRY_COUNT;
+
+    FTPRINT("\nRead ID: ");
+    while (HAL_Read8(REG_ID) != FT800_ID && count) {
+        FTPRINT(".");
         count--;
         FTDELAY(READ_ID_WAIT);
-    } while (count && (id != FT800_ID));
+    }
 
     if (count) {
+        FTPRINT("Done");
         /* for FT81X, users are recommended to 
            read 4 bytes data from address 0xC0000 
            before application overwrites this address,
@@ -40,7 +43,7 @@ FTU8 verify (FTVOID)
 
 FTVOID ft800_init (FTVOID)
 {
-    FTPRINT("\nFT800 init ");
+    FTPRINT("\nPath init");
     do {
         HAL_Path_Config();
 
@@ -54,7 +57,6 @@ FTVOID ft800_init (FTVOID)
 
         HAL_FT800_Clock();
 
-        FTPRINT(".");
     } while(!verify());
 
     HAL_FT800_GPIOConfig();
@@ -62,15 +64,13 @@ FTVOID ft800_init (FTVOID)
     HAL_FT800_TouchConfig();
 
     HAL_FT800_LCDConfig();
-
-    FTPRINT("\nDone!");
 }
 
 FTVOID run_apps (FTVOID)
 {
     appWaitCal();
 
-    FTPRINT("\nFT800 run app");
+    FTPRINT("\nApp running");
     while (Apps[appGP.appIndex]) {
         Apps[appGP.appIndex](appGP.appPara);
     }
