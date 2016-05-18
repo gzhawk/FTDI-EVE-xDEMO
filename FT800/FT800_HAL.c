@@ -727,10 +727,13 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum)
                 FTPRINT("\nmcu to eve: cmd tag invalid");
                 return;
             }
-
-            HAL_CmdWait((FTU16)HAL_EVELoopMemWr(reg,HAL_Read32(REG_CMD_WRITE),
-                        CMDBUF_SIZE,(FTU8 *)mcuCMDBuf,
-                        mcuCMDindex));
+			/* sometime cmd buffer already flush into eve in HAL_CmdBufIn
+			   so judge the mcuCMDindex before doing the flush */
+			if (mcuCMDindex) {
+				HAL_CmdWait((FTU16)HAL_EVELoopMemWr(reg,HAL_Read32(REG_CMD_WRITE),
+							CMDBUF_SIZE,(FTU8 *)mcuCMDBuf,
+							mcuCMDindex));
+			}
         } else {
             HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
         }
@@ -740,8 +743,11 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum)
                 FTPRINT("\nmcu to eve: dlp tag invalid");
                 return;
             }
-
-            HAL_Write8Src(reg+mcuDLindex,(FTU8 *)mcuCMDBuf,mcuCMDindex);
+			/* sometime cmd buffer already flush into eve in HAL_DlpBufIn
+			   so judge the mcuCMDindex before doing the flush */
+			if (mcuCMDindex) {
+				HAL_Write8Src(reg+mcuDLindex,(FTU8 *)mcuCMDBuf,mcuCMDindex);
+			}
         }
         HAL_DlWait();
     }
