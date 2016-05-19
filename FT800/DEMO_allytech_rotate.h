@@ -53,6 +53,7 @@
 
 #define TST_NUM_H   (348)
 
+FTU32 call_start = 0;
 bmpHDR_st bmp_header[PIC_NUM] = {
     {CUT1_INX,   CUT1_LUT,   0,PALETTED8,   0,0,400,84},
     {CUT2_INX,   CUT2_LUT,   0,PALETTED8,   0,0,400,266},
@@ -244,36 +245,74 @@ FT16 getSpdAngle(FTU32 spd, spd_n_st *p)
         return p[spd].angle;
     }
 }
+FTVOID prePal8(FTVOID)
+{
+    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));//0
+    HAL_CmdBufIn(RETURN());//1
+
+    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));//2
+    HAL_CmdBufIn(RETURN());//3
+
+    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));//4
+    HAL_CmdBufIn(RETURN());//5
+
+    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));//6
+    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));//7
+    HAL_CmdBufIn(RETURN());//8
+
+    HAL_CmdBufIn(SAVE_CONTEXT());//9
+    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));//10
+    HAL_CmdBufIn(RETURN());//11
+
+	HAL_CmdBufIn(CLEAR(1,0,0));//12
+    HAL_CmdBufIn(RESTORE_CONTEXT());//13
+    HAL_CmdBufIn(RETURN());//14
+}
+/* 
+in order to optimize the call speed
+build up some call structure
+insdie the display list
+the call_start was from "offset" value in ally_rotate()
+in real practice, instead of cutting the calling peices to this little
+you may use a larger part of calling peices display list
+for even better performance
+*/
 FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
 {
     /* every thing after this commands would not display
        if not use save/restore context */
-    HAL_CmdBufIn(SAVE_CONTEXT());
-    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
-    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
+    //HAL_CmdBufIn(SAVE_CONTEXT());
+    //HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
+    //HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
+	HAL_CmdBufIn(CALL(call_start+9));
+	HAL_CmdBufIn(CALL(call_start));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
-    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
-    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
+    //HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
+    //HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
+	HAL_CmdBufIn(CALL(call_start+6));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
-    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
+    //HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
+	HAL_CmdBufIn(CALL(call_start+4));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
-    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
+    //HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
+	HAL_CmdBufIn(CALL(call_start+2));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     /* while using previous stencil function need to add this */
-	HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
-	HAL_CmdBufIn(CLEAR(1,0,0));
-
-    HAL_CmdBufIn(RESTORE_CONTEXT());
+	//HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
+	//HAL_CmdBufIn(CLEAR(1,0,0));
+    //HAL_CmdBufIn(RESTORE_CONTEXT());
+	HAL_CmdBufIn(CALL(call_start));
+	HAL_CmdBufIn(CALL(call_start+12));
 }
 FTVOID allytech_speed (FTU32 para)
 {
@@ -463,8 +502,6 @@ FTU32 ally_fixed_background (FTVOID)
     dispPal8(CUTED_M_X,bmp_header[I_CUT1].high,bmp_header[I_CUT2].lut_src, I_CUT2, 0);
     HAL_CmdBufIn(RESTORE_CONTEXT());
 
-    HAL_CmdBufIn(END());
-
     HAL_CmdBufIn(STENCIL_OP(INCR,INCR));
     HAL_CmdBufIn(BEGIN(BITMAPS));
     /* background: cut3 */
@@ -482,12 +519,9 @@ FTU32 ally_fixed_background (FTVOID)
 
     return HAL_Read32(REG_CMD_DL);
 }
-FTVOID ally_realtime_background (FTU32 speed, FTU32 start_addr, FTU32 code_size)
+FTVOID ally_realtime_background (FTU32 speed)
 {
     FTU16 x,y;
-
-    HAL_CmdBufIn(CMD_DLSTART);
-    CoCmd_APPEND(start_addr,code_size);
 
     /* shadow left edge strip */
     HAL_CmdBufIn(VERTEX2F(getHX(speed,shadow_edge)*FT800_PIXEL_UNIT,SHADOW_Y*FT800_PIXEL_UNIT));
@@ -522,11 +556,7 @@ FTVOID ally_realtime_background (FTU32 speed, FTU32 start_addr, FTU32 code_size)
     HAL_CmdBufIn(VERTEX2F((x+bmp_header[I_NUM_S].wide)*FT800_PIXEL_UNIT,
                           y*FT800_PIXEL_UNIT));
 
-    HAL_CmdBufIn(END());
-
     HAL_CmdBufIn(DISPLAY());
-	HAL_CmdBufIn(CMD_SWAP);
-	HAL_BufToReg(RAM_CMD,0);
 }
 FTU32 ally_get_bitmap_tail(bmpHDR_st *p, FTU32 n)
 {
@@ -578,7 +608,10 @@ FTVOID ally_special_treatment(FTVOID)
 }
 FTVOID ally_rotate (FTU32 para)
 {
-	static FTU32 preDLsize = 0, code_start_addr;
+	static FTU32 len_fDL1 = 0, addr_RAMG1,
+                 len_fDL2 = 0, addr_RAMG2,
+				 skip_it = 0;
+    FTU32 offset;
 
 	/* 
       this part just for this routine jump out 
@@ -586,7 +619,8 @@ FTVOID ally_rotate (FTU32 para)
      */
 	appGP.appIndex = 2;
 
-	if (!preDLsize) {
+	/* run it once */
+	if (!len_fDL1) {
 		/* load bitmap resources data into FT800 */
 		if(APP_OK != appBmpToRamG(0, RAM_G, bmp_header, PIC_NUM)){
 			DBGPRINT;
@@ -599,21 +633,68 @@ FTVOID ally_rotate (FTU32 para)
 		/* automatically fill the needle moving track data */
         fill10edge();
 #endif
-		/* generate display list for 'never change' part of backgroudn */
-        preDLsize = ally_fixed_background();
 
 		/* calculate the offset in RAM_G for previous generated display list */
-        code_start_addr = ally_get_bitmap_tail(bmp_header, PIC_NUM);
+        addr_RAMG1 = ally_get_bitmap_tail(bmp_header, PIC_NUM);
+	}
+
+	/* run it twice */
+	if (!skip_it) {
+		/* generate display list for 'never change' part of backgroudn */
+        len_fDL1 = ally_fixed_background();
 
 		/* copy the display list into specific offset in RAM_G */
-        CoCmd_MEMCPY(code_start_addr,RAM_DL,preDLsize);
+        CoCmd_MEMCPY(addr_RAMG1,RAM_DL,len_fDL1);
 
 		/* execute above command */
         HAL_BufToReg(RAM_CMD,0);
-	}
+	} else {
+        HAL_CmdBufIn(CMD_DLSTART);
+        CoCmd_APPEND(addr_RAMG1,len_fDL1);
+    }
     
-    ally_realtime_background(*(FTU32 *)para,code_start_addr,preDLsize);
+	/* run it every times */
+    ally_realtime_background(*(FTU32 *)para);
 
+	/* run it twice */
+	if (!skip_it) {
+		/* execute above command */
+        HAL_BufToReg(RAM_CMD,0);
+
+        offset = HAL_Read32(REG_CMD_DL);
+        prePal8();
+		/* execute above command */
+        HAL_BufToReg(RAM_CMD,0);
+
+        len_fDL2 = HAL_Read32(REG_CMD_DL) - offset;
+        addr_RAMG2 = addr_RAMG1+len_fDL1;
+
+		/* copy the display list into specific offset in RAM_G */
+        CoCmd_MEMCPY(addr_RAMG2,RAM_DL+offset,len_fDL2);
+
+		/* execute above command */
+        HAL_BufToReg(RAM_CMD,0);
+    } else {
+        CoCmd_APPEND(addr_RAMG2,len_fDL2);
+    }
+    
+	/* the first times coming down is to get the offset
+	   the data in first time run is wrong
+	   need to run it again with right call_start*/
+    if (!call_start) {
+        /* what CALL needs is instruction offset
+           one instruction 4 bytes*/
+        call_start = offset/FTU32_LEN;
+	    appGP.appIndex = 1;
+        return;
+	}
+	
+	if (!skip_it) {
+		skip_it = 1;
+	}
+
+	HAL_CmdBufIn(CMD_SWAP);
+	HAL_BufToReg(RAM_CMD,0);
 	appGP.appIndex = 0;
 	
 	return;
