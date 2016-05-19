@@ -1004,6 +1004,15 @@ FTVOID HAL_FT800_SetSPI (FTU32 type)
     }
 #endif
 }
+FTVOID HAL_FT800_Clean (FTVOID)
+{
+    HAL_CmdBufIn(CMD_DLSTART);
+    HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
+    HAL_CmdBufIn(CLEAR(1,1,1));
+    HAL_CmdBufIn(DISPLAY());
+    HAL_CmdBufIn(CMD_SWAP);
+    HAL_BufToReg(RAM_CMD,0);
+}
 #define VER_FONT 25
 #define CAL_FONT 20
 #define CAL_WIDE 15

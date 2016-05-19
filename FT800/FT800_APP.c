@@ -193,6 +193,7 @@ appRet_en appWaitCal (FTVOID)
         } while (ret != APP_OK);
     }
 #endif
+    HAL_FT800_Clean();
     return APP_OK; 
 }
 FTU32 appGetLinestride(bmpHDR_st bmpHD)
