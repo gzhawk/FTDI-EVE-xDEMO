@@ -6,11 +6,23 @@
 */
 #ifdef DEMO_AVI
 
+#if defined(LCD_WVGA)
 #define PATH_AVI ROOT_PATH"avi\\x.avi"
-
 /* your avi frame, NOT your LCD resolution */
 #define AVI_FRAME_WIDE 800
 #define AVI_FRAME_HIGH 480
+#elif defined(LCD_HVGA)
+#define PATH_AVI ROOT_PATH"avi\\y.avi"
+/* your avi frame, NOT your LCD resolution */
+#define AVI_FRAME_WIDE 480
+#define AVI_FRAME_HIGH 320
+#else
+#error "program is not for this LCD"
+#endif
+
+#define CLICK HAL_Write16(REG_SOUND, 0x0050); \
+              HAL_Write8(REG_PLAY, 1); \
+              while(HAL_Read8(REG_PLAY))
 
 /* 
  * EVE need a 4 bytes space to store a flag, 
@@ -226,9 +238,10 @@ FTINDEF FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,F
         g_frame++;
 		Display(opt, start, g_fps, index, file_len);
 		if (TOUCHED) {
+            CLICK;
 			while (TOUCHED) {
 				/* hold till touch released then go next */;
-				FTDELAY(50);
+                FTDELAY(50);
 			}
 			start = !start;
 			return 0;
@@ -241,19 +254,27 @@ FTINDEF FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,F
 FTINDEF FTVOID cmdbufAviWrite (FTU32 resHDL, FTU32 file_len, FTU32 opt)
 {
 	FTU32 i = 0, l = 0;
-	
+
 	HAL_CmdToReg(CMD_PLAYVIDEO);
 	HAL_CmdToReg(opt | OPT_SOUND);
+    HAL_Write8(REG_VOL_PB,0xFF);
 
 	while (i < file_len) {
 		l = HAL_Read32(REG_CMDB_SPACE);
 		/* copy it into CMD buffer in EVE */
 		appResToDes(resHDL, REG_CMDB_WRITE, i, l, resWrEve);
 		i += l;
+/* 
+it's doable to stop the CMD_PLAYVIDEO in following way
+but it would case the co-processor triger some popup
+noice in audio playing next time
+*/
+#if 0
 		if (TOUCHED) {
+            CLICK;
 			while (TOUCHED) {
 				/* hold till touch released then go next */;
-				FTDELAY(50);
+                FTDELAY(50);
 			}
 			/* Once cmd_playvideo is issued, the co processor expects the whole file to be streamed to it
 			 * as the AVI parser is also part of the firmware. 
@@ -277,6 +298,7 @@ FTINDEF FTVOID cmdbufAviWrite (FTU32 resHDL, FTU32 file_len, FTU32 opt)
 			} while (1&i);
 			break;
 		}
+#endif
 	}
 }
 
@@ -301,7 +323,6 @@ FTINDEF FTU32 AVIToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 flagAddr, FTU32 fifoAd
 	appResClose(resHDL);
 	return Len;
 }
-
 /* 
  * base on my understanding, when using EVE to play AVI file:
  * 1. CMD_PLAYVIDEO, can play AVI by using CMD buffer or MEDIAFIFO
@@ -320,13 +341,15 @@ FTVOID play_avi (FTU32 para)
 	appGP.appIndex = 1;
 	appGP.appPara = 0;
 
+#if defined(LCD_HVGA)
+    HAL_Write8(REG_ROTATE,3);
+#endif
 	do {
 		if (OPT_MEDIAFIFO&opt) {
 			if (AVIToRamG((FTU8 *)PATH_AVI,AVI_RAM_ADDR,AVI_COMPLETE,AVI_FIFOADDR,AVI_FIFOSIZE,opt) == 0) {
 				DBGPRINT;
 				return;
 			}
-			
 			if (AVIToRamG((FTU8 *)PATH_AVI,AVI_RAM_ADDR,AVI_COMPLETE,AVI_FIFOADDR,AVI_FIFOSIZE,opt) == 0) {
 				DBGPRINT;
 				return;
@@ -338,6 +361,7 @@ FTVOID play_avi (FTU32 para)
 				DBGPRINT;
 				return;
 			}
+            HAL_Write8(REG_VOL_PB,0);
 			Display(opt, 0, 0, 0, 0);
 			FTDELAY(1000);
 		}
