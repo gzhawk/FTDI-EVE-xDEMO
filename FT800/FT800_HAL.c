@@ -888,11 +888,45 @@ FTVOID HAL_FT800_GPIOConfig ( FTVOID )
 {
     /* set DISP to output, then enable the DISP */
 #if defined(DEF_81X)
-    HAL_Write16(REG_GPIOX_DIR,0x8000 | HAL_Read16(REG_GPIOX_DIR));
-    HAL_Write16(REG_GPIOX,0x8000 | HAL_Read16(REG_GPIOX));
+    /*
+       Bit 31-16: Reserved
+       Bit 15 : Controlling the direction of pin DISP. For DISP functionality, this bit
+       shall be kept intact.
+       Bit 14-4: Reserved
+       Bit 3-0: Controlling the direction of pin GPIO 3-0. (1 = output, 0 = input)
+       For FT810/811, only GPIO 1-0 are available. For FT812/813, GPIO 3-0 are
+       available.
+     */
+    HAL_Write16(REG_GPIOX_DIR,0x800F);
+    /*
+       Bit 31-16: Reserved
+       Bit 15 : Setting or reading the level of pin DISP. 1 for high and 0 for low
+       Bit 14-13:GPIO[3:0], TOUCHWAKE Drive Strength Setting
+       (00:5mA - default, 01:10mA, 10:15mA, 11:20mA)
+       Bit 12:PCLK, DISP, V/HSYNC, DE, R,G,B, BACKLIGHT Drive Strength Setting
+       (0:5mA - default, 1:10mA)
+       Bit 11 - 10:MISO, MOSI, IO2, IO3, INT_N Drive Strength Setting
+       (00:5mA - default, 01:10mA, 10:15mA, 11:20mA)
+       Bit 9: INT_N Type
+       (0 : OD - default, 1 : Push-pull)
+       Bit 8-4: Reserved
+       Bit 3-0: Writing or reading the pin of GPIO 3-0. 1 for high and 0 for low.
+       For FT810/811, only GPIO 1-0 are available. For FT812/813, GPIO 3-0 are available.
+     */
+    HAL_Write16(REG_GPIOX,0x800F);
 #else
-    HAL_Write8(REG_GPIO_DIR,0x80 | HAL_Read8(REG_GPIO_DIR));
-    HAL_Write8(REG_GPIO,0x80 | HAL_Read8(REG_GPIO));
+    /*
+       Bit 0 - 7 : These bits configure the direction of GPIO pins of the FT800. Bit 0 controls
+       the direction of GPIO0 and Bit 7 controls the direction of GPIO7. The bit value 1
+       means the GPIO pin is set as an output, otherwise it means an input. After reset, only
+       the GPIO7 is set to output by default.
+     */
+    HAL_Write8(REG_GPIO_DIR,0xFF);
+    /*
+       Bit 0 - 7 : These bits are versatile. Bit 0 , 1, 7 are used to control GPIO pin values.
+       Bit 2 - 6 : These are used to configure the drive strength of the pins.
+     */
+    HAL_Write8(REG_GPIO,0xFF);
 #endif
 }
 
@@ -1189,6 +1223,7 @@ FTVOID HAL_FT800_LCDConfig ( FTVOID )
     /* mute sound to avoid pop sound */
     HAL_Write16(REG_SOUND,0x0060);
     HAL_Write8(REG_PLAY,0x01);
+    while(HAL_Read8(REG_PLAY));
 
 #if defined(LCD_HVGA) && defined(FT9XXEV)
     /*
