@@ -342,7 +342,9 @@ FTVOID play_avi (FTU32 para)
 	appGP.appPara = 0;
 
 #if defined(LCD_HVGA)
-    HAL_Write8(REG_ROTATE,3);
+    HAL_CmdBufIn(CMD_DLSTART);
+    CoCmd_SETROTATE(3);
+	HAL_BufToReg(RAM_CMD, 0);
 #endif
 	do {
 		if (OPT_MEDIAFIFO&opt) {

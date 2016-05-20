@@ -928,6 +928,11 @@ FTVOID HAL_FT800_GPIOConfig ( FTVOID )
      */
     HAL_Write8(REG_GPIO,0xFF);
 #endif
+
+    /* mute sound to avoid pop sound */
+    HAL_Write16(REG_SOUND,0x0060);
+    HAL_Write8(REG_PLAY,0x01);
+    while(HAL_Read8(REG_PLAY));
 }
 
 /*
@@ -1175,52 +1180,35 @@ FTVOID HAL_FT800_LCDConfig ( FTVOID )
         500,10,0, 5, 
         //4,2,1,1,1};
         5,2,1,1,1}; //for ME810A_HV35R pclk is 5
-#else
+#elif defined(LCD_WQVGA)
         548,43,0,41, 
         292,12,0,10, 
         5,0,1,1,1};
+#else
+#error "undefined LCD"
 #endif
-    /* 
-     * After recognizing the type of chip, 
-     * perform the trimming if necessary 
-     */
-    HAL_FT800_ClkTrim();
 
+    /* config the LCD related parameters */
     HAL_Write16(REG_HSIZE, lcd.Width);
     HAL_Write16(REG_VSIZE, lcd.Height);
-
     HAL_Write16(REG_HCYCLE, lcd.HCycle);
     HAL_Write16(REG_HOFFSET, lcd.HOffset);
     HAL_Write16(REG_HSYNC0, lcd.HSync0);
     HAL_Write16(REG_HSYNC1, lcd.HSync1);
-
     HAL_Write16(REG_VCYCLE, lcd.VCycle);
     HAL_Write16(REG_VOFFSET, lcd.VOffset);
     HAL_Write16(REG_VSYNC0, lcd.VSync0);
     HAL_Write16(REG_VSYNC1, lcd.VSync1);
-
     HAL_Write8(REG_SWIZZLE, lcd.Swizzle);
     HAL_Write8(REG_PCLK_POL, lcd.PCLKPol);
-
     HAL_Write16(REG_CSPREAD, lcd.Cspread);
     HAL_Write16(REG_DITHER, lcd.Dither);
 
-    /* clear the screen */
-    HAL_CmdBufIn(CMD_DLSTART);
-    HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
-    HAL_CmdBufIn(CLEAR(1,1,1));
-    HAL_CmdBufIn(DISPLAY());
-    HAL_CmdBufIn(CMD_SWAP);
-    HAL_BufToReg(RAM_CMD,0);
-
-    /* start to display */
-    HAL_Write8(REG_PCLK,lcd.PCLK);
-
-    /* set the backlight to highest */
+    /* the backlight default is highest 
     HAL_Write8(REG_PWM_DUTY,128);
+    */
 
-    /* set the RGB output bit */
-    /* 
+    /* the RGB output default is 6x6x6 
         R:8,7,6
         G:5,4,3
         B:2,1,0
@@ -1228,11 +1216,6 @@ FTVOID HAL_FT800_LCDConfig ( FTVOID )
         0: 8x8x8
     HAL_Write32(REG_OUTBITS,0);
      */
-
-    /* mute sound to avoid pop sound */
-    HAL_Write16(REG_SOUND,0x0060);
-    HAL_Write8(REG_PLAY,0x01);
-    while(HAL_Read8(REG_PLAY));
 
 #if defined(LCD_HVGA) && defined(FT9XXEV)
     /*
@@ -1243,7 +1226,7 @@ FTVOID HAL_FT800_LCDConfig ( FTVOID )
     ft9xx_spi_init(1,128);
     ft9xx_init_ili9488();
 #endif
-    /* set the SPI, DSPI, QSPI */
-    HAL_FT800_SetSPI(EVE_SPI_TYPE); 
+    /* start to display */
+    HAL_Write8(REG_PCLK,lcd.PCLK);
 }
 

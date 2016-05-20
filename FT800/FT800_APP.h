@@ -201,6 +201,11 @@ typedef FTVOID (* AppFunc) (FTU32);
                                     HAL_CmdBufIn(addr); \
                                     HAL_CmdBufIn(nums)
 
+#if defined(DEF_81X)
+#define CoCmd_SETROTATE(r)          HAL_CmdBufIn(CMD_SETROTATE); \
+                                    HAL_CmdBufIn(r)
+#endif
+
 FTVOID resWrBuf (FTU32 para);
 FTVOID resWrEve (FTU32 para);
 FTVOID resWrEveCmd (FTU32 para);

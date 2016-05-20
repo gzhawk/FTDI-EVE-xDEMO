@@ -58,12 +58,24 @@ FTVOID ft800_init (FTVOID)
         HAL_FT800_Clock();
 
     } while(!verify());
+    /* 
+     * After recognizing the type of chip, 
+     * perform the trimming if necessary 
+     */
+    HAL_FT800_ClkTrim();
 
     HAL_FT800_GPIOConfig();
 
     HAL_FT800_TouchConfig();
+    /* clear the screen before enable the LCD
+       to avoid messy info on LCD during bootup */
+    HAL_FT800_Clean();
 
     HAL_FT800_LCDConfig();
+
+    /* after use single SPI to config the EVE
+       set the SPI base on real HW: SPI/DSPI/QSPI */
+    HAL_FT800_SetSPI(EVE_SPI_TYPE); 
 }
 
 FTVOID run_apps (FTVOID)
