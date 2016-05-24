@@ -89,6 +89,7 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len );
 FTVOID HAL_Write16 ( FTU32 addr, FTU16 data );
 FTVOID HAL_Write32 ( FTU32 addr, FTU32 data );
 FTU32 HAL_CalResultAddr (FTVOID);
+FTVOID HAL_CoReset (FTVOID);
 FTVOID HAL_CmdWait (FTU16 CmdWrAddr);
 FTVOID HAL_DlWait (FTVOID);
 FTU32 HAL_EVELoopMemWr (FTU32 pDes, FTU32 desNow, FTU32 desLen, FTU8 * inSrc, FTU32 inLen);

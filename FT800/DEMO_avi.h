@@ -281,21 +281,7 @@ noice in audio playing next time
 			 * There is no support for pause, stop, fast forward/fast rewind player commands. 
 			 * So the only way to stop the playvideo in between is by co processor reset. */
 
-			/*
-			   Bit 2 - 0 :
-			   Bit 0 for coprocessor engine,
-			   Bit 1 for touch engine,
-			   Bit 2 for audio engine.
-			   Write 1 to reset the corresponding engine. Write zero to go back normal working
-			   status.
-			*/
-			HAL_Write32(REG_CPURESET, 1);
-			do {
-				FTDELAY(100);
-				HAL_Write32(REG_CPURESET, 0);
-				FTDELAY(100);
-				i = HAL_Read32(REG_CPURESET);
-			} while (1&i);
+			HAL_CoReset();
 			break;
 		}
 #endif

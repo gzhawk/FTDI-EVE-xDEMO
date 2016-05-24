@@ -103,10 +103,35 @@ FTINDEF FTVOID wrStart ( FTU32 addr )
     SPI.transfer(lowByte(addr));
 #endif
 }
-
+FTVOID HAL_CoReset (FTVOID)
+{
+    /*
+       Bit 2 - 0 :
+       Bit 0 for coprocessor engine,
+       Bit 1 for touch engine,
+       Bit 2 for audio engine.
+       Write 1 to reset the corresponding engine.
+       Write 0 to go back normal working status.
+     */
+    HAL_Write8(REG_CPURESET, 1);
+    while (!HAL_Read8(REG_CPURESET));
+    HAL_Write32(REG_CMD_READ,0);
+    HAL_Write32(REG_CMD_WRITE,0);
+    mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = REG_FLAG_CLN;
+    mcuCMDindex = 0; 
+    HAL_Write8(REG_CPURESET, 0);
+    while (HAL_Read8(REG_CPURESET));
+}
 FTINDEF FTU32 cmdWait (FTVOID)
 {
-    while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ));
+    while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ)) {
+        if (0xFFF == HAL_Read32(REG_CMD_READ)) {
+            FTPRINT("\nco-processor error, reset...");
+            HAL_CoReset();
+            FTPRINT("done");
+            return 0;
+        }
+    }
     
     return HAL_Read32(REG_CMD_READ);
 }
@@ -711,7 +736,6 @@ FTVOID HAL_DlpBufIn (FTU32 Dlp)
 FTVOID HAL_CmdWait (FTU16 CmdWrAddr)
 {
     HAL_Write16(REG_CMD_WRITE, CmdWrAddr);
-
     cmdWait();
 }
 FTVOID HAL_DlWait (FTVOID)
@@ -973,20 +997,20 @@ FTVOID HAL_FT800_TouchConfig ( FTVOID )
  */
 FTVOID HAL_FT800_EndDisp ( FTVOID )
 {
-    while (1) {
-        HAL_CmdBufIn(CMD_DLSTART);
-        HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
-        HAL_CmdBufIn(CLEAR(1,1,1));
+    HAL_CmdBufIn(CMD_DLSTART);
+    HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
+    HAL_CmdBufIn(CLEAR(1,1,1));
 
-        CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3,24,
-                OPT_CENTERX,"Missing correct files in SD card");
-        CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3*2,24,
-                OPT_CENTERX,"or image not for this platform");
+    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3,24,
+            OPT_CENTERX,"Missing correct files in SD card");
+    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3*2,24,
+            OPT_CENTERX,"or image not for this platform");
 
-        HAL_CmdBufIn(DISPLAY());
-        HAL_CmdBufIn(CMD_SWAP);
-        HAL_BufToReg(RAM_CMD,0);
-    }
+    HAL_CmdBufIn(DISPLAY());
+    HAL_CmdBufIn(CMD_SWAP);
+    HAL_BufToReg(RAM_CMD,0);
+
+    while(1);
 }
 FTVOID HAL_FT800_SetSPI (FTU32 type)
 {
