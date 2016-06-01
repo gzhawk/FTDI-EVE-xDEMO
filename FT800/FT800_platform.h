@@ -35,6 +35,7 @@
 #define DEMO_ALLYTECH
 #define DEMO_ALLY_FONT
 #define DEMO_ALLY_ROTATE
+#define DEMO_ALLY_MODEB
 #define DEMO_BSH
 #define DEMO_COOBOT
 #define DEMO_PUZZLE
@@ -93,6 +94,7 @@
     defined(DEMO_LIERDA)) || \
     defined(DEMO_CJ) || \
     defined(DEMO_ALLYTECH) || \
+    defined(DEMO_ALLY_MODEB) || \
     defined(DEMO_JPGDISP) || \
     defined(DEMO_LITTLESWAN) || \
     defined(DEMO_NJTOYO) || \
@@ -179,7 +181,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.33.6"
+#define FT800_VER "5.A.34.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
