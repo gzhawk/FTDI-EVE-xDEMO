@@ -12,6 +12,7 @@ typedef short          FT16;
 typedef unsigned short FTU16;
 typedef int            FT32;
 typedef unsigned int   FTU32;
+typedef long           FT64;
 typedef unsigned long  FTU64;
 #define FTVOID void
 
