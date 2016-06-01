@@ -652,24 +652,24 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
 /* 
  * It's not smart at all
  * you may refer to SampleApp for better solution
- * I'll leave this stupid routine to show how fool I am :-)
- * one of the reason I'm doing this is:
- * there are two loop buffer needs to be handled
- * 1. mcu cmd buf
- * 2. eve cmd buf
- * both of them got and 'loop free space' need to be consider
- * before doing any continous filling
- * and for string, string become another 'buffer' space when
- * continous filling into what ever mcu buffer or eve buffer
- * to prevent too many 'if there are still free space ahead'
- * judgement in program, I use make the action to 4 byte a shot
+ * I'll leave my stupid routine here
  */
 FTVOID HAL_CmdBufInStr (FTC8 *pstr)
 {
     FTU32 i,tmp = 0;
-
-    /* get the length by myslef to avoid different platform strlen 
-     * may return the length include or not include '\0' */
+    /*
+     * one of the reason I'm doing this is:
+     * there are two loop buffer needs to be handled
+     * 1. mcu cmd buf
+     * 2. eve cmd buf
+     * both of them got and 'loop free space' need to be consider
+     * before doing any continous filling
+     * and for string, string become another 'buffer' space
+     * 3. string buf
+     * when continous filling into whatever mcu buffer or eve buffer
+     * to prevent too many 'if there are still free space ahead'
+     * judgement in program, I use make the action to 4 byte a shot
+     */
     for (i = 0; pstr[i] != '\0'; i++) {
         switch (i%FTU32_LEN) {
             case 0:
@@ -694,14 +694,21 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
 
         HAL_CmdBufIn(tmp);
 
+        /* 
+         make sure:
+         1. not 4 byte align length str would have '\0' with the tmp
+         2. 4 byte align length str would have '\0'
+         once it break from the while loop
+         */
         tmp = 0;
     }
 
-    if (i%FTU32_LEN == 0) {
-        HAL_CmdBufIn(0);
-    } else {
-        HAL_CmdBufIn(tmp);	
-    }
+    /*
+     when the str length is :
+     1. 4 byte align, here is to give '\0'
+     2. none 4 byte align, here is to give the tmp with '\0'
+     */
+    HAL_CmdBufIn(tmp);	
 
     return;
 }
