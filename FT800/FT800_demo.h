@@ -84,6 +84,8 @@ app_para_t appGP = {0};
 #include "DEMO_allytech_rotate.h"
 #elif defined(DEMO_NJTOYO)
 #include "DEMO_njtoyo.h"
+#elif defined(DEMO_ALLY_MODEB)
+#include "DEMO_ally_modeb.h"
 #else
 #error "define the DEMO in FT800_platform.h!"
 #endif
