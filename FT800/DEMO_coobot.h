@@ -392,16 +392,6 @@ FTVOID coobot_data_handle (FTU32 para)
 	}
 
 	if (touch == 0 && UIData.tag[T_NOW] != 0) {
-		/* you may print you debug information, if you enable the FT800_PRINT */
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
-		FTPRINT("\r\nTag %d -> %d",UIData.tag[T_NOW],UIData.tag[T_PRE]);
-#else
-		FTPRINT("\r\n");
-		FTPRINT("Tag ");
-		FTPRINT(UIData.tag[T_NOW]);
-		FTPRINT(" -> ");
-		FTPRINT(UIData.tag[T_PRE]);
-#endif
 		UIData.tag[T_PRE] = UIData.tag[T_NOW];
 		UIData.set = 1;
 	}
