@@ -130,39 +130,18 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
     HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
     HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
     HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 #endif
-
-FTVOID FillBmpLayoutSize(bmpHDR_st bmpHD)
-{
-    FTU32 linestride = appGetLinestride(bmpHD);
-
-    HAL_CmdBufIn(BITMAP_LAYOUT(bmpHD.format,linestride,bmpHD.high));
-#ifdef DEF_81X
-    HAL_CmdBufIn(BITMAP_LAYOUT_H(linestride >> 10,bmpHD.high>>9));
-#endif       
-    /* don't know the different between NEAREST and BILINEAR, here just use NEAREST */
-    HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmpHD.wide,bmpHD.high));
-#ifdef DEF_81X
-    HAL_CmdBufIn(BITMAP_SIZE_H(bmpHD.wide >> 9,bmpHD.high>>9));
-#endif         
-}
 
 FTVOID disp_bitmap (FTU32 para)
 {
