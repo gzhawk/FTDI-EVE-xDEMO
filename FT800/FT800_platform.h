@@ -36,6 +36,7 @@
 #define DEMO_ALLY_FONT
 #define DEMO_ALLY_ROTATE
 #define DEMO_ALLY_MODEB
+#define DEMO_ALLY_LCDTST
 #define DEMO_BSH
 #define DEMO_COOBOT
 #define DEMO_PUZZLE
@@ -149,6 +150,7 @@
 /*------------------------------------------------Android, FT9XX, MSVC, STM32 */
 #if defined(DEMO_EVEUI) || \
     defined(DEMO_AUDIO) || \
+    defined(DEMO_ALLY_LCDTST) || \
     defined(DEMO_DRAGICON)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
@@ -181,7 +183,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.34.0"
+#define FT800_VER "5.A.35.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
