@@ -98,8 +98,7 @@
     defined(DEMO_LITTLESWAN) || \
     defined(DEMO_NJTOYO) || \
     defined(DEMO_ALLY_ROTATE) || \
-    defined(DEMO_STELIGENT) || \
-    defined(DEMO_TOUCH)
+    defined(DEMO_STELIGENT)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
@@ -111,11 +110,6 @@
 #define EVE_SPI_TYPE 4
 #else
 #define EVE_SPI_TYPE 1
-#endif
-
-#if defined(DEMO_TOUCH)
-#undef DEF_CAP_NONMULTI
-#define DEF_CAP_MULTI
 #endif
 
 #define HW_DEFINED
@@ -155,11 +149,18 @@
 #if defined(DEMO_EVEUI) || \
     defined(DEMO_AUDIO) || \
     defined(DEMO_ALLY_LCDTST) || \
-    defined(DEMO_DRAGICON)
+    defined(DEMO_DRAGICON) || \
+    defined(DEMO_TOUCH)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
+
+#if defined(DEMO_TOUCH)
+#undef DEF_CAP_NONMULTI
+#define DEF_CAP_MULTI
+#endif
+
 #define HW_DEFINED
 #endif
 
