@@ -9,6 +9,7 @@
 #define _FT800_PLATFORM_H_
 
 /* --------------------------------------------ONLY enable ONE of them per times
+ * code for customer: technical support
 #define DEMO_EVEUI
 #define DEMO_AVI
 #define DEMO_JPGDISP
@@ -21,16 +22,7 @@
 #define DEMO_DXT1
 #define DEMO_FVIDEO
 #define DEMO_RIPPLE
- * code for customer: useful
-#define DEMO_CJ
-#define DEMO_STELIGENT
-#define DEMO_LIERDA
-#define DEMO_MIDEA_W
-#define DEMO_WELLING
-#define DEMO_XIZI
-#define DEMO_GRG
-#define DEMO_NJTOYO
- * code for customer: useless
+#define DEMO_TOUCH
 #define DEMO_LITTLESWAN
 #define DEMO_ALLYTECH
 #define DEMO_ALLY_FONT
@@ -46,23 +38,29 @@
 #define DEMO_AMICON
 #define DEMO_DIAL
 #define DEMO_FV_INVENSYS
+ * code for customer: demonstration
+#define DEMO_CJ
+#define DEMO_STELIGENT
+#define DEMO_LIERDA
+#define DEMO_MIDEA_W
+#define DEMO_WELLING
+#define DEMO_XIZI
+#define DEMO_GRG
+#define DEMO_NJTOYO
 */
 
 #define DEMO_EVEUI
 
 /*-------------------------------------------------Demo Related hardware setting
- * DEF_81X      //when using FT81X, or DEMO run as FT80X 
- * CAP_MULTI    //Cap touch with multiple touch control, or DEMO run as res TCP 
- * CAP_NONMULTI //Cap touch with single touch control, or DEMO run as res TCP 
- * LCD_QVGA     //320x240
- * LCD_HVGA     //320x480 for FTDI ME8XXA_HV35R module
- * LCD_WQVGA    //480x272
- * LCD_WVGA     //800x480 only FT81X have WVGA
- * EVE_SPI_TYPE //SPI, DSPI or QSPI supported, only FT81X can set to 2 or 4
- *              //also, need to know if your MCU use what kind of SPI
-
-
-
+ * DEF_81X          when using FT81X, or DEMO run as FT80X 
+ * DEF_CAP_MULTI    Cap touch with multiple touch control, or DEMO run as res TCP 
+ * DEF_CAP_NONMULTI Cap touch with single touch control, or DEMO run as res TCP 
+ * LCD_QVGA         320x240
+ * LCD_HVGA         320x480 for FTDI ME8XXA_HV35R module
+ * LCD_WQVGA        480x272
+ * LCD_WVGA         800x480 only FT81X have WVGA
+ * EVE_SPI_TYPE     SPI, DSPI or QSPI supported, only FT81X can set to 2 or 4
+ *                  also, need to know if your MCU use what kind of SPI
  */
 /* not support STM32 */
 #if !defined(STM32F4)
@@ -100,7 +98,8 @@
     defined(DEMO_LITTLESWAN) || \
     defined(DEMO_NJTOYO) || \
     defined(DEMO_ALLY_ROTATE) || \
-    defined(DEMO_STELIGENT)
+    defined(DEMO_STELIGENT) || \
+    defined(DEMO_TOUCH)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
@@ -112,6 +111,11 @@
 #define EVE_SPI_TYPE 4
 #else
 #define EVE_SPI_TYPE 1
+#endif
+
+#if defined(DEMO_TOUCH)
+#undef DEF_CAP_NONMULTI
+#define DEF_CAP_MULTI
 #endif
 
 #define HW_DEFINED
@@ -183,7 +187,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.35.0"
+#define FT800_VER "5.A.36.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
