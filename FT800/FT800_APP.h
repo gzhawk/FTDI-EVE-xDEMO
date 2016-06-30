@@ -79,6 +79,9 @@ typedef FTVOID (* AppFunc) (FTU32);
                                     HAL_CmdBufIn((FTU32)(h)<<16|(FTU32)(w)); \
                                     HAL_CmdBufIn((FTU32)(t))
 
+#define CoCmd_SETBASE(base)         HAL_CmdBufIn(CMD_SETBASE); \
+                                    HAL_CmdBufIn(base)
+
 #define CoCmd_NUMBER(x, y, f, o, n) HAL_CmdBufIn(CMD_NUMBER); \
                                     HAL_CmdBufIn((FT32)(y)<<16|(FT32)(x)); \
                                     HAL_CmdBufIn((FTU32)(o)<<16|(FTU32)(f)); \
@@ -196,6 +199,20 @@ typedef FTVOID (* AppFunc) (FTU32);
                                     HAL_CmdBufIn(des); \
                                     HAL_CmdBufIn(src); \
                                     HAL_CmdBufIn(len)
+
+#define CoCmd_MEMSET(ptr,val,len)   HAL_CmdBufIn(CMD_MEMSET); \
+                                    HAL_CmdBufIn(ptr); \
+                                    HAL_CmdBufIn(val); \
+                                    HAL_CmdBufIn(len)
+
+#define CoCmd_MEMZERO(ptr,len)      HAL_CmdBufIn(CMD_MEMZERO); \
+                                    HAL_CmdBufIn(ptr); \
+                                    HAL_CmdBufIn(len)
+
+#define CoCmd_MEMCRC(ptr,len,ret)   HAL_CmdBufIn(CMD_MEMCRC); \
+                                    HAL_CmdBufIn(ptr); \
+                                    HAL_CmdBufIn(len); \
+                                    HAL_CmdBufIn(ret)
 
 #define CoCmd_APPEND(addr, nums)    HAL_CmdBufIn(CMD_APPEND); \
                                     HAL_CmdBufIn(addr); \

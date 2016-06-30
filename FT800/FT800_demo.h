@@ -90,6 +90,8 @@ app_para_t appGP = {0};
 #include "DEMO_ally_lcdtst.h"
 #elif defined(DEMO_TOUCH)
 #include "DEMO_touch.h"
+#elif defined(DEMO_MEMOPT)
+#include "DEMO_memopt.h"
 #else
 #error "define the DEMO in FT800_platform.h!"
 #endif

@@ -11,6 +11,7 @@
 /* --------------------------------------------ONLY enable ONE of them per times
  * code for customer: technical support
 #define DEMO_EVEUI
+#define DEMO_MEMOPT
 #define DEMO_AVI
 #define DEMO_JPGDISP
 #define DEMO_DISPRAW
@@ -148,6 +149,7 @@
 /*------------------------------------------------Android, FT9XX, MSVC, STM32 */
 #if defined(DEMO_EVEUI) || \
     defined(DEMO_AUDIO) || \
+    defined(DEMO_MEMOPT) || \
     defined(DEMO_ALLY_LCDTST) || \
     defined(DEMO_DRAGICON) || \
     defined(DEMO_TOUCH)
@@ -188,7 +190,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.A.36.0"
+#define FT800_VER "5.A.37.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
