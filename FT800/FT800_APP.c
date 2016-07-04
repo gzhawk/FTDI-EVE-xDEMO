@@ -26,6 +26,7 @@ wrFuncPara fPara = {0};
 FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
 #endif
 
+#if defined(CAL_NEEDED)
 FTINDEF appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
 {
     FTU32 ret_addr;
@@ -155,7 +156,7 @@ FTINDEF appRet_en appCal (FTU8 force, FTC8 *dPath)
     }
     return APP_OK;
 }
-
+#endif
 appRet_en appWaitCal (FTVOID)
 {
 #if defined(CAL_NEEDED)
