@@ -12,12 +12,12 @@ CC=$(TOOLDIR)ft32-elf-gcc
 CP=$(TOOLDIR)ft32-elf-ld
 SIZE=$(TOOLDIR)ft32-elf-size
 
-CFLAGS=-D FT9XXEV -Wall -O0 -ffunction-sections -Wl,--gc-sections -I. -I.. -I../UI/EVE -I../UI
+CFLAGS=-D FT9XXEV -Wall -O0 -ffunction-sections -Wl,--gc-sections -I. -I./sys/lib -I.. -I../UI/EVE -I../UI
 
 LIB9XX="C:\Program Files (x86)\FTDI\FT90x Toolchain\Toolchain\hardware\lib"
 LIBINC="C:\Program Files (x86)\FTDI\FT90x Toolchain\Toolchain\hardware\include"
 LIBFS=./sys
-LIB=-L$(LIB9XX) -L$(LIBFS) -L"../UI" -L"../UI/EVE" -L"../" -lc -lfatfs -lstub -lft900 
+LIB=-L$(LIB9XX) -L$(LIBFS) -L"../UI" -L"../UI/EVE" -L"../" -L"./sys/lib" -lc -lfatfs -lstub -lft900 
 
 XSRC= $(LIBFS)/ft900_xdemo.c \
 	  ../sys_main.c \

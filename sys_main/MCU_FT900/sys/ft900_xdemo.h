@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "ft900.h"
-#include "ff.h"
+#include "lib/ff.h"
 typedef const char     FTC8;
 typedef signed char    FT8;
 typedef unsigned char  FTU8;
