@@ -36,7 +36,7 @@ if errorlevel 1 goto FT9XX
 
 :FT9XX
 echo.
-@echo Be sure you finished reading FT800\FT900\ReadMe.txt
+@echo Be sure you finished reading main\FT900\ReadMe.txt
 @echo 1: Finished
 @echo 2: Not Finished
 @echo 3: Compile Only
@@ -49,22 +49,13 @@ if errorlevel 2 goto SkipRunme
 if errorlevel 1 goto FT900CompileAndProg
 
 :FT900Compile
-rename FT800\FT800.cpp FT800.c
-rename FT800\FT800_APP.cpp FT800_APP.c
-rename FT800\FT800_HAL.cpp FT800_HAL.c
-
-cd FT800\FT900
+cd main\MCU_FT900
 make
 cd ..\..
 pause
 goto SkipRunme
-
 :FT900CompileAndProg
-rename FT800\FT800.cpp FT800.c
-rename FT800\FT800_APP.cpp FT800_APP.c
-rename FT800\FT800_HAL.cpp FT800_HAL.c
-
-cd FT800\FT900
+cd main\MCU_FT900
 make
 pause
 cd img
@@ -73,87 +64,62 @@ cd ..\..\..
 goto SkipRunme
 
 :Arduino
-rename FT800\FT800.c FT800.cpp
-rename FT800\FT800_APP.c FT800_APP.cpp
-rename FT800\FT800_HAL.c FT800_HAL.cpp
-call FT800\FT800.ino
+echo.
+@echo copy main\MCU_Arduino\*.* to main
+@echo copy UI\the specific ui file to main
+@echo copy UI\EVE\*.* to main
+@echo rename main.c to main.cpp
+@echo execute main.ino to open ArduionIDE
+echo.
+pause
 goto SkipRunme
 
 :STM32
 echo.
-@echo Be sure you finished reading FT800\STM32F4\ReadMe.txt
+@echo Be sure you finished reading main\STM32F4\ReadMe.txt
 @echo 1: Finished
 @echo 2: Not Finished
 @echo 3: Compile Only
 echo.
-
 choice /C:123
-
 if errorlevel 3 goto Compile
 if errorlevel 2 goto SkipRunme
 if errorlevel 1 goto CompileAndProg
-
 :Compile
-rename FT800\FT800.cpp FT800.c
-rename FT800\FT800_APP.cpp FT800_APP.c
-rename FT800\FT800_HAL.cpp FT800_HAL.c
-
 @echo Start to compile STM32F4 code
 @echo off
-
-cd FT800\STM32F4
-
+cd main\MCU_STM32F4
 make
-
 cd ..\..
 pause
 goto SkipRunme
-
 :CompileAndProg
-rename FT800\FT800.cpp FT800.c
-rename FT800\FT800_APP.cpp FT800_APP.c
-rename FT800\FT800_HAL.cpp FT800_HAL.c
-
 @echo Start to compile STM32F4 code
 @echo off
-
-cd FT800\STM32F4
-
+cd main\MCU_STM32F4
 make
-
 cd ..\..
-
 choice /M "Y: Jlink Connected N: Jlink Not Connected"
-
 if errorlevel 2 goto SkipRunme
-
 echo.
 @echo connect the Jlink between PC and Discovery
 @echo run following command to program the flash
 @echo 1. device STM32F407VG
 @echo 2. h
 @echo 3. r
-@echo 4. loadbin ./FT800/STM32F4/img/xdemo.bin 0
+@echo 4. loadbin ./main/MCU_STM32F4/img/xdemo.bin 0
 @echo 5. r
 @echo 6. g
 echo.
-
 jlink
-
 goto SkipRunme
 
 :VC2010
-rename FT800\FT800.cpp FT800.c
-rename FT800\FT800_APP.cpp FT800_APP.c
-rename FT800\FT800_HAL.cpp FT800_HAL.c
-call FT800\VC2010Express\FT800.vcxproj
+call main\MCU_VC2010\vc2010.vcxproj
 goto SkipRunme
 
 :VC2012
-rename FT800\FT800.cpp FT800.c
-rename FT800\FT800_APP.cpp FT800_APP.c
-rename FT800\FT800_HAL.cpp FT800_HAL.c
-call FT800\VC2012Emu\FT800.vcxproj
+call main\MCU_VC2012\vc2012.vcxproj
 goto SkipRunme
 
 :SkipRunme
