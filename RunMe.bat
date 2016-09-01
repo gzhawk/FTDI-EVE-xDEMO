@@ -49,13 +49,13 @@ if errorlevel 2 goto SkipRunme
 if errorlevel 1 goto FT900CompileAndProg
 
 :FT900Compile
-cd main\MCU_FT900
+cd sys_main\MCU_FT900
 make
 cd ..\..
 pause
 goto SkipRunme
 :FT900CompileAndProg
-cd main\MCU_FT900
+cd sys_main\MCU_FT900
 make
 pause
 cd img
@@ -65,11 +65,7 @@ goto SkipRunme
 
 :Arduino
 echo.
-@echo copy main\MCU_Arduino\*.* to main
-@echo copy UI\the specific ui file to main
-@echo copy UI\EVE\*.* to main
-@echo rename main.c to main.cpp
-@echo execute main.ino to open ArduionIDE
+@echo read the sys_main\MCU_Arduino\ReadMe.txt
 echo.
 pause
 goto SkipRunme
@@ -88,7 +84,7 @@ if errorlevel 1 goto CompileAndProg
 :Compile
 @echo Start to compile STM32F4 code
 @echo off
-cd main\MCU_STM32F4
+cd sys_main\MCU_STM32F4
 make
 cd ..\..
 pause
@@ -96,7 +92,7 @@ goto SkipRunme
 :CompileAndProg
 @echo Start to compile STM32F4 code
 @echo off
-cd main\MCU_STM32F4
+cd sys_main\MCU_STM32F4
 make
 cd ..\..
 choice /M "Y: Jlink Connected N: Jlink Not Connected"
@@ -107,7 +103,7 @@ echo.
 @echo 1. device STM32F407VG
 @echo 2. h
 @echo 3. r
-@echo 4. loadbin ./main/MCU_STM32F4/img/xdemo.bin 0
+@echo 4. loadbin ./sys_main/MCU_STM32F4/img/xdemo.bin 0
 @echo 5. r
 @echo 6. g
 echo.
@@ -115,11 +111,11 @@ jlink
 goto SkipRunme
 
 :VC2010
-call main\MCU_VC2010\vc2010.vcxproj
+call sys_main\MCU_VC2010\vc2010.vcxproj
 goto SkipRunme
 
 :VC2012
-call main\MCU_VC2012\vc2012.vcxproj
+call sys_main\MCU_VC2012\vc2012.vcxproj
 goto SkipRunme
 
 :SkipRunme

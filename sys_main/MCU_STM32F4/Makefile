@@ -41,7 +41,7 @@ LIBSRC=$(LIBSDIR)/stm32f4xx_it.c \
 	   $(LIBSDIR)/stm32f4xx_syscfg.c \
 	   $(LIBSDIR)/misc.c 
 
-XSRC=$(XDIR)/main.c \
+XSRC=$(XDIR)/sys_main.c \
 	 $(XDIR)/UI/EVE/EVE_APP.c \
 	 $(XDIR)/UI/EVE/EVE_HAL.c 
 

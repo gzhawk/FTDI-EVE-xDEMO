@@ -20,7 +20,7 @@ LIBFS=./sys
 LIB=-L$(LIB9XX) -L$(LIBFS) -L"../UI/EVE" -L"../" -lc -lfatfs -lstub -lft900 
 
 XSRC= $(LIBFS)/ft900_xdemo.c \
-	  ../main.c \
+	  ../sys_main.c \
 	  ../UI/EVE/EVE_APP.c \
 	  ../UI/EVE/EVE_HAL.c 
 

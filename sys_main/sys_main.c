@@ -6,10 +6,10 @@
  */
 
 #include "platform.h"
-#include "UI/EVE/EVE_Gpu.h"
-#include "UI/EVE/EVE_HAL.h"
-#include "UI/EVE/EVE_APP.h"
-#include "UI/UI.h"
+#include "EVE_Gpu.h"
+#include "EVE_HAL.h"
+#include "EVE_APP.h"
+#include "UI.h"
 
 FTVOID run_apps (FTVOID)
 {
