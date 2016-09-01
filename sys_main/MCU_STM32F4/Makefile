@@ -21,6 +21,8 @@ IMGDIR=./img/
 LIBSDIR=$(LIBDIR)/src
 LIBINC=$(LIBDIR)/inc
 XDIR=..
+UIDIR=../UI
+EVEDIR=../UI/EVE
 
 LDFILE=$(LIBDIR)/stm32_flash.ld
 
@@ -46,7 +48,7 @@ XSRC=$(XDIR)/sys_main.c \
 	 $(XDIR)/UI/EVE/EVE_HAL.c 
 
 all:
-	$(CC) -I$(XDIR) $(CFLAGS) -T$(LDFILE) -I$(LIBINC) -I$(LIBDIR) $(XDEF) $(XFILE) $(LIBSRC) $(XSRC) $(STFILE) -o $(IMGDIR)$(XDEMO).elf
+	$(CC) -I$(XDIR) -I$(UIDIR) -I$(EVEDIR) $(CFLAGS) -T$(LDFILE) -I$(LIBINC) -I$(LIBDIR) $(XDEF) $(XFILE) $(LIBSRC) $(XSRC) $(STFILE) -o $(IMGDIR)$(XDEMO).elf
 	$(CP) -O binary $(IMGDIR)$(XDEMO).elf $(IMGDIR)$(XDEMO).bin
 	$(SIZE) $(IMGDIR)$(XDEMO).elf
 
