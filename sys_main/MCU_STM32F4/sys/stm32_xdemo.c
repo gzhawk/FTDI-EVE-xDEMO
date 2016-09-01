@@ -31,6 +31,10 @@ unsigned int TimingDelay;
 unsigned short VirtAddVarTab[NB_OF_VAR];
 unsigned int FILE_SADDR = 0;
 
+FTVOID stm32_apps_sys_dummy (FTU32 para)
+{
+
+}
 void stm32_dumy_print(char * p)
 {
 /* do nothing */

@@ -251,7 +251,7 @@ FTVOID playaudio (FTU32 cashPara)
 */
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	playaudio,
 	/* Leave this NULL at the buttom of this array */
 	NULL

@@ -1333,7 +1333,7 @@ FTVOID main_ui (FTU32 para)
 	tag = HAL_Read8(REG_TOUCH_TAG);
 	appGP.appIndex = 1;
 }
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	/* System bootup logo show */
 	bootup_ui,
 	main_ui,

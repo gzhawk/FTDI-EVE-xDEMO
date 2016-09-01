@@ -111,7 +111,7 @@ FTVOID demo_memopt (FTU32 para)
 	return;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	demo_memopt,
 	/* Leave this NULL at the buttom of this array */
 	NULL

@@ -9,7 +9,7 @@
 */
 #define USE_BUBBLE
 
-/* go Apps[] define to count the number */
+/* go APPS_UI[] define to count the number */
 typedef enum APPINDEX_e {
 	INDEXBOOTUP = 0,
 	INDEXMAIN,
@@ -658,7 +658,7 @@ FTVOID ui_main (FTU32 para)
 	}
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	ui_bootup,
 	ui_main,
 	ui_standby,

@@ -430,7 +430,7 @@ FTVOID welling_ui (FTU32 para)
 	appGP.appIndex = 0;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	/* Handling the data */
 	welling_data_handle,
 	/* Display on LCD */

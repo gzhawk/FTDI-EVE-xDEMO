@@ -1,9 +1,20 @@
+#include "ft900_xdemo.h"
 
-#include "platform.h"
+#if defined(UI_BOMS_HID)
+#include "ft900_xdemo_boms_hid.c"
+#endif
 
 #if defined(DEF_TIMER)
 extern FTVOID timerISR(FTVOID);
 #endif
+
+FTVOID ft9xx_apps_sys_dummy (FTU32 para)
+{
+#if defined(UI_BOMS_HID)
+    ft9xx_apps_sys(para);
+#endif
+}
+
 FTVOID ft9xx_dumy_print (char *p)
 {
 /* do nothing for dumy print */

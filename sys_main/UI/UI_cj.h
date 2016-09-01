@@ -707,7 +707,7 @@ FTVOID cj_init (FTU32 para)
 	
 	appGP.appIndex = 1;
 }
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	cj_init,
 	cj_main,
 	/* Leave this NULL at the buttom of this array */

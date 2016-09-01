@@ -698,7 +698,7 @@ FTVOID ally_rotate (FTU32 para)
 	return;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
     allytech_speed,
 	ally_rotate,
 	/* Leave this NULL at the buttom of this array */

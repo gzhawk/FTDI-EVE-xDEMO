@@ -79,6 +79,10 @@ typedef unsigned long  FTU32;
 #define FAT16            0
 #define FAT32            1
 
+#ifndef APPS_SYS
+#define APPS_SYS arduino_apps_sys_dummy
+#endif
+
 struct dirent {
 	FT8 name[SDC_NAME_LEN];
 	FT8 ext[SDC_NAME_EXT_LEN];
@@ -395,4 +399,4 @@ FTVOID arduino_invaild_tag (FTVOID);
 FTVOID arduino_save_cdata (FTU8 *p);
 FTVOID arduino_restore_cdata (FTU8 *p);
 FTVOID arduino_vaild_tag (FTVOID);
-
+FTVOID arduino_apps_sys_dummy (FTU32 para);

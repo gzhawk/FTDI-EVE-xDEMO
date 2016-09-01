@@ -14,8 +14,12 @@
 FTVOID run_apps (FTVOID)
 {
     FTPRINT("\nApp running");
-    while (Apps[appGP.appIndex]) {
-        Apps[appGP.appIndex](appGP.appPara);
+    while (APPS_UI[appGP.appIndex]) {
+        /* UI related application */
+        APPS_UI[appGP.appIndex](appGP.appPara);
+
+        /* system control related application */
+        APPS_SYS(appGP.appPara);
     }
 }
 
@@ -27,7 +31,13 @@ FTVOID end_loop (FTVOID)
 {
     FTPRINT("\nApp End");
 
+    /* stop the UI diaplay if necessary */
     HAL_FT800_EndDisp();
+
+    /* but MCU application should keep running for system control */
+    while (1) {
+        APPS_SYS(appGP.appPara);
+    }
 }
 
 /* main() from here */

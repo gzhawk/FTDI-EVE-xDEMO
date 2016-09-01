@@ -93,6 +93,10 @@ typedef unsigned long  FTU64;
 #define FT9XX_ILI9488_DCX_HIGH gpio_write(FT9XX_ILI9488_DCX, 1)
 #define FT9XX_ILI9488_DCX_LOW  gpio_write(FT9XX_ILI9488_DCX, 0)
 
+#ifndef APPS_SYS
+#define APPS_SYS ft9xx_apps_sys_dummy
+#endif
+
 /* default 1 dummy byte */
 unsigned char spi_dummy;
 FATFS FT9xxFatFs;
@@ -109,4 +113,5 @@ void ft9xx_invaild_tag (const char *dataPath);
 void ft9xx_save_cdata (FIL *f_hdl, const char *dataPath, unsigned char *p);
 void ft9xx_restore_cdata (FIL *f_hdl, const char *dataPath, void *p);
 void ft9xx_vaild_tag (void);
+FTVOID ft9xx_apps_sys_dummy (FTU32 para);
 

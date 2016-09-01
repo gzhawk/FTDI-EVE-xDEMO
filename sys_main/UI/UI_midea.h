@@ -261,7 +261,7 @@ FTVOID playmidea (FTU32 para)
 	} while (1);
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	playmidea,
 	/* Leave this NULL at the buttom of this array */
 	NULL

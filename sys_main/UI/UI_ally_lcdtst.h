@@ -65,7 +65,7 @@ FTVOID lcdtst (FTU32 para)
     while (1);
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	lcdtst,
 	/* Leave this NULL at the buttom of this array */
 	NULL

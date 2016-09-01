@@ -260,7 +260,7 @@ FTVOID playpuzzle (FTU32 para)
 #endif
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	playpuzzle,
 	/* Leave this NULL at the buttom of this array */
 	NULL

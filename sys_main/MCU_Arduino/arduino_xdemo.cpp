@@ -2,6 +2,11 @@
 
 sdcard SD;
 
+FTVOID arduino_apps_sys_dummy (FTU32 para)
+{
+
+}
+
 FTVOID arduino_dumy_print (char * p)
 {
 /* do nothing */

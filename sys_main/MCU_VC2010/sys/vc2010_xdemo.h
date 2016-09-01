@@ -65,6 +65,10 @@ typedef unsigned long  FTU64;
 #define SPI_TXCMD_LEN 3
 #define SPI_RXCMD_LEN 4
 
+#ifndef APPS_SYS
+#define APPS_SYS vc2010_apps_sys_dummy
+#endif
+
 FT_HANDLE ftHandle;
 void vc2010_spi_init(void);
 FTVOID vc2010_invaild_tag (FTC8 *dataPath);
@@ -73,3 +77,4 @@ FTVOID vc2010_save_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2010_restore_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2010_vaild_tag (FTVOID);
 FTVOID vc2010_dumy_print(char *p);
+FTVOID vc2010_apps_sys_dummy (FTU32 para);

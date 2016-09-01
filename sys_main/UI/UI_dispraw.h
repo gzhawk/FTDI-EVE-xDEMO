@@ -57,7 +57,7 @@ FTVOID dispraw (FTU32 para)
 	appGP.appIndex = 0;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	dispraw,
 	/* Leave this NULL at the buttom of this array */
 	NULL

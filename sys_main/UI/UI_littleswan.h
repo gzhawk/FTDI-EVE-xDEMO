@@ -201,7 +201,7 @@ FTVOID jpgdisp (FTU32 para)
 	} while (1);
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	jpgdisp,
 	/* Leave this NULL at the buttom of this array */
 	NULL

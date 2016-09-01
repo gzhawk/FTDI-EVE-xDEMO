@@ -5,7 +5,7 @@
 	Date  : 2015/May
 */
 
-/* go Apps[] define to count the number */
+/* go APPS_UI[] define to count the number */
 typedef enum APPINDEX_e {
 	I_LOCK = 0,
 	I_MAIN,
@@ -579,7 +579,7 @@ FTVOID screen_clock (FTU32 para)
 	}
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	screen_lock,
 	screen_main,
 	screen_clock,

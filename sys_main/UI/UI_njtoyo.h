@@ -371,7 +371,7 @@ FTVOID disp4jpeg (FTU32 para)
     appGP.appIndex = 1;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	disp4jpeg,
     change4file,
 	/* Leave this NULL at the buttom of this array */

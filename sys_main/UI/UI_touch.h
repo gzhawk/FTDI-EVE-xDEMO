@@ -121,7 +121,7 @@ FTVOID touch_show (FTU32 para)
 	appGP.appIndex = 0;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
     touch_detect,
 	touch_show,
 	/* Leave this NULL at the buttom of this array */

@@ -869,7 +869,7 @@ FTVOID drawHalo_show (FTU32 para)
  * but here, just show you how to use Apps to switch between each sub routine
  * so, we seperate into some sub routine
  */
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	rotate_show,
 	tremble_show,
 	fire_show,

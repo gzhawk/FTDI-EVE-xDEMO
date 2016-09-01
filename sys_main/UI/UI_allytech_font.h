@@ -199,7 +199,7 @@ FTVOID ally_font_main (FTU32 para)
 	return;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	ally_font_main,
 	/* Leave this NULL at the buttom of this array */
 	NULL

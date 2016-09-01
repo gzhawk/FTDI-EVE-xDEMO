@@ -239,7 +239,7 @@ FTVOID jpgdisp (FTU32 para)
     appGP.appIndex = 1;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	jpgdisp,
     pngdisp,
 	/* Leave this NULL at the buttom of this array */

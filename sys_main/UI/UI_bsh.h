@@ -248,7 +248,7 @@ FTVOID bsh_main_win (FTU32 para)
 	return;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	bsh_main_win,
 	/* Leave this NULL at the buttom of this array */
 	NULL

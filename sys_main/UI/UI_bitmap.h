@@ -211,7 +211,7 @@ FTVOID disp_bitmap (FTU32 para)
 	appGP.appIndex = 0;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	disp_bitmap,
 	/* Leave this NULL at the buttom of this array */
 	NULL

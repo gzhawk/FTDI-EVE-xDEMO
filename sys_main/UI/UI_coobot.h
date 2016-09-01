@@ -510,7 +510,7 @@ FTVOID coobot_ui (FTU32 para)
 	appGP.appIndex = 1;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	/* Show the startup LOGO */
 	coobot_startup,
 	/* Handling the data */

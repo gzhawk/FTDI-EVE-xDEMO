@@ -240,7 +240,7 @@ FTVOID playdxt1 (FTU32 para)
 	} while (1);
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	playdxt1,
 	/* Leave this NULL at the buttom of this array */
 	NULL

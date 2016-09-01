@@ -16,7 +16,8 @@ XDEF+=-D USE_STDPERIPH_DRIVER
 
 XDEMO=xdemo
 
-LIBDIR=./sys
+LIBDIR=./lib
+FILEDIR=./sys
 IMGDIR=./img/
 LIBSDIR=$(LIBDIR)/src
 LIBINC=$(LIBDIR)/inc
@@ -27,8 +28,6 @@ EVEDIR=../UI/EVE
 LDFILE=$(LIBDIR)/stm32_flash.ld
 
 STFILE=$(LIBDIR)/startup_stm32f4xx.s
-
-XFILE=$(LIBDIR)/stm32_xdemo.c
 
 LIBSRC=$(LIBSDIR)/stm32f4xx_it.c \
 	   $(LIBSDIR)/stm32f4xx_flash.c \
@@ -43,12 +42,13 @@ LIBSRC=$(LIBSDIR)/stm32f4xx_it.c \
 	   $(LIBSDIR)/stm32f4xx_syscfg.c \
 	   $(LIBSDIR)/misc.c 
 
-XSRC=$(XDIR)/sys_main.c \
+XSRC=$(FILEDIR)/stm32_xdemo.c \
+     $(XDIR)/sys_main.c \
 	 $(XDIR)/UI/EVE/EVE_APP.c \
 	 $(XDIR)/UI/EVE/EVE_HAL.c 
 
 all:
-	$(CC) -I$(XDIR) -I$(UIDIR) -I$(EVEDIR) $(CFLAGS) -T$(LDFILE) -I$(LIBINC) -I$(LIBDIR) $(XDEF) $(XFILE) $(LIBSRC) $(XSRC) $(STFILE) -o $(IMGDIR)$(XDEMO).elf
+	$(CC) -I$(XDIR) -I$(UIDIR) -I$(EVEDIR) -I$(FILEDIR) $(CFLAGS) -T$(LDFILE) -I$(LIBINC) -I$(LIBDIR) $(XDEF) $(LIBSRC) $(XSRC) $(STFILE) -o $(IMGDIR)$(XDEMO).elf
 	$(CP) -O binary $(IMGDIR)$(XDEMO).elf $(IMGDIR)$(XDEMO).bin
 	$(SIZE) $(IMGDIR)$(XDEMO).elf
 

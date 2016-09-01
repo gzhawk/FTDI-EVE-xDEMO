@@ -5,8 +5,8 @@
     Date  : 2013/Oct
  */
 
-#ifndef _FT800_PLATFORM_H_
-#define _FT800_PLATFORM_H_
+#ifndef _PLATFORM_H_
+#define _PLATFORM_H_
 
 /* --------------------------------------------ONLY enable ONE of them per times
  * code for customer: technical support
@@ -36,6 +36,7 @@
 #define UI_PUZZLE
 #define UI_MIDEA
 #define UI_XIZI_BKGND
+#define UI_BOMS_HID
  * coded by Born
 #define UI_AMICON
 #define UI_DIAL
@@ -51,7 +52,7 @@
 #define UI_NJTOYO
 */
 
-#define UI_EVEUI
+#define UI_BOMS_HID
 
 /*-------------------------------------------------Demo Related hardware setting
  * DEF_81X          when using FT81X, or DEMO run as FT80X 
@@ -100,6 +101,7 @@
     defined(UI_JPGDISP) || \
     defined(UI_LITTLESWAN) || \
     defined(UI_NJTOYO) || \
+    defined(UI_BOMS_HID) || \
     defined(UI_ALLY_ROTATE) || \
     defined(UI_STELIGENT)
 #define DEF_81X
@@ -209,8 +211,8 @@
 /* 
  * too limit resource on Arduino platform, 
  * may disable the print for resource saving
-#define FT800_PRINT
  */
+#define FT800_PRINT
 
 /* 
  * when not using external OSC

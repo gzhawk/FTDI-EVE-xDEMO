@@ -205,7 +205,7 @@ FTVOID ally_modeb (FTU32 para)
     appGP.appIndex = 0;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
     ally_modeb,
     /* Leave this NULL at the buttom of this array */
     NULL

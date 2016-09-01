@@ -195,7 +195,7 @@ FTVOID allytech_bitmap (FTU32 para)
 	FTDELAY(STOP_PEROID);
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
     allytech_speed, 
 	allytech_bitmap,
 	/* Leave this NULL at the buttom of this array */

@@ -89,9 +89,14 @@ typedef uint32_t argb8888;
 #define FTIOCNTRL
 #define FT800_CAL_PARA_NUM    (6)
 
+#ifndef APPS_SYS
+#define APPS_SYS vc2012emu_apps_sys_dummy
+#endif
+
 FTVOID vc2012emu_invaild_tag (FTC8 *dataPath);
 FTU8 vc2012emu_is_tag_vaild (FTC8 *dataPath);
 FTVOID vc2012emu_save_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2012emu_restore_cdata (FTC8 *dataPath, FTU8 *p);
 FTVOID vc2012emu_vaild_tag (FTVOID);
 FTVOID vc2012emu_dumy_print (char *p);
+FTVOID vc2012emu_apps_sys_dummy (FTU32 para);

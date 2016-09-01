@@ -1016,8 +1016,6 @@ FTVOID HAL_FT800_EndDisp ( FTVOID )
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);
-
-    while(1);
 }
 FTVOID HAL_FT800_SetSPI (FTU32 type)
 {

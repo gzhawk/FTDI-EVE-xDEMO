@@ -302,7 +302,7 @@ FTVOID ally_modeswap (FTU32 para)
     mode = (mode == 0)?1:0;
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
     ally_modeswap,
     /* Leave this NULL at the buttom of this array */
     NULL

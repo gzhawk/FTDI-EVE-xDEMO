@@ -869,7 +869,7 @@ FTVOID dragIcon (FTU32 para)
 	}
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	dragIcon,
 	subScreen,
 	/* Leave this NULL at the buttom of this array */

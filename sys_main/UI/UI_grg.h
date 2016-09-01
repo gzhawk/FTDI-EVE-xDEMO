@@ -7,7 +7,7 @@
 
 /* 
  * The sequence below HAS to be the SAME 
- * as function point be put in Apps 
+ * as function point be put in APPS_UI 
  */
 typedef enum CASH_NUM_e {
 	CASH_BOOT = 0,
@@ -1188,7 +1188,7 @@ FTVOID cashDbsm (FTU32 cashPara)
 	devp(cashPara);
 }
 
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 	cashBootup,
 	cashMain,
 	cashRest,

@@ -557,7 +557,7 @@ FTVOID background_fizz (FTU32 para)
  * but here, just show you how to use Apps to switch between each sub routine
  * so, we seperate into some sub routine
  */
-AppFunc Apps[] = {
+AppFunc APPS_UI[] = {
 #if !defined(STM32F4)
 	background_bitmap,
 #endif

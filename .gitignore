@@ -35,3 +35,5 @@ sys_main/MCU_STM32F4/img/xdemo.elf
 sys_main/MCU_VC2010/img/vc2010.exe
 *.lastbuildstate
 sys_main/MCU_VC2012/img/vc2012.exe
+ctags.bat
+p900.bat

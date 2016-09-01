@@ -1,6 +1,9 @@
+#include "vc2010_xdemo.h"
 
-#include "..\..\platform.h"
+FTVOID vc2010_apps_sys_dummy (FTU32 para)
+{
 
+}
 FTVOID vc2010_dumy_print(char *p)
 {
 /*do nothing*/
