@@ -22,7 +22,6 @@ typedef uint32_t     FTU32;
 
 #define USED_CMD_BUF
 
-#define FTEND          return 0
 #define FTMAIN int main (FTVOID) 
 #define FTDUMMY FTVOID _exit(FT32 status) {while(1);}
 
@@ -30,6 +29,7 @@ typedef uint32_t     FTU32;
 
 #define ROOT_PATH 
 #define CDATA_PATH NULL
+
 #ifdef FT800_PRINT
 #define FTPRINT   stm32f4Print 
 #define DBGPRINT  stm32f4Dbg()
@@ -37,7 +37,8 @@ typedef uint32_t     FTU32;
 #define FTPRINT stm32_dumy_print
 #define DBGPRINT
 #endif
-#define FTPREINIT stm32f4Init()
+
+#define SYS_INIT stm32f4Init()
 #define FTDELAY   stm32f4Delay
 
 #define CALD_TAG_ADDR 0
@@ -45,8 +46,6 @@ typedef uint32_t     FTU32;
 #define CALD_TAG_LEN  4
 
 #define FTRANDOM stm32f4Random
-
-#define FTEMU
 
 #define FTRES FTU32
 
@@ -62,6 +61,8 @@ typedef uint32_t     FTU32;
 #define FT800_CS_LOW (FT800_SPI_GPIO->BSRRH |= FT800_SPI_CS)
 
 #define APPS_SYS stm32_apps_sys_dummy
+
+#define SYS_END  return 0
 
 extern unsigned int FILE_SADDR;
 void stm32_dumy_print(char * p);

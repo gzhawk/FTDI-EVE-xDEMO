@@ -52,7 +52,7 @@
 #define UI_NJTOYO
 */
 
-#define UI_BOMS_HID
+#define UI_EVEUI
 
 /*-------------------------------------------------Demo Related hardware setting
  * DEF_81X          when using FT81X, or DEMO run as FT80X 

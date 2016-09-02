@@ -704,7 +704,7 @@ FTU8 verify (FTVOID)
     return count;
 }
 
-FTVOID ui_init (FTVOID)
+FTVOID UI_INIT (FTVOID)
 {
     FTPRINT("\nEVE init");
     
@@ -748,3 +748,7 @@ FTVOID ui_init (FTVOID)
 
 }
 
+FTVOID UI_END (FTVOID)
+{
+    HAL_FT800_EndDisp();
+}

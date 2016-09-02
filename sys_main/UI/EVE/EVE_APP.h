@@ -240,5 +240,6 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD);
 FTVOID arduino_simugpio(FTU8 flag);
 FTVOID arduino_sdcardInit (FTVOID);
 #endif
-FTVOID ui_init (FTVOID);
+FTVOID UI_INIT (FTVOID);
+FTVOID UI_END (FTVOID);
 #endif

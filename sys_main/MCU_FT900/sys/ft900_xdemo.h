@@ -18,7 +18,6 @@ typedef unsigned long  FTU64;
 
 #define USED_CMD_BUF
 
-#define FTEND          return 0
 #define FTMAIN int main (FTVOID) 
 #define FTDUMMY
 
@@ -26,6 +25,7 @@ typedef unsigned long  FTU64;
 
 #define ROOT_PATH 
 #define CDATA_PATH "cdata.bin"
+
 #ifdef FT800_PRINT
 /* if stdio.h be included, printf is usable, 
    but uart_puts would cost less image space */
@@ -36,7 +36,8 @@ typedef unsigned long  FTU64;
 #define FTPRINT ft9xx_dumy_print
 #define DBGPRINT
 #endif
-#define FTPREINIT ft9xx_int_print(FT800_VER)
+
+#define SYS_INIT ft9xx_int_print(FT800_VER)
 #define FTDELAY   delayms
 
 #define CALD_TAG_ADDR 0
@@ -44,8 +45,6 @@ typedef unsigned long  FTU64;
 #define CALD_TAG_LEN  4
 
 #define FTRANDOM(M) (rand()%(M))
-
-#define FTEMU
 
 #define FTRES FIL* 
 
@@ -98,6 +97,9 @@ typedef unsigned long  FTU64;
 #if defined(UI_BOMS_HID)
 #include "ft900_xdemo_boms_hid.h" 
 #endif
+
+#define SYS_END  while (1) {APPS_SYS(appGP.appPara);} \
+                 return 0
 
 /* default 1 dummy byte */
 unsigned char spi_dummy;

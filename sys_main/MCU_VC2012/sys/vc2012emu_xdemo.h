@@ -39,22 +39,32 @@ typedef uint32_t argb8888;
 #define FLASHRD8(a) (*(FTU8 *)(a))
 
 #define FTDELAY(mS)    Sleep(mS)
-#define FTEND
 #define ROOT_PATH "..\\..\\res\\"
 #define CDATA_PATH ROOT_PATH"cdata.bin"
 #define FTMAIN FTVOID setup () 
-#define FTDUMMY FTVOID loop () {}
+#define FTDUMMY FTVOID loop () {} \
+                int main(FT32 argc,FT8 *argv[]) \
+                { \
+				  FT8XXEMU_EmulatorParameters params; \
+				  FT8XXEMU_defaults(FT8XXEMU_VERSION_API, &params, EVEMODE); \
+				  params.Flags &= (~FT8XXEMU_EmulatorEnableDynamicDegrade & \
+						           ~FT8XXEMU_EmulatorEnableRegPwmDutyEmulation); \
+				  params.Setup = setup; \
+				  params.Loop = loop; \
+				  FT8XXEMU_run(FT8XXEMU_VERSION_API, &params); \
+				  return 0; \
+			    }
 
 #define FTINDEF static
 
 #ifdef FT800_PRINT
 #define FTPRINT     printf
 #define DBGPRINT    printf("\r\nError %s:%d",__FUNCTION__,__LINE__)
-#define FTPREINIT   printf("\r\nVer: %s",FT800_VER)
+#define SYS_INIT   printf("\r\nVer: %s",FT800_VER)
 #else
 #define FTPRINT     vc2012emu_dumy_print
 #define DBGPRINT
-#define FTPREINIT 
+#define SYS_INIT 
 #endif
 
 #define FTRANDOM(M) (rand()%(M))
@@ -73,23 +83,14 @@ typedef uint32_t argb8888;
 #endif
 #endif
 
-#define FTEMU int main(FT32 argc,FT8 *argv[]) \
-              { \
-				  FT8XXEMU_EmulatorParameters params; \
-				  FT8XXEMU_defaults(FT8XXEMU_VERSION_API, &params, EVEMODE); \
-				  params.Flags &= (~FT8XXEMU_EmulatorEnableDynamicDegrade & \
-						           ~FT8XXEMU_EmulatorEnableRegPwmDutyEmulation); \
-				  params.Setup = setup; \
-				  params.Loop = loop; \
-				  FT8XXEMU_run(FT8XXEMU_VERSION_API, &params); \
-				  return 0; \
-			  }
 #define FTRES FILE*
 
 #define FTIOCNTRL
 #define FT800_CAL_PARA_NUM    (6)
 
 #define APPS_SYS vc2012emu_apps_sys_dummy
+
+#define SYS_END
 
 FTVOID vc2012emu_invaild_tag (FTC8 *dataPath);
 FTU8 vc2012emu_is_tag_vaild (FTC8 *dataPath);

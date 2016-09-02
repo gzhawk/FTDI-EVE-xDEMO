@@ -25,11 +25,10 @@ typedef unsigned long  FTU32;
 
 #define FTPRINT        Serial.print
 #define FTDELAY(mS)    delay(mS)
-#define FTEND
 #define ROOT_PATH 
 #define CDATA_PATH NULL
-#define FTMAIN FTVOID setup () 
-#define FTDUMMY FTVOID loop () {}
+#define FTMAIN FTVOID loop () 
+#define FTDUMMY FTVOID setup () {}
 
 #define CALD_TAG_ADDR 0
 #define CALD_TAG_DATA "CALD"
@@ -46,16 +45,14 @@ typedef unsigned long  FTU32;
  * only wait a while for you to manually open serial mornitor 
  * in Arduino IDE, to see the whole debug output from the beginning
  */
-#define FTPREINIT Serial.begin(9600);FTDELAY(5000); \
+#define SYS_INIT Serial.begin(9600);FTDELAY(5000); \
 	              FTPRINT("\r\n");FTPRINT("Ver: ");FTPRINT(FT800_VER)
 #else
 #define DBGPRINT
-#define FTPREINIT 
+#define SYS_INIT 
 #endif
 
 #define FTRANDOM(M) random(M)
-
-#define FTEMU
 
 #define FTRES Reader
 
@@ -80,6 +77,8 @@ typedef unsigned long  FTU32;
 #define FAT32            1
 
 #define APPS_SYS arduino_apps_sys_dummy
+
+#define SYS_END 
 
 struct dirent {
 	FT8 name[SDC_NAME_LEN];

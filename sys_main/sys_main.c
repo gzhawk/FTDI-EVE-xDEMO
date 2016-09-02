@@ -11,9 +11,14 @@
 #include "EVE_APP.h"
 #include "UI.h"
 
-FTVOID run_apps (FTVOID)
+/* main() from here */
+FTMAIN
 {
-    FTPRINT("\nApp running");
+    SYS_INIT;
+
+    UI_INIT();
+
+    FTPRINT("\nAPPS running");
     while (APPS_UI[appGP.appIndex]) {
         /* UI related application */
         APPS_UI[appGP.appIndex](appGP.appPara);
@@ -21,42 +26,12 @@ FTVOID run_apps (FTVOID)
         /* system control related application */
         APPS_SYS(appGP.appPara);
     }
+
+    UI_END();
+
+    SYS_END;
 }
 
-/* 
- * 'keep looping' function should not come here, just for debugging
- * 'run once' function finished indication 
- */
-FTVOID end_loop (FTVOID)
-{
-    FTPRINT("\nApp End");
-
-    /* stop the UI diaplay if necessary */
-    HAL_FT800_EndDisp();
-
-    /* but MCU application should keep running for system control */
-    while (1) {
-        APPS_SYS(appGP.appPara);
-    }
-}
-
-/* main() from here */
-FTMAIN
-{
-    FTPREINIT;
-
-    ui_init();
-
-    run_apps();
-
-    end_loop();
-
-    FTEND;
-}
-
-/* only arduino platform would use it */
+/* platform related special handle */
 FTDUMMY
-
-/* only MSVC2012 emulator platform would use it */
-FTEMU
 
