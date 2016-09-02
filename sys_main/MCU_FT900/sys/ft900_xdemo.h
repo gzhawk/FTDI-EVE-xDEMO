@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "ft900.h"
-#include "lib/ff.h"
+#include "ff.h"
 typedef const char     FTC8;
 typedef signed char    FT8;
 typedef unsigned char  FTU8;
@@ -93,8 +93,10 @@ typedef unsigned long  FTU64;
 #define FT9XX_ILI9488_DCX_HIGH gpio_write(FT9XX_ILI9488_DCX, 1)
 #define FT9XX_ILI9488_DCX_LOW  gpio_write(FT9XX_ILI9488_DCX, 0)
 
-#ifndef APPS_SYS
 #define APPS_SYS ft9xx_apps_sys_dummy
+
+#if defined(UI_BOMS_HID)
+#include "ft900_xdemo_boms_hid.h" 
 #endif
 
 /* default 1 dummy byte */

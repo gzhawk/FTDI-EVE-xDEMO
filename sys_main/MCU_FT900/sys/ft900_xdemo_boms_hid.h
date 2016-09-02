@@ -88,6 +88,34 @@
 
 #define BOMS_USBS BOMS2CPU_32(BOMS_SIG_USBS) // Little Endian converted to CPU
 #define BOMS_USBC BOMS2CPU_32(BOMS_SIG_USBC) // Little Endian converted to CPU
+/* 
+ * will be used for communication flag
+ * between MCU thread and EVE thread
+ */
+#define DATA4UI  0
+#define DATA4MCU 1
+
+#define DATA_POOL_LEN 20
+
+#ifdef APPS_SYS
+#undef APPS_SYS
+#define APPS_SYS ft9xx_apps_sys
+#endif
+
+typedef enum UI_INDEX_ {
+    UI_KB2PC = 0,
+    UI_ERR
+} UI_INDEX;
+
+typedef struct data_pool_ {
+    FTU8 type;
+    /*
+      0: wait for UI data 
+      1: set to MCU
+     */
+    FTU8 direction;
+    FTU8 data[DATA_POOL_LEN];
+} data_pool_st;
 
 typedef struct PACK hid_report_structure_t
 {

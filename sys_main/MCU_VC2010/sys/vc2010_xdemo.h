@@ -65,9 +65,7 @@ typedef unsigned long  FTU64;
 #define SPI_TXCMD_LEN 3
 #define SPI_RXCMD_LEN 4
 
-#ifndef APPS_SYS
 #define APPS_SYS vc2010_apps_sys_dummy
-#endif
 
 FT_HANDLE ftHandle;
 void vc2010_spi_init(void);

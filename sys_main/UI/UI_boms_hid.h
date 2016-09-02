@@ -8,32 +8,7 @@
 #define RET_W    80
 #define RET_H    40
 
-/* 
- * will be used for communication flag
- * between MCU thread and EVE thread
- */
-#define DATA4UI  0
-#define DATA4MCU 1
-
 #if defined(MSVC2012EMU)
-typedef enum UI_INDEX_ {
-    UI_MAIN = 0,
-    UI_ERR
-} UI_INDEX;
-
-#define TEST_DISK_STR_LEN 3
-#define TEST_DISK_STA_LEN 50
-
-typedef struct test_rate_ {
-    HANDLE threadHDL;
-    FTU8 start;     /* stop the test or not */
-    FTU8 read;     /* write test or read */
-    FTU8 disk[TEST_DISK_STR_LEN];  /* test disk */
-    FTU32 size;    /* test package size */
-    FTU32 low;     /* lowest rate */
-    FTU32 high;    /* highest rate */
-    FTU8 status[TEST_DISK_STA_LEN];/* test status report */
-}test_rate_t;
 
 test_rate_t rate_data = {0};
 #define DISK_LIST_LEN 3
@@ -238,22 +213,6 @@ AppFunc APPS_UI[] = {
 	NULL
 };
 #elif defined(FT9XXEV)
-#define DATA_POOL_LEN 20
-
-typedef enum UI_INDEX_ {
-    UI_KB2PC = 0,
-    UI_ERR
-} UI_INDEX;
-
-typedef struct data_pool_ {
-    FTU8 type;
-    /*
-      0: wait for UI data 
-      1: set to MCU
-     */
-    FTU8 direction;
-    FTU8 data[DATA_POOL_LEN];
-} data_pool_st;
 
 data_pool_st dataPool = {0};
 

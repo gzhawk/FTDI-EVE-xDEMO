@@ -61,9 +61,7 @@ typedef uint32_t     FTU32;
 #define FT800_CS_HIGH (FT800_SPI_GPIO->BSRRL |= FT800_SPI_CS)
 #define FT800_CS_LOW (FT800_SPI_GPIO->BSRRH |= FT800_SPI_CS)
 
-#ifndef APPS_SYS
 #define APPS_SYS stm32_apps_sys_dummy
-#endif
 
 extern unsigned int FILE_SADDR;
 void stm32_dumy_print(char * p);

@@ -1,4 +1,4 @@
-#include "vc2012emu_xdemo.h"
+#include "platform.h"
 
 #if defined(UI_BOMS_HID)
 #include "vc2012emu_xdemo_boms_hid.c"
@@ -6,9 +6,6 @@
 
 FTVOID vc2012emu_apps_sys_dummy (FTU32 para)
 {
-#if defined(UI_BOMS_HID)
-    vc2012emu_apps_sys(para);
-#endif
 }
 FTVOID vc2012emu_dumy_print (char *p)
 {

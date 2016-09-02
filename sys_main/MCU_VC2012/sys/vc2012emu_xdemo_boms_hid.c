@@ -1,4 +1,3 @@
-#include "vc2012emu_xdemo_boms_hid.h"
 
 #define RUN_TIMES     50
 #define RUN_TIMES_X   500

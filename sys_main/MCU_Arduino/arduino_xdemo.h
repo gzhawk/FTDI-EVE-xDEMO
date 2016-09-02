@@ -79,9 +79,7 @@ typedef unsigned long  FTU32;
 #define FAT16            0
 #define FAT32            1
 
-#ifndef APPS_SYS
 #define APPS_SYS arduino_apps_sys_dummy
-#endif
 
 struct dirent {
 	FT8 name[SDC_NAME_LEN];

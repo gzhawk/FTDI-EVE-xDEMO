@@ -1,4 +1,3 @@
-#include "ft900_xdemo_boms_hid.h"
 
 hid_report_structure_t report_buffer;
 static uint8_t report_protocol = 0;
@@ -200,12 +199,6 @@ const key_mappings_t KMaps[] =
 		{'\\', 100, 0, 0, 0 }, {'|', 100, 1, 0, 0 },
 		{ 0, 0, 0, 0 }, // end marker 
 };
-
-FTVOID ft9xx_int_timer (FTVOID)
-{
-// no timer is needed 
-}
-
 
 int8_t req_cb_boms_hid(USB_device_request *req)
 {
