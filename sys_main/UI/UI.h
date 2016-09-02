@@ -16,7 +16,9 @@ typedef struct app_para_st {
 }app_para_t;
 
 /*
- * global variable for sub routine
+ * global parameter, data exchange between
+ * 1. UI.n and UI.n+1
+ * 2. UI and SYS
  */
 app_para_t appGP = {0};
 
@@ -97,7 +99,7 @@ app_para_t appGP = {0};
 #elif defined(UI_BOMS_HID)
 #include "UI_boms_hid.h"
 #else
-#error "define the UI in platform.h!"
+#error "no UI be selected"
 #endif
 
 

@@ -37,7 +37,7 @@ typedef unsigned long  FTU64;
 #define DBGPRINT
 #endif
 
-#define SYS_INIT ft9xx_int_print(FT800_VER)
+#define SYS_INIT ft9xx_int_print(APPS_VER)
 #define FTDELAY   delayms
 
 #define CALD_TAG_ADDR 0

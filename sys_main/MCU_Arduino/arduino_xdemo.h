@@ -46,7 +46,7 @@ typedef unsigned long  FTU32;
  * in Arduino IDE, to see the whole debug output from the beginning
  */
 #define SYS_INIT Serial.begin(9600);FTDELAY(5000); \
-	              FTPRINT("\r\n");FTPRINT("Ver: ");FTPRINT(FT800_VER)
+	              FTPRINT("\r\n");FTPRINT("Ver: ");FTPRINT(APPS_VER)
 #else
 #define DBGPRINT
 #define SYS_INIT 

@@ -8,8 +8,9 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-/* --------------------------------------------ONLY enable ONE of them per times
- * code for customer: technical support
+#define UI_EVEUI
+#if 0
+/* UI for customer: technical support */
 #define UI_EVEUI
 #define UI_MEMOPT
 #define UI_AVI
@@ -37,11 +38,10 @@
 #define UI_MIDEA
 #define UI_XIZI_BKGND
 #define UI_BOMS_HID
- * coded by Born
 #define UI_AMICON
 #define UI_DIAL
 #define UI_FV_INVENSYS
- * code for customer: demonstration
+/* UI for customer: demonstration */
 #define UI_CJ
 #define UI_STELIGENT
 #define UI_LIERDA
@@ -50,9 +50,7 @@
 #define UI_XIZI
 #define UI_GRG
 #define UI_NJTOYO
-*/
-
-#define UI_EVEUI
+#endif
 
 /*-------------------------------------------------Demo Related hardware setting
  * DEF_81X          when using FT81X, or DEMO run as FT80X 
@@ -85,7 +83,7 @@
     defined(UI_COOBOT))
 #define LCD_WQVGA
 #define EVE_SPI_TYPE 1
-#define HW_DEFINED
+#define DEF_DISPLAY
 #endif
 
 /*-------------------------------------------FT9XX, MSVC platform, None STM32 */
@@ -117,14 +115,14 @@
 #define EVE_SPI_TYPE 1
 #endif
 
-#define HW_DEFINED
+#define DEF_DISPLAY
 #endif
 
 #if (defined(UI_MIDEA_W))
 #define DEF_81X
 #define LCD_WQVGA
 #define EVE_SPI_TYPE 1
-#define HW_DEFINED
+#define DEF_DISPLAY
 #endif
 
 #endif
@@ -135,7 +133,7 @@
 #if defined(UI_XIZI)
 #define LCD_WQVGA
 #define EVE_SPI_TYPE 1
-#define HW_DEFINED
+#define DEF_DISPLAY
 #endif
 
 #if defined(UI_RIPPLE) || \
@@ -144,7 +142,7 @@
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
-#define HW_DEFINED
+#define DEF_DISPLAY
 #endif
 #endif
 
@@ -167,12 +165,12 @@
 #define DEF_CAP_MULTI
 #endif
 
-#define HW_DEFINED
+#define DEF_DISPLAY
 #endif
 
 /*------------------------------------------prevent undefined hardware setting */
-#if !defined(HW_DEFINED)
-#error "define your hardware setting for your DEMO"
+#if !defined(DEF_DISPLAY)
+#error "no display be selected"
 #endif
 
 /*---------------------------------------------------Universal platform define*/
@@ -194,7 +192,7 @@
  5  - 5 small changes/modify
  *
  */
-#define FT800_VER "5.B.39.0"
+#define APPS_VER "5.B.39.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

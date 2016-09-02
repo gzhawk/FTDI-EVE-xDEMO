@@ -33,7 +33,7 @@ typedef unsigned long  FTU64;
 #ifdef FT800_PRINT
 #define FTPRINT     printf
 #define DBGPRINT    printf("\r\nError %s:%d",__FUNCTION__,__LINE__)
-#define SYS_INIT   printf("\r\nVer: %s",FT800_VER)
+#define SYS_INIT   printf("\r\nVer: %s",APPS_VER)
 #else
 #define FTPRINT     vc2010_dumy_print
 #define DBGPRINT
