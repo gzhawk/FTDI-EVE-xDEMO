@@ -1,8 +1,7 @@
 echo off
 
-copy /Y arduino_xdemo.cpp ..\
-copy /Y arduino_xdemo.h ..\
-copy /Y sys_main.ino ..\
+copy /Y arduino_xdemo*.* ..\
+copy /Y *.ino ..\
 copy /Y ..\UI\UI.h ..\
 copy /Y ..\UI\EVE\*.* ..\
 

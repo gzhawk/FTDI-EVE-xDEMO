@@ -81,26 +81,6 @@ FTVOID ft9xx_fatfs_dbg_info(FRESULT ret)
             break;
     }
 }
-FTVOID ft9xx_gpio_test (FTU8 flag)
-{
-	if (flag) {
-		gpio_write(FT9XX_TST, 0);
-		delayms(100);
-		gpio_write(FT9XX_TST, 1);
-		delayms(100);
-		gpio_write(FT9XX_TST, 0);
-		delayms(100);
-		gpio_write(FT9XX_TST, 1);
-	} else {
-		gpio_write(FT9XX_TST, 0);
-		delayms(50);
-		gpio_write(FT9XX_TST, 1);
-		delayms(50);
-		gpio_write(FT9XX_TST, 0);
-		delayms(50);
-		gpio_write(FT9XX_TST, 1);
-	}
-}
 FTVOID ft9xx_ili9488_cmd (FTU8 *pdata, FTU32 num)
 {
 	FT9XX_ILI9488_CS_LOW;

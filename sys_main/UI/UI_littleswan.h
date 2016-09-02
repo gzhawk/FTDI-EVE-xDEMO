@@ -132,73 +132,79 @@ FTVOID jpgdisp (FTU32 para)
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
 	FTU32 lenX, lenY;
 #endif
+    static FTU8 inited = 0;
 	
 	/* just for debug */
 	appGP.appIndex = 1;
 	appGP.appPara = 0;
-	
-	/* X1.jpg */
-	len = fileload(p_tmp, FIFOADDR);
-	if (len == 0) {
-		DBGPRINT;
-		return;
-	}
-/*Arduino*/
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
-	/* X2.jpg */
-	p_tmp[P_INX]++;
-	lenX = len;
-	lenY = fileload(p_tmp, FIFOADDR+FIFOGAP);
-	if (lenX == 0) {
-		DBGPRINT;
-		return;
-	}
-#endif
 
-	FTIOCNTRL(0xFF);
-	do {
-		mfifoJpegWrite(mfifo_addr, FIFOGAP, RAM_G, len);
-
-		if (TOUCHED) {
-			while (TOUCHED) {
-				XY = HAL_Read32(REG_CTOUCH_TOUCH0_XY);
-				/*keep waiting for the release*/
-				Display(0, RAM_G, (XY >> 16)&0x7FFF, XY&0x7FFF);
-				FTDELAY(100);
-			}
-
-			if (FIFOADDR == mfifo_addr) {
-				mfifo_addr += FIFOGAP;
+    if (!inited) {
+        /* X1.jpg */
+        len = fileload(p_tmp, FIFOADDR);
+        if (len == 0) {
+            DBGPRINT;
+            return;
+        }
+        /*Arduino*/
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
-				len = lenY;
+        /* X2.jpg */
+        p_tmp[P_INX]++;
+        lenX = len;
+        lenY = fileload(p_tmp, FIFOADDR+FIFOGAP);
+        if (lenX == 0) {
+            DBGPRINT;
+            return;
+        }
 #endif
-				/* do the IO control */
-				FTIOCNTRL(0);
-			} else {
-				mfifo_addr = FIFOADDR;
+	    appGP.appIndex = 0;
+	    appGP.appPara = 0xFF;
+        inited = 1;
+        return;
+    }
+
+    mfifoJpegWrite(mfifo_addr, FIFOGAP, RAM_G, len);
+
+    if (TOUCHED) {
+        while (TOUCHED) {
+            XY = HAL_Read32(REG_CTOUCH_TOUCH0_XY);
+            /*keep waiting for the release*/
+            Display(0, RAM_G, (XY >> 16)&0x7FFF, XY&0x7FFF);
+            FTDELAY(100);
+        }
+
+        if (FIFOADDR == mfifo_addr) {
+            mfifo_addr += FIFOGAP;
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
-				len = lenX;
+            len = lenY;
 #endif
-				/* do the IO control */
-				FTIOCNTRL(1);
-			}
+            /* do the IO control */
+            appGP.appPara = 0;
+        } else {
+            mfifo_addr = FIFOADDR;
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
+            len = lenX;
+#endif
+            /* do the IO control */
+            appGP.appPara = 1;
+        }
 #if defined(STM32F4) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
-			p_tmp[P_INX]++;
-			len = fileload(p_tmp, mfifo_addr);
-			if (len == 0) {
-				Display(1, RAM_G, 0, 0);
-				p_tmp[P_INX] = P_BEN;
-				len = fileload(p_tmp, mfifo_addr);
-				if (len == 0) {
-					DBGPRINT;
-					return;
-				}
-			}
+        p_tmp[P_INX]++;
+        len = fileload(p_tmp, mfifo_addr);
+        if (len == 0) {
+            Display(1, RAM_G, 0, 0);
+            p_tmp[P_INX] = P_BEN;
+            len = fileload(p_tmp, mfifo_addr);
+            if (len == 0) {
+                DBGPRINT;
+                return;
+            }
+        }
 #endif
-		} else {
-			Display(0, RAM_G, 0, 0);
-		}
-	} while (1);
+    } else {
+        Display(0, RAM_G, 0, 0);
+    }
+
+    appGP.appIndex = 0;
 }
 
 AppFunc APPS_UI[] = {

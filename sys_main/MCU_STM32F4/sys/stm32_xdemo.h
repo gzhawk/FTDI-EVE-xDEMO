@@ -49,8 +49,6 @@ typedef uint32_t     FTU32;
 
 #define FTRES FTU32
 
-#define FTIOCNTRL(a) stm32f4simu_gpio(a)
-
 #define FT800_CAL_PARA_NUM    (6)
 
 #define FT800_SPI SPI1
@@ -74,7 +72,6 @@ unsigned int stm32f4Random(unsigned int r);
 void stm32f4Dbg(void);
 void stm32f4SPI1Init (unsigned short Prescaler);
 unsigned char STM32_SPISend(unsigned char data);
-void stm32f4simu_gpio (unsigned char status);
 unsigned int stm32f4_is_match (unsigned char *path, unsigned char *name);
 unsigned int stm32f4fileopen(unsigned char *path, unsigned int p);
 unsigned int stm32f4filesize(unsigned int p);

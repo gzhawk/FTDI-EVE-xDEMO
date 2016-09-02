@@ -269,25 +269,6 @@ unsigned char STM32_SPISend(unsigned char data)
 	return (unsigned char)SPI_ReceiveData(SPI1);
 }
 
-void stm32f4simu_gpio (unsigned char status)
-{
-	/* 
-	 * LED4: PD12
-	 * LED5: PD14
-	 */
-	if (status == 0xFF) {
-		STM_EVAL_LEDOff(LED5);	
-		STM_EVAL_LEDOff(LED4);
-	} else {
-		if (status) {
-			STM_EVAL_LEDOn(LED4);
-			STM_EVAL_LEDOff(LED5);
-		} else {
-			STM_EVAL_LEDOff(LED4);	
-			STM_EVAL_LEDOn(LED5);
-		}
-	}
-}
 unsigned int stm32f4_len (unsigned char *str)
 {
 	unsigned int i = 0;

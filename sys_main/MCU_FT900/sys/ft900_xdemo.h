@@ -48,8 +48,6 @@ typedef unsigned long  FTU64;
 
 #define FTRES FIL* 
 
-#define FTIOCNTRL ft900_gpio_test
-
 #define FT800_CAL_PARA_NUM (6)
 
 #define FT9XX_UART0_RX 49
@@ -111,7 +109,6 @@ void ft9xx_init (void);
 void ft9xx_spi_init (unsigned char spi_type, unsigned int spi_div);
 void ft9xx_int_print (char *p);
 void ft9xx_sdc_init (void);
-void ft9xx_gpio_test (unsigned char flag);
 unsigned char ft9xx_is_tag_vaild (FIL *f_hdl, const char *dPath);
 void ft9xx_invaild_tag (const char *dataPath);
 void ft9xx_save_cdata (FIL *f_hdl, const char *dataPath, unsigned char *p);

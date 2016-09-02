@@ -1,4 +1,8 @@
-#include "arduino_xdemo.h"
+#include "platform.h"
+
+#if defined(UI_LITTLESWAN)
+#include "arduino_xdemo_littleswan.h" 
+#endif
 
 sdcard SD;
 
@@ -26,39 +30,6 @@ FTVOID dos83(FTU8 dst[SDC_NAME_LEN+SDC_NAME_EXT_LEN], FT8 *ps)
 	}
 	while (i < (SDC_NAME_LEN+SDC_NAME_EXT_LEN))
 		dst[i++] = ' ';
-}
-
-
-FTU8 arduino_tst_msg[TST_CMD_LEN+TST_MSG_LEN+1] = {0xAA,6,0xBA,0,2,2,0,0,0,0,0};
-
-FTU8 arduino_tst_crc (FTU8 * p)
-{
-	FTU32 i;
-	FTU8 crc;
-
-	for (i = 1, crc = 0; i < (TST_CMD_LEN+TST_MSG_LEN+1); i++) {
-		crc += p[i];
-	}
-
-	return (~crc+1);
-}
-
-FTVOID arduino_simugpio(FTU8 flag)
-{
-	FTU32 i;
-
-	if (flag == 0) {
-		arduino_tst_msg[TST_CMD_LEN] = 0;
-	} else {
-		arduino_tst_msg[TST_CMD_LEN] = 1;
-	}
-
-	for (i = 0; i < (TST_CMD_LEN+TST_MSG_LEN+1); i++) {
-		FTPRINT(arduino_tst_msg[i]);
-		//FTPRINT(',');
-	}
-
-	FTPRINT(arduino_tst_crc(arduino_tst_msg));
 }
 
 FTVOID arduino_sdcardInit (FTVOID)

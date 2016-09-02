@@ -56,8 +56,6 @@ typedef unsigned long  FTU32;
 
 #define FTRES Reader
 
-#define FTIOCNTRL arduino_simugpio
-
 #ifdef PLUS_PRO
 #define FT800_SPI_CS (9) //VM800P, Arduino Pro
 #define FT800_SDC_CS (8)   //VM800P, Arduino Pro
@@ -385,11 +383,8 @@ class Reader {
 		FTU32 size;
 		FTU8 sector;
 };
-#define TST_CMD_LEN 6
-#define TST_MSG_LEN 4
 
 FTVOID arduino_dumy_print (char * p);
-FTVOID arduino_simugpio(FTU8 flag);
 FTVOID arduino_sdcardInit (FTVOID);
 FTU8 arduino_is_tag_vaild (FTVOID);
 FTVOID arduino_invaild_tag (FTVOID);

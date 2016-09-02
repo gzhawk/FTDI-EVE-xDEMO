@@ -86,6 +86,14 @@
 #define DEF_DISPLAY
 #endif
 
+#if defined(UI_LITTLESWAN)
+#define DEF_81X
+#define DEF_CAP_NONMULTI
+#define LCD_WVGA
+#define EVE_SPI_TYPE 1
+#define DEF_DISPLAY
+#endif
+
 /*-------------------------------------------FT9XX, MSVC platform, None STM32 */
 #if (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
 
@@ -97,7 +105,6 @@
     defined(UI_ALLY_MODEB) || \
     defined(UI_ALLY_SWAP) || \
     defined(UI_JPGDISP) || \
-    defined(UI_LITTLESWAN) || \
     defined(UI_NJTOYO) || \
     defined(UI_BOMS_HID) || \
     defined(UI_ALLY_ROTATE) || \
