@@ -1037,7 +1037,11 @@ FTU8 ft900_xdemo_usbd_init(FTVOID)
     usb_ctx_boms_hid.resume_cb = resume_cb;
     usb_ctx_boms_hid.reset_cb = reset_cb;
     usb_ctx_boms_hid.lpm_cb = NULL;
+#if defined(MODULE_BOMS)
     usb_ctx_boms_hid.speed = USBD_SPEED_HIGH;
+#else /* for HID can only use FULL speed */
+    usb_ctx_boms_hid.speed = USBD_SPEED_FULL;
+#endif
     usb_ctx_boms_hid.ep0_size = USB_CONTROL_EP_SIZE;
 
     USBD_initialise(&usb_ctx_boms_hid);
