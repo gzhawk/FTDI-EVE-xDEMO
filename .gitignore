@@ -38,3 +38,4 @@ sys_main/MCU_VC2012/img/vc2012.exe
 ctags.bat
 p900.bat
 tags.bat
+*.unsuccessfulbuild
