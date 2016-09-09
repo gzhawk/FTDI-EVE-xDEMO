@@ -41,6 +41,7 @@
 #define UI_AMICON
 #define UI_DIAL
 #define UI_FV_INVENSYS
+#define UI_SLIP_M
 /* UI for customer: demonstration */
 #define UI_CJ
 #define UI_STELIGENT
@@ -105,6 +106,7 @@
     defined(UI_ALLY_MODEB) || \
     defined(UI_ALLY_SWAP) || \
     defined(UI_JPGDISP) || \
+    defined(UI_SLIP_M) || \
     defined(UI_NJTOYO) || \
     defined(UI_BOMS_HID) || \
     defined(UI_ALLY_ROTATE) || \
@@ -199,7 +201,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.39.0"
+#define APPS_VER "5.B.40.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

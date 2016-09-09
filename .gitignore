@@ -39,3 +39,4 @@ ctags.bat
 p900.bat
 tags.bat
 *.unsuccessfulbuild
+sys_main/MCU_FT900/img/pm.hex

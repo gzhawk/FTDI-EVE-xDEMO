@@ -537,11 +537,15 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 }
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-    FTU32 i, src;
+    FTU32 i, src, l;
 
     for (i = 0, src = ramgAddr; i < nums; i++) {
-        pbmpHD[i].len = appFileToRamG(pbmpHD[i].path,src,1,0,0);
-        if (pbmpHD[i].len) {
+        l = appFileToRamG(pbmpHD[i].path,src,1,0,0);
+        if (pbmpHD[i].len == 0) {
+            /* only when input length == 0, set the real length */
+            pbmpHD[i].len = l;
+        }
+        if (l) {
             /* 
                when using zlib compressed file (*.bin)
                the actual decompressed size would not
@@ -552,23 +556,30 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
                 pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
             }
         } else {
-            FTPRINT("\nappLoadBmp: Len == 0");
+            FTPRINT("\nappLoadBmp: Len 0");
             return APP_ERR_LEN;
         }
         src += pbmpHD[i].len;
 #ifdef DEF_81X
         if (PALETTED8 == pbmpHD[i].format || 
-                PALETTED565 == pbmpHD[i].format || 
-                PALETTED4444 == pbmpHD[i].format) {
-            pbmpHD[i].lut_src = src;
-            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
-            if (pbmpHD[i].len_lut) {
+            PALETTED565 == pbmpHD[i].format || 
+            PALETTED4444 == pbmpHD[i].format) {
+            /* only when lut_src == 0, set the src */
+            if (pbmpHD[i].lut_src == 0) {
+                pbmpHD[i].lut_src = src;
+            }
+            l = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
+            if (pbmpHD[i].len_lut == 0) {
+                /* only when input length == 0, set the real length */
+                pbmpHD[i].len_lut = l;
+            }
+            if (l) {
                 /* same reason as above, lookup table alway less than 1K */
                 if (ZLIB_LEN == pbmpHD[i].len_lut) {
                     pbmpHD[i].len_lut = 1024;
                 }
             } else {
-                FTPRINT("\nappLoadBmp: Lut Len == 0");
+                FTPRINT("\nappLoadBmp: 81X Lut 0");
                 return APP_ERR_LEN;
             }
 
@@ -577,14 +588,17 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 #else
         if (PALETTED == pbmpHD[i].format) {
             pbmpHD[i].lut_src = RAM_PAL;
-            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
+            /* only when length == 0, set the real length */
+            if (pbmpHD[i].len_lut == 0) {
+                pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
+            }
             if (pbmpHD[i].len_lut) {
                 /* same reason as above, lookup table alway less than 1K */
                 if (ZLIB_LEN == pbmpHD[i].len_lut) {
                     pbmpHD[i].len_lut = 1024;
                 }
             } else {
-                FTPRINT("\nappLoadBmp: Lut Len == 0");
+                FTPRINT("\nappLoadBmp: 80X Lut 0");
                 return APP_ERR_LEN;
             }    
         }
@@ -599,7 +613,7 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
  * all base on your actual application needed
  * it just one of the way to tell the EVE about bitmap information
  */
-FTVOID FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
     FTU32 i, src;
 
@@ -644,7 +658,7 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
         return APP_ERR_LEN;
     }
 
-    FillBmpDL(bmpHdl, ramgAddr, pbmpHD, nums);
+    appUI_FillBmpDL(bmpHdl, ramgAddr, pbmpHD, nums);
 
     return APP_OK;
 }

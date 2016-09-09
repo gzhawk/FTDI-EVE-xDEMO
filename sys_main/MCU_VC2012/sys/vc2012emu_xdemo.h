@@ -29,7 +29,7 @@ typedef signed __int64 int64_t;
 #endif
 
 typedef uint32_t argb8888;
-#include "ft800emu_emulator.h"
+#include "ft8xxemu_emulator.h"
 
 #define USED_CMD_BUF
 
