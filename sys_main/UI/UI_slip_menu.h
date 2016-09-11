@@ -5,36 +5,43 @@
 	Date  : 2016/Sep
 */
 
-//FTU8 MENU_LEFT[] = ROOT_PATH"slip_m\\1a.raw";
-//FTU8 MENU_LEFT[] = ROOT_PATH"slip_m\\1a.bin";
-FTU8 MENU_LEFT[] = ROOT_PATH"slip_m\\1a_inx.bin";
-FTU8 MENU_LEFT_[] = ROOT_PATH"slip_m\\1a_lut.bin";
+//FTU8 MENU_0[] = ROOT_PATH"slip_m\\1a.raw";
+//FTU8 MENU_0[] = ROOT_PATH"slip_m\\1a.bin";
+FTU8 MENU_0[] = ROOT_PATH"slip_m\\1a_inx.bin";
+
 //FTU8 MENU_1[] = ROOT_PATH"slip_m\\2a.raw";
 //FTU8 MENU_1[] = ROOT_PATH"slip_m\\2a.bin";
 FTU8 MENU_1[] = ROOT_PATH"slip_m\\2a_inx.bin";
-FTU8 MENU_1_[] = ROOT_PATH"slip_m\\2a_lut.bin";
+
 //FTU8 MENU_2[] = ROOT_PATH"slip_m\\3a.raw";
 //FTU8 MENU_2[] = ROOT_PATH"slip_m\\3a.bin";
 FTU8 MENU_2[] = ROOT_PATH"slip_m\\3a_inx.bin";
-FTU8 MENU_2_[] = ROOT_PATH"slip_m\\3a_lut.bin";
+
 //FTU8 MENU_3[] = ROOT_PATH"slip_m\\4a.raw";
 //FTU8 MENU_3[] = ROOT_PATH"slip_m\\4a.bin";
 FTU8 MENU_3[] = ROOT_PATH"slip_m\\4a_inx.bin";
-FTU8 MENU_3_[] = ROOT_PATH"slip_m\\4a_lut.bin";
+
 //FTU8 MENU_4[] = ROOT_PATH"slip_m\\5a.raw";
 //FTU8 MENU_4[] = ROOT_PATH"slip_m\\5a.bin";
 FTU8 MENU_4[] = ROOT_PATH"slip_m\\5a_inx.bin";
+
+//FTU8 MENU_5[] = ROOT_PATH"slip_m\\6a.raw";
+//FTU8 MENU_5[] = ROOT_PATH"slip_m\\6a.bin";
+FTU8 MENU_5[] = ROOT_PATH"slip_m\\6a_inx.bin";
+
+FTU8 MENU_0_[] = ROOT_PATH"slip_m\\1a_lut.bin";
+FTU8 MENU_1_[] = ROOT_PATH"slip_m\\2a_lut.bin";
+FTU8 MENU_2_[] = ROOT_PATH"slip_m\\3a_lut.bin";
+FTU8 MENU_3_[] = ROOT_PATH"slip_m\\4a_lut.bin";
 FTU8 MENU_4_[] = ROOT_PATH"slip_m\\5a_lut.bin";
-//FTU8 MENU_RIGHT[] = ROOT_PATH"slip_m\\6a.raw";
-//FTU8 MENU_RIGHT[] = ROOT_PATH"slip_m\\6a.bin";
-FTU8 MENU_RIGHT[] = ROOT_PATH"slip_m\\6a_inx.bin";
-FTU8 MENU_RIGHT_[] = ROOT_PATH"slip_m\\6a_lut.bin";
+FTU8 MENU_5_[] = ROOT_PATH"slip_m\\6a_lut.bin";
 
 FTU8 MENU_SUB[] = ROOT_PATH"slip_m\\0_inx.bin";
 FTU8 MENU_SUB_[] = ROOT_PATH"slip_m\\0_lut.bin";
 
-#define MENU_MAIN_NUM  6 //left, 1, 2, 3, 4, right
-#define MENU_NUM       '8' //total menu number
+#define MENU_MAIN_NUM  6
+#define MENU_NUM_END   '8'
+#define MENU_NUM_START '1'
 #define MENU_HDL_START 0
 #define MENU_RAM_START RAM_G
 #define MENU_W         200
@@ -76,7 +83,7 @@ FT16 pos_anchor[MENU_MAIN_NUM] = {
 };
 
 menu_prop_st main_menu[MENU_MAIN_NUM+1] = {
-    {{(FTC8 *)MENU_LEFT , (FTC8 *)MENU_LEFT_ , 
+    {{(FTC8 *)MENU_0 , (FTC8 *)MENU_0_ , 
       (MENU_RAM_START+(MENU_W*MENU_H)),          
       //RGB332, (MENU_W*MENU_H), 1024, MENU_W,  MENU_H},
       PALETTED565, (MENU_W*MENU_H), 1024, MENU_W,  MENU_H},
@@ -106,7 +113,7 @@ menu_prop_st main_menu[MENU_MAIN_NUM+1] = {
       PALETTED565, (MENU_W*MENU_H), 1024, MENU_W,  MENU_H},
     (MENU_END_L+4*MENU_W),0,100},
 
-    {{(FTC8 *)MENU_RIGHT, (FTC8 *)MENU_RIGHT_, 
+    {{(FTC8 *)MENU_5, (FTC8 *)MENU_5_, 
       (MENU_RAM_START+6*(MENU_W*MENU_H)+5*1024), 
       //RGB332, (MENU_W*MENU_H), 1024, MENU_W,  MENU_H},
       PALETTED565, (MENU_W*MENU_H), 1024, MENU_W,  MENU_H},
@@ -133,6 +140,7 @@ FTU8 menu_nunber (FT16 X)
 {
     FTU8 i;
 
+    /* get the menu index from pressed location */
     for (i = 0; i < MENU_MAIN_NUM; i++) {
         if (main_menu[i].X <= X && (main_menu[i].X + (FT16)main_menu[i].menuInfo.wide) > X) {
             break;
@@ -146,6 +154,7 @@ FTU8 menu_anchor_index (FT16 X)
 {
     FTU8 i;
     
+    /* get the anchor index from pressed location */
     for (i = 0; i < MENU_MAIN_NUM; i++) {
         if (pos_anchor[i] == X) {
             break;
@@ -155,11 +164,13 @@ FTU8 menu_anchor_index (FT16 X)
     return i;
 }
 
+/* set all the menu back to it's original offset position */
 FTVOID menu_anchor (FTVOID)
 {
     FTU8 i, j;
     menu_prop_st *p = &main_menu[0];
 
+    /* use index 0 to search the anchor */
     for (i = 0; i < MENU_MAIN_NUM; i++) {
         if ((pos_anchor[i]-MENU_W/2) < p->X && (pos_anchor[i]+MENU_W/2) > p->X) {
             p->X = pos_anchor[i];
@@ -167,6 +178,7 @@ FTVOID menu_anchor (FTVOID)
         }
     }
 
+    /* set the rest (start from 1) to the end base on anchor */
     for (j = 1, i += 1; j < MENU_MAIN_NUM; j++,i++) {
         if (i >= MENU_MAIN_NUM) {
             i = 0;
@@ -175,35 +187,44 @@ FTVOID menu_anchor (FTVOID)
     }
 }
 
+/* 
+ two loop need to be handled, and make it sync:
+ 1. menu number loop
+ 2. sub menu number loop
+ */
 FTVOID menu_new_path (FTU8 i)
 {
     FTU8 n;
 	FT16 w = (FT16)main_menu[i].menuInfo.wide;
 
     if (main_menu[i].X <= MENU_END_L+w) {
+        /* 1. menu number loop */
         if (i >= (MENU_MAIN_NUM-1)) {
             n = main_menu[0].menuInfo.path[UPDATE_PATH_INDEX] - 1;
         } else {
             n = main_menu[i+1].menuInfo.path[UPDATE_PATH_INDEX] - 1;
         }
 
-        if (n < '1') {
-            *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = MENU_NUM;
-            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = MENU_NUM;
+        /* 2. sub menu number loop */
+        if (n < MENU_NUM_START) {
+            *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = MENU_NUM_END;
+            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = MENU_NUM_END;
         } else {
             *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = n;
             *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = n;
         }
     } else if (main_menu[i].X >= MENU_END_R-w) {
+        /* 1. menu number loop */
         if (i <= 0) {
             n = main_menu[MENU_MAIN_NUM-1].menuInfo.path[UPDATE_PATH_INDEX] + 1;
         } else {
             n = main_menu[i-1].menuInfo.path[UPDATE_PATH_INDEX] + 1;
         }
 
-        if (n > MENU_NUM) {
-            *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = '1';
-            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = '1';
+        /* 2. sub menu number loop */
+        if (n > MENU_NUM_END) {
+            *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = MENU_NUM_START;
+            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = MENU_NUM_START;
         } else {
             *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = n;
             *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = n;
@@ -216,6 +237,7 @@ FTU8 menu_load (FTU8 i, FTU8 init)
     FTU32 ram_addr = main_menu[i].menuInfo.lut_src - main_menu[i].menuInfo.len;
     
     if(!main_menu[i].inRAM){
+        /* load the new menu/submenu, base on the index */
         if (APP_OK != appLoadBmp(ram_addr,&(main_menu[i].menuInfo),1) ) {
             return 0;
         }
@@ -223,6 +245,7 @@ FTU8 menu_load (FTU8 i, FTU8 init)
     }
 
     if (init) {
+        /* set the bitmap global variable */
         appUI_FillBmpDL(MENU_HDL_START+i, ram_addr, &(main_menu[i].menuInfo), 1);
     }
     
@@ -240,83 +263,186 @@ FTU8 menu_init (FTVOID)
     return 1;
 }
 
-FTU8 menu_detect (FTU32 *pMainMenuIndex)
+FTVOID menu_move (FTU8 M_index, FT16 move, FTU8 release)
 {
-#define RELEASED     (0x8000&nowTouch)
-#define DELTA_L      (-3)
-#define DELTA_R      (3)
-    static FT16 lastTouch = 0, drag = 0;
-    FT16 nowTouch = 0xFFFF&(HAL_Read32(REG_TOUCH_SCREEN_XY)>>16),
-         delta = 0;
     FTU8 i;
-
-    /* never touch */
-    if (RELEASED && !lastTouch) {
-        return E_MENU_M;
-    }
-
-    /* first touch */
-	if (!lastTouch) {
-		lastTouch = nowTouch;
-        return E_MENU_M;
-	}
-
-	if (RELEASED) {
-        /* touched, and released */
-        menu_anchor();
-	} else {
-        /* touched, and drag */
-		delta = nowTouch - lastTouch;
-		lastTouch = nowTouch;
-        /* ignore the tiny movement */
-        if (delta > DELTA_L && delta < DELTA_R) {
-            delta = 0;
-        }
-        /* 
-         once set it to drag
-         only release can reset it
-         */
-        if (!drag && delta) {
-            drag = 1;
-        }
-	}
+    /* in single touch, the first location is wrong, ignore it */
+    static FTU8 ignore = 1;
 
     for (i = 0; i < MENU_MAIN_NUM; i++) {
-		if (RELEASED) {
-            main_menu[i].scale = RELEASED?SCALE_RELEASED:SCALE_PRESSED;
-		} else {
-			main_menu[i].scale = SCALE_PRESSED;
-            if (delta) {
-                main_menu[i].X += delta;
-                menu_load_test(&main_menu[i]);
+        if (release) {
+            ignore = 1;
+			if (main_menu[i].scale == SCALE_RELEASED) {
+				continue;
+			} else {
+			    main_menu[i].scale = SCALE_RELEASED;
             }
-		}
+            /* do it only once, below routine would handle all menu */
+            if (i == 0) {
+                menu_anchor();
+            }
+        } else {
+            if (move) {
+                /* user drag or inertia move */
+                ignore = 1;
+                main_menu[i].scale = SCALE_PRESSED;
+                main_menu[i].X += move;
+                menu_load_test(&main_menu[i]);
+            } else {
+                /* single click */
+                if (M_index == i) {
+                    if (ignore) {
+                        ignore = 0;
+                        continue;
+                    }
+                    main_menu[i].scale = SCALE_PRESSED;
+                }
+            }
+        }
 
         if (!main_menu[i].inRAM) {
             menu_new_path(i);
             menu_load(i, 0);
         }
     }
+}
 
-    i = E_MENU_M;
+/* 
+ instead of using out side loop count (WAIT)
+ you may use timer to have more accurate result
+ */
+FT16 menu_slip_inertia (FT16 tX)
+{
+#define WAIT (8)
+    static FT16 lastX = 0, 
+                prevX = 0, 
+                wait = 0,
+                inertia = 0;
 
-    if (RELEASED) {
+    if (0x8000&tX) {
+        /* 
+         to count the last inertia, what we need is "the last pair (prevX, lastX)"
+         the last entry of this routine before release only go "prevX" or "lastX"
+         the "inertia" would be used till the next release entry this routine
+         */
+        if (!prevX && !lastX) {
+            inertia = 0;
+		}
+        wait = 0;
+		lastX = 0;
+		prevX = 0;
+    } else {
+        if (!prevX) {
+            prevX = tX;
+        } else {
+            if (lastX) {
+                lastX = 0;
+                prevX = tX;
+            }
+            if (++wait >= WAIT) {
+                wait = 0;
+                lastX = tX;
+                inertia = lastX - prevX;
+            }
+        }
+    }
+    return inertia;
+}
+
+FT16 menu_slip_press (FT16 press, FTU8 *pMenu, FTU32 *pMenuIndex)
+{
+#define DELTA_L        (-3)
+#define DELTA_R        (3)
+
+    static FT16 last_press = 0, drag = 0;
+    FT16 delta = 0;
+	FTU8 unpress = (0x8000&press)?1:0;
+
+    *pMenu = E_MENU_M;
+
+    /* never touch */
+    if (unpress && !last_press) {
+        return delta;
+    }
+
+    /* first touch */
+	if (!last_press) {
+		last_press = press;
+        return delta;
+	}
+
+    /* tell the menu index for single click */
+    *pMenuIndex = menu_nunber(last_press);
+
+    if (unpress) {
         if (!drag) {
-            *pMainMenuIndex = menu_nunber(lastTouch);
-            if (*pMainMenuIndex == MENU_MAIN_NUM) {
-                /* main menu index not found */
-                i = E_MENU_M;
-            } else {
-                i = E_MENU_SUB;
+            if (*pMenuIndex != MENU_MAIN_NUM) {
+                *pMenu = E_MENU_SUB;
                 main_menu[MENU_MAIN_NUM].inRAM = 0;
             }
         }
-        lastTouch = 0;
-        delta = 0;
+        last_press = 0;
         drag = 0;
+    } else {
+        /* touched, and drag */
+		delta = press - last_press;
+		last_press = press;
+        /* ignore the tiny movement */
+        if (delta > DELTA_L && delta < DELTA_R) {
+            delta = 0;
+        }
+        /* 
+         once set it to drag
+         only unpress can reset it
+         */
+        if (!drag && delta) {
+            drag = 1;
+        }
+	}
+
+    return delta;
+}
+
+FTU8 menu_detect (FTU32 *pMenuIndex)
+{
+#define STEP (10)
+
+    FT16 Touch = 0xFFFF&(HAL_Read32(REG_TOUCH_SCREEN_XY)>>16);
+	FTU8 ui = E_MENU_M, released = (0x8000&Touch)?1:0;
+    FT16 D_press = menu_slip_press(Touch,&ui,pMenuIndex);
+    FT16 D_inertia = menu_slip_inertia(Touch);
+    static FT16 inertiaing = 0;
+
+    if (inertiaing) {
+        if (!released) {
+            /* any touch during the inertia process would stop the inertia */
+            inertiaing = 0;
+        } else {
+            menu_move(*pMenuIndex,inertiaing, 0);
+            if (inertiaing > 0) {
+                inertiaing -= STEP;
+                if (inertiaing <= 0) {
+                    /* avoid endless loop to blow routine */
+                    inertiaing = 0;
+                }
+            } else {
+                inertiaing += STEP;
+                if (inertiaing >= 0) {
+                    /* avoid endless loop to above routine */
+                    inertiaing = 0;
+                }
+            }
+        }
+    } else {
+        /* only release and fast enough movement can trigger the inertia */
+        if (released && D_inertia) {
+            inertiaing = D_inertia;
+        } else {
+            menu_move(*pMenuIndex,D_press, released);
+        }
     }
 
-    return i;
+    return ui;
 }
 
 FTVOID menu_disp (FTU8 index)
@@ -326,9 +452,7 @@ FTVOID menu_disp (FTU8 index)
 
     HAL_CmdBufIn(BITMAP_HANDLE(MENU_HDL_START+index));
     HAL_CmdBufIn(CELL(0));
-    /* TODO: impliment palette 8 later */
-    if (main_menu[index].menuInfo.format == PALETTED565 ||
-        main_menu[index].menuInfo.format == PALETTED4444) {
+    if (main_menu[index].menuInfo.format == PALETTED565) {
         HAL_CmdBufIn(PALETTE_SOURCE(addr));
     }
     HAL_CmdBufIn(VERTEX2F(X,0));
@@ -367,7 +491,7 @@ FTVOID menu_disp_inside (FTU8 index)
 
 FTVOID submenu_detect (FTU8 sub, FTU8 *p_ing)
 {
-#define RELEASED     (0x8000&nowTouch)
+#define SUB_RELEASED (0x8000&nowTouch)
 #define DECREASE     (20)
     static FT16 lastTouch = 0;
     FT16 nowTouch = 0xFFFF&(HAL_Read32(REG_TOUCH_SCREEN_XY)>>16);
@@ -376,9 +500,13 @@ FTVOID submenu_detect (FTU8 sub, FTU8 *p_ing)
     appGP.appIndex = E_MENU_SUB;
     
     if (!(*p_ing)) {
-        if (RELEASED) {
+        /* coming from submenu normal display period */
+        if (SUB_RELEASED) {
             if (lastTouch) {
-                /* set the main menu position back to visable */
+                /*
+                 before going back to main menu
+                 set the main menu position back to visable 
+                 */
                 for (i = menu_anchor_index(main_menu[sub].X)+1,j=sub+1; 
                      ; i++,j++) {
                     if (i >= MENU_MAIN_NUM) {
@@ -403,14 +531,20 @@ FTVOID submenu_detect (FTU8 sub, FTU8 *p_ing)
             main_menu[MENU_MAIN_NUM].scale = SCALE_PRESSED;
         }
     } else {
+        /* coming from main menu, need a "moving none selected menu away" effect */
         for (i = 0; i < MENU_MAIN_NUM; i++) {
             if (i == sub) {
+                /* ignore selected one */
                 continue;
             }
             if (main_menu[i].X <= MENU_END_L || main_menu[i].X >= MENU_END_R) {
+                /* ignore invisable two */
                 continue;
             }
 
+            /* 
+             "moving none selected menu away" effect
+             */
             if (main_menu[i].X < main_menu[sub].X) {
                 main_menu[i].X -= DECREASE;
             } else {
@@ -423,6 +557,10 @@ FTVOID submenu_detect (FTU8 sub, FTU8 *p_ing)
                 i == sub) {
                 continue;
             }
+            /* 
+             keep entry this routine
+             till all valid "none selected" menu invisable
+             */
             return;
         }
         *p_ing = 0;
@@ -454,7 +592,7 @@ FTVOID submenu_disp (FTU32 para)
         menu_disp_inside(MENU_MAIN_NUM);
         for (i = 0; i < MENU_MAIN_NUM;i++) {
             if (i == para) {
-                /* don't display the selected one */
+                /* don't display the selected main menu */
                 continue;
             }
             menu_disp(i);
