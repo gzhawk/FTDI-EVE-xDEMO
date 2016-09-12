@@ -236,9 +236,6 @@ FTVOID playaudio (FTU32 cashPara)
 		AUD_VOL
 	};
 #endif
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
-
 	screenShow((FTU32)&raw_hd);
 	if (audPlay(&raw_hd, screenShow)) {
 		appGP.appIndex = 0;
@@ -252,8 +249,6 @@ FTVOID playaudio (FTU32 cashPara)
 }
 
 AppFunc APPS_UI[] = {
-	playaudio,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	playaudio
 };
 

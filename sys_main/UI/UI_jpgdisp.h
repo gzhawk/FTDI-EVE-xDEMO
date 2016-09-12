@@ -150,7 +150,6 @@ FTINDEF FTVOID DisplayJPG (FTU32 hdl, FTU32 addr, FTU32 opt)
     }
 
     if (len == 0) {
-        appGP.appIndex = 2;
         DBGPRINT;
         return;
     }
@@ -185,7 +184,6 @@ FTVOID pngdisp (FTU32 para)
     len = ImageToRamG((FTU8 *)PATH_PNG_A,RAM_G,0,0,0);
     if (len == 0) {
         DBGPRINT;
-        appGP.appIndex = 2;
         return;
     }
 
@@ -241,8 +239,6 @@ FTVOID jpgdisp (FTU32 para)
 
 AppFunc APPS_UI[] = {
 	jpgdisp,
-    pngdisp,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+    pngdisp
 };
 

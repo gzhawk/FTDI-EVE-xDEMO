@@ -692,8 +692,6 @@ AppFunc APPS_UI[] = {
 	Scroller_show,
 	Scroller_show1,
 	Scroller_show2,
-	Scroller_show3,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	Scroller_show3
 };
 

@@ -164,10 +164,6 @@ FTVOID bup (FTU32 para)
 {
 	FTU32 len;
 
-	/* just for debug */
-	appGP.appIndex = 2;
-	appGP.appPara = 0;
-
 	do {
 	
 		len = JPEGToRamG(path_bup,RAM_G,FIFOADDR,FIFOSIZE,OPT_MEDIAFIFO);
@@ -207,10 +203,6 @@ FTVOID main_m (FTU32 para)
 	FTU32 len;
 	static FTU16 angle = 0, flag = 0;
 	static FTU32 bkgnd_offset, icon_l_offset;
-
-	/* just for debug */
-	appGP.appIndex = 2;
-	appGP.appPara = 0;
 
 	if (flag == 0) {
 		/* load bitmap resources data into FT800 */
@@ -282,8 +274,6 @@ FTVOID main_m (FTU32 para)
 
 AppFunc APPS_UI[] = {
 	bup,
-	main_m,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	main_m
 };
 

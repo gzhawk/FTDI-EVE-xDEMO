@@ -133,10 +133,6 @@ FTVOID jpgdisp (FTU32 para)
 	FTU32 lenX, lenY;
 #endif
     static FTU8 inited = 0;
-	
-	/* just for debug */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
 
     if (!inited) {
         /* X1.jpg */
@@ -208,8 +204,6 @@ FTVOID jpgdisp (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	jpgdisp,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	jpgdisp
 };
 

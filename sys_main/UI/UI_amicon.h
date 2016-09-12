@@ -672,8 +672,6 @@ FTVOID fire_show (FTU32 para)
 	}
 
 	appGP.appIndex++;
-	//gIndex = 0;
-
 	return;
 }
 
@@ -716,8 +714,6 @@ FTVOID tremble_show (FTU32 para)
 	}
 
 	appGP.appIndex++;
-	//gIndex = 0;
-
 	return;
 }
 
@@ -760,8 +756,6 @@ FTVOID rotate_show (FTU32 para)
 	}
 
 	appGP.appIndex++;
-	//gIndex = 0;
-
 	return;
 }
 
@@ -818,9 +812,6 @@ FTINDEF FTVOID drawGIF(FTU32 para)
 		// hold till release 
 	}
 
-	//appGP.appIndex = 0;
-	//gIndex = 0;
-
 	return;
 }
 
@@ -860,7 +851,6 @@ FTVOID drawHalo_show (FTU32 para)
 		/* hold till release */
 	}
 	appGP.appIndex++;
-	//gIndex = 0;
 	return;
 }
 
@@ -874,8 +864,6 @@ AppFunc APPS_UI[] = {
 	tremble_show,
 	fire_show,
 	drawHalo_show,
-	drawGIF,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	drawGIF
 };
 

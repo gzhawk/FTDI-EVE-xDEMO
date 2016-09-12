@@ -337,8 +337,6 @@ FTVOID disp4jpeg (FTU32 para)
 {
     static FTU32 preDLaddr = 0;
 
-    appGP.appIndex = 2;
-
     if (dump4jpeg()) {
         DBGPRINT;
         return;
@@ -373,8 +371,6 @@ FTVOID disp4jpeg (FTU32 para)
 
 AppFunc APPS_UI[] = {
 	disp4jpeg,
-    change4file,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+    change4file
 };
 

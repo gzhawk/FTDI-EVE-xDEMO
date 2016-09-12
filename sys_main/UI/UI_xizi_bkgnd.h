@@ -217,9 +217,6 @@ FTVOID playdxt1xizi (FTU32 para)
 			  m2 = {&ScnPath[1],DXT1_START_ADDR,DXT1_START_HDL+DXT1_HDL_NUMS,0,-272,480,272},
 			  *pm;
 
-	/* just for debug */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
 #if defined(STM32F4)
 	return;
 #endif
@@ -260,8 +257,6 @@ FTVOID playdxt1xizi (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	playdxt1xizi,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	playdxt1xizi
 };
 

@@ -16,8 +16,6 @@ typedef enum APPINDEX_e {
 	INDEXSTANDBY,
 	INDEXEND
 } APPINDEX;
-/* make the error routine be shown in end screen */
-#define SETENDINDEX appGP.appIndex = INDEXEND
 
 typedef enum TAGINDEX_e {
 	TAG_STBY = 10,
@@ -178,8 +176,6 @@ FTVOID ui_bootup (FTU32 para)
 {
 	FTU32 ret = 1;
 
-	SETENDINDEX;
-
 #if defined(USE_BUBBLE)
 	init_bubble();
 #endif
@@ -334,7 +330,6 @@ FTVOID ui_standby (FTU32 para)
 {
 	FTU32 ret = 1;
 
-	SETENDINDEX;
 	while (ret) {
 		HAL_CmdBufIn(CMD_DLSTART);
 		HAL_CmdBufIn(COLOR_BAKGRD_CLR);
@@ -616,8 +611,6 @@ FTVOID ui_main (FTU32 para)
 	FTU8  touch,i = 0, ret_title, ret_app;
 	static FTU8 last_index = 0;
 
-	SETENDINDEX;
-
 	while (ret) {
 		HAL_CmdBufIn(CMD_DLSTART);
 		HAL_CmdBufIn(COLOR_BAKGRD_CLR);
@@ -661,8 +654,6 @@ FTVOID ui_main (FTU32 para)
 AppFunc APPS_UI[] = {
 	ui_bootup,
 	ui_main,
-	ui_standby,
-	/* Leave this NULL at the buttom of this array */
-	NULL /* INDEXEND */
+	ui_standby
 };
 

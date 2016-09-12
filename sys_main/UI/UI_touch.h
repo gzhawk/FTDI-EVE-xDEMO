@@ -50,7 +50,6 @@ FTVOID touch_detect (FTU32 para)
                 tGrp[i].ty = T_MASK&HAL_Read16(REG_CTOUCH_TOUCH4_Y);
                 break;
             default:
-	            appGP.appIndex = 2;
                 return;
         }
 
@@ -71,12 +70,6 @@ FTVOID touch_show (FTU32 para)
 {
     FTU8 i;
     static FTU8 f = 0;
-	/* never mind, it's for debug,
-	 * this part just for this routine 
-     * jump out the outside caller 
-     * when error happen */
-	appGP.appIndex = 2;
-	appGP.appPara = 0;
 
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
@@ -123,8 +116,6 @@ FTVOID touch_show (FTU32 para)
 
 AppFunc APPS_UI[] = {
     touch_detect,
-	touch_show,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	touch_show
 };
 

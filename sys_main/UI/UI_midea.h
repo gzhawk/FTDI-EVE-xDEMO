@@ -188,9 +188,6 @@ FTVOID playmidea (FTU32 para)
 		{PATH_STATUS,    0,0,RGB565, 0,0, 126, 62},
 	};
 
-	/* just for debug */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
 #if defined(STM32F4)
 	return;
 #endif
@@ -262,8 +259,6 @@ FTVOID playmidea (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	playmidea,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	playmidea
 };
 

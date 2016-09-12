@@ -38,13 +38,6 @@ FTVOID create_bitmap(FTVOID)
 
 FTVOID lcdtst (FTU32 para)
 {
-	/* never mind, it's for debug,
-	 * this part just for this routine 
-     * jump out the outside caller 
-     * when error happen */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
-
     create_bitmap();
 
 	HAL_CmdBufIn(CMD_DLSTART);
@@ -66,8 +59,6 @@ FTVOID lcdtst (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	lcdtst,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	lcdtst
 };
 

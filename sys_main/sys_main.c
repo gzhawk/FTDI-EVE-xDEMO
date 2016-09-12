@@ -11,6 +11,27 @@
 #include "EVE_APP.h"
 #include "UI.h"
 
+FTVOID APP_RUN (FTVOID)
+{
+    FTU8 exit_index, index;
+
+    for (index = 0, appGP.appPara = 0, 
+         exit_index = sizeof(APPS_UI)/sizeof(AppFunc);
+         index < exit_index;
+         index = appGP.appIndex, appGP.appIndex = exit_index) {
+        /* 
+         run the indexed UI application
+         it should set the appGP.appIndex within limit
+         or, the main routine would exit to expection handle
+         UI_END, SYS_END
+         */
+        APPS_UI[index](appGP.appPara);
+
+        /* system/MCU control related application */
+        APPS_SYS(appGP.appPara);
+    }
+}
+
 /* main() from here */
 FTMAIN
 {
@@ -18,15 +39,8 @@ FTMAIN
 
     UI_INIT();
 
-    FTPRINT("\nAPPS running");
-    while (APPS_UI[appGP.appIndex]) {
-        /* UI related application */
-        APPS_UI[appGP.appIndex](appGP.appPara);
-
-        /* system control related application */
-        APPS_SYS(appGP.appPara);
-    }
-
+    APP_RUN();
+    
     UI_END();
 
     SYS_END;

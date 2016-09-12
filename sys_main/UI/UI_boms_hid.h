@@ -125,13 +125,6 @@ FTVOID test_boms (FTU32 para)
 #define TEST_PAK_Y   TEST_DSK_Y
 #define TEST_ACT_Y   (FT800_LCD_HIGH-TEST_KEY_H)
     static FTU8 pressed = 0, inited = 0;
-    /* 
-     * never mind, it's for debug,
-	 * this part just for this routine 
-     * jump out the outside caller 
-     * when error happen 
-     */
-	appGP.appIndex = UI_ERR;
 
     if (!inited) {
         strcpy_s(rate_data.disk,TEST_DISK_STR_LEN,&diskList[0][0]);
@@ -208,9 +201,7 @@ FTVOID test_boms (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	test_boms,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	test_boms
 };
 #elif defined(FT9XXEV)
 
@@ -341,11 +332,6 @@ FTVOID simple_keyboard_ui (FTU32 ui_index)
 #define SIM_KB_L4_Y  (FT800_LCD_HIGH/2+3*SIM_KB_KEY_H)
     static FTU8 pressed = 0, mode = KB_MODE_NON_CAP, inited = 0;
 
-	/* never mind, it's for debug,
-	 * this part just for this routine 
-     * jump out the outside caller 
-     * when error happen */
-	appGP.appIndex = UI_ERR;
     /* 
      * assign the data exchange mempool
      * to the exchange variable
@@ -429,9 +415,7 @@ FTVOID keyboard_to_pc (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	keyboard_to_pc,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	keyboard_to_pc
 };
 #else
 #error "not for this platform"

@@ -8,26 +8,35 @@
 //FTU8 MENU_0[] = ROOT_PATH"slip_m\\1a.raw";
 //FTU8 MENU_0[] = ROOT_PATH"slip_m\\1a.bin";
 FTU8 MENU_0[] = ROOT_PATH"slip_m\\1a_inx.bin";
+//FTU8 MENU_0[] = ROOT_PATH"slip_m\\1a_inx.raw";
 
 //FTU8 MENU_1[] = ROOT_PATH"slip_m\\2a.raw";
 //FTU8 MENU_1[] = ROOT_PATH"slip_m\\2a.bin";
 FTU8 MENU_1[] = ROOT_PATH"slip_m\\2a_inx.bin";
+//FTU8 MENU_1[] = ROOT_PATH"slip_m\\2a_inx.raw";
 
 //FTU8 MENU_2[] = ROOT_PATH"slip_m\\3a.raw";
 //FTU8 MENU_2[] = ROOT_PATH"slip_m\\3a.bin";
 FTU8 MENU_2[] = ROOT_PATH"slip_m\\3a_inx.bin";
+//FTU8 MENU_2[] = ROOT_PATH"slip_m\\3a_inx.raw";
 
 //FTU8 MENU_3[] = ROOT_PATH"slip_m\\4a.raw";
 //FTU8 MENU_3[] = ROOT_PATH"slip_m\\4a.bin";
 FTU8 MENU_3[] = ROOT_PATH"slip_m\\4a_inx.bin";
+//FTU8 MENU_3[] = ROOT_PATH"slip_m\\4a_inx.raw";
 
 //FTU8 MENU_4[] = ROOT_PATH"slip_m\\5a.raw";
 //FTU8 MENU_4[] = ROOT_PATH"slip_m\\5a.bin";
 FTU8 MENU_4[] = ROOT_PATH"slip_m\\5a_inx.bin";
+//FTU8 MENU_4[] = ROOT_PATH"slip_m\\5a_inx.raw";
 
 //FTU8 MENU_5[] = ROOT_PATH"slip_m\\6a.raw";
 //FTU8 MENU_5[] = ROOT_PATH"slip_m\\6a.bin";
 FTU8 MENU_5[] = ROOT_PATH"slip_m\\6a_inx.bin";
+//FTU8 MENU_5[] = ROOT_PATH"slip_m\\6a_inx.raw";
+
+FTU8 MENU_SUB[] = ROOT_PATH"slip_m\\0_inx.bin";
+//FTU8 MENU_SUB[] = ROOT_PATH"slip_m\\0_inx.raw";
 
 FTU8 MENU_0_[] = ROOT_PATH"slip_m\\1a_lut.bin";
 FTU8 MENU_1_[] = ROOT_PATH"slip_m\\2a_lut.bin";
@@ -35,8 +44,6 @@ FTU8 MENU_2_[] = ROOT_PATH"slip_m\\3a_lut.bin";
 FTU8 MENU_3_[] = ROOT_PATH"slip_m\\4a_lut.bin";
 FTU8 MENU_4_[] = ROOT_PATH"slip_m\\5a_lut.bin";
 FTU8 MENU_5_[] = ROOT_PATH"slip_m\\6a_lut.bin";
-
-FTU8 MENU_SUB[] = ROOT_PATH"slip_m\\0_inx.bin";
 FTU8 MENU_SUB_[] = ROOT_PATH"slip_m\\0_lut.bin";
 
 #define MENU_MAIN_NUM  6
@@ -208,10 +215,14 @@ FTVOID menu_new_path (FTU8 i)
         /* 2. sub menu number loop */
         if (n < MENU_NUM_START) {
             *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = MENU_NUM_END;
-            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = MENU_NUM_END;
+            if (main_menu[i].menuInfo.format == PALETTED565) {
+                *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = MENU_NUM_END;
+            }
         } else {
             *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = n;
-            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = n;
+            if (main_menu[i].menuInfo.format == PALETTED565) {
+                *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = n;
+            }
         }
     } else if (main_menu[i].X >= MENU_END_R-w) {
         /* 1. menu number loop */
@@ -224,10 +235,14 @@ FTVOID menu_new_path (FTU8 i)
         /* 2. sub menu number loop */
         if (n > MENU_NUM_END) {
             *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = MENU_NUM_START;
-            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = MENU_NUM_START;
+            if (main_menu[i].menuInfo.format == PALETTED565) {
+                *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = MENU_NUM_START;
+            }
         } else {
             *(FTU8 *)(main_menu[i].menuInfo.path + UPDATE_PATH_INDEX) = n;
-            *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = n;
+            if (main_menu[i].menuInfo.format == PALETTED565) {
+                *(FTU8 *)(main_menu[i].menuInfo.path_lut + UPDATE_PATH_INDEX) = n;
+            }
         }
     }
 }
@@ -572,13 +587,13 @@ FTVOID submenu_disp (FTU32 para)
     FTU8 i;
     static FTU8 processing = 1;
     
-    appGP.appIndex = E_MENU_ERR;
-
     if (!main_menu[MENU_MAIN_NUM].inRAM) {
         *(FTU8 *)(main_menu[MENU_MAIN_NUM].menuInfo.path + UPDATE_PATH_INDEX) =
                   main_menu[para].menuInfo.path[UPDATE_PATH_INDEX];
-        *(FTU8 *)(main_menu[MENU_MAIN_NUM].menuInfo.path_lut + UPDATE_PATH_INDEX) =
-                  main_menu[para].menuInfo.path[UPDATE_PATH_INDEX];
+        if (main_menu[MENU_MAIN_NUM].menuInfo.format == PALETTED565) {
+            *(FTU8 *)(main_menu[MENU_MAIN_NUM].menuInfo.path_lut + UPDATE_PATH_INDEX) =
+                      main_menu[para].menuInfo.path[UPDATE_PATH_INDEX];
+        }
         menu_load(MENU_MAIN_NUM, 0);
     }
 	
@@ -617,13 +632,6 @@ FTVOID menu_main (FTU32 para)
 	static FTU8 inited = 0;
     FTU8 i;
 
-	/* never mind, it's for debug,
-	 * this part just for this routine 
-     * jump out the outside caller 
-     * when error happen */
-	appGP.appIndex = E_MENU_ERR;
-	appGP.appPara = 0;
-
 	if (!inited) {
 		inited = menu_init();
 	}
@@ -653,8 +661,6 @@ FTVOID menu_main (FTU32 para)
 
 AppFunc APPS_UI[] = {
 	menu_main,
-    submenu_disp,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+    submenu_disp
 };
 

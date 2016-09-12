@@ -826,7 +826,6 @@ FTVOID cashBootup (FTU32 cashPara)
 	appGP.appIndex = CASH_BOOT;
 	gData = CASH_MAIN;
 #if defined(STM32F4)
-	appGP.appIndex = CASH_NULL;
 	return;
 #endif
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
@@ -1196,8 +1195,6 @@ AppFunc APPS_UI[] = {
 	cashFake,
 	cashTime,
 	cashVers,
-	cashDbsm,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	cashDbsm
 };
 

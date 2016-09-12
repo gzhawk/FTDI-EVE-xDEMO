@@ -227,9 +227,6 @@ FTVOID playfv (FTU32 para)
 	FTU8 hdl = DXT1_START_HDL;
 	dxt1_path_st *path = &vPath;
 
-	/* just for debug */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
 #if defined(STM32F4)
 	return;
 #endif	
@@ -251,8 +248,6 @@ FTVOID playfv (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	playfv,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	playfv
 };
 

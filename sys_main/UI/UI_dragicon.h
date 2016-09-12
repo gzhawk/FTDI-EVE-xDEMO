@@ -819,13 +819,7 @@ FTVOID dragIcon (FTU32 para)
 	FTU8 dskpSave;
 	static FTU8 ifLoaded = 0;
 
-	/* never mind, it's for debug,
-	 * this part just for this routine jump out the outside caller 
-	 * when error happen */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
 #if defined(STM32F4)
-	appGP.appIndex = 2;
 	return;
 #endif
 	if (ifLoaded == 0) {
@@ -871,8 +865,6 @@ FTVOID dragIcon (FTU32 para)
 
 AppFunc APPS_UI[] = {
 	dragIcon,
-	subScreen,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	subScreen
 };
 

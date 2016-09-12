@@ -134,11 +134,6 @@ FTVOID ally_modeb (FTU32 para)
     static FTU32 i=NDL_START;
     FT16 Nx=NDL_X, Ny=NDL_Y;
 
-    /* never mind, it's for debug,
-     * this part just for this routine jump out the outside caller when error happen */
-    appGP.appIndex = 1;
-    appGP.appPara = 0;
-
     /* only load the file once */
     if (flag == 0) {
         /* load bitmap resources data into FT800 */
@@ -206,8 +201,6 @@ FTVOID ally_modeb (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-    ally_modeb,
-    /* Leave this NULL at the buttom of this array */
-    NULL
+    ally_modeb
 };
 

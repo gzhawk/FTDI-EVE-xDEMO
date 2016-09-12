@@ -45,9 +45,6 @@ FTVOID font_main (FTU32 para)
 
 	static FT_Gpu_Fonts_t stFB1,stFB2;
 
-	/* if something wrong in the code, force out */
-	appGP.appIndex = 1;
-	
 	/* load the font resources into FT800 */
 	if (init) {
 		if (0 == appFileToRamG(PATH_LINE1,LINE1_ADDR,0,(FTU8 *)&stFB1,sizeof(FT_Gpu_Fonts_t))) {
@@ -87,8 +84,6 @@ FTVOID font_main (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	font_main,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	font_main
 };
 

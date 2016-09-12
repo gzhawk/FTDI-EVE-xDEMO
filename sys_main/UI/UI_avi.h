@@ -322,10 +322,6 @@ FTVOID play_avi (FTU32 para)
 {
 	FTU32 opt = OPT_MEDIAFIFO | OPT_FULLSCREEN | OPT_NOTEAR;
 
-	/* just for debug */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
-
 #if defined(LCD_HVGA)
     HAL_CmdBufIn(CMD_DLSTART);
     CoCmd_SETROTATE(3);
@@ -358,8 +354,6 @@ FTVOID play_avi (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	play_avi,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	play_avi
 };
 

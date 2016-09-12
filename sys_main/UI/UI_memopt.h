@@ -15,9 +15,6 @@ FTVOID demo_memopt (FTU32 para)
     FTU16 addr;
     FTU8 buf[TST_LEN] = {0};
 
-	/* if something wrong in the code, force out */
-	appGP.appIndex = 1;
-
     CoCmd_MEMSET(0, TST_BYT, TST_LEN);
     HAL_BufToReg(RAM_CMD,0);
     for (i = 0; i < TST_LEN; i++) {
@@ -112,8 +109,6 @@ FTVOID demo_memopt (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	demo_memopt,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	demo_memopt
 };
 

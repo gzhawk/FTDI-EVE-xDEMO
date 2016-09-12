@@ -177,10 +177,6 @@ FTVOID playpuzzle (FTU32 para)
 	FTU8 Tag = 0, Touch, ani_index;
 	FTU32 sensitive = 0, speed = 0;
 
-	/* never mind, it's for debug,
-	 * this part just for this routine jump out the outside caller when error happen */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
 #if defined(STM32F4)
 	return;
 #endif
@@ -261,8 +257,6 @@ FTVOID playpuzzle (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	playpuzzle,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	playpuzzle
 };
 

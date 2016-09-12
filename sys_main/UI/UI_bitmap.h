@@ -149,11 +149,6 @@ FTVOID disp_bitmap (FTU32 para)
 	static FTU8 flag = 0;
     FTU32 i,j;
 
-	/* never mind, it's for debug,
-	 * this part just for this routine jump out the outside caller when error happen */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
-
 	/* only load the file once */
 	if (flag == 0) {
 		/* load bitmap resources data into FT800 */
@@ -212,8 +207,6 @@ FTVOID disp_bitmap (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	disp_bitmap,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	disp_bitmap
 };
 

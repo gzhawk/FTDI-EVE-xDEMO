@@ -467,8 +467,6 @@ FTINDEF FTVOID coobot_Gradient(FTVOID)
 
 FTVOID coobot_startup (FTU32 para)
 {	
-	/* for debugging */
-	appGP.appIndex = 3;
 	/* for input number transfer between subroutine */
 	appGP.appPara = (FTU32)&UIData;
 #if !defined(STM32F4)
@@ -516,8 +514,6 @@ AppFunc APPS_UI[] = {
 	/* Handling the data */
 	coobot_data_handle,
 	/* Display on LCD */
-	coobot_ui,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	coobot_ui
 };
 

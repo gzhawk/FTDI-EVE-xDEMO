@@ -176,11 +176,7 @@ FTVOID ripple (FTU32 para)
 {
 	FTU32 len, XY;
 	FTU8 *pCurr = wav_buf1, *pNext = wav_buf2;
-	
-	/* just for debug */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
-	
+
 	/* X1.jpg */
 	len = fileload((FTU8 *)PATH_DISP, FIFOADDR);
 	if (len == 0) {
@@ -208,8 +204,6 @@ FTVOID ripple (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	ripple,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	ripple
 };
 

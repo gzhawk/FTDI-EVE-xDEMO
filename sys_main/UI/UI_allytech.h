@@ -131,11 +131,6 @@ FTVOID allytech_bitmap (FTU32 para)
 	static FTU32 needle = 0,i_shadow = 1,i_needle = 2;
     FTU32 speed = *(FTU32 *)para;
 
-	/* never mind, it's for debug,
-	 * this part just for this routine jump out 
-     * the outside caller when error happen */
-	appGP.appIndex = 2;
-
 	if (flag == 0) {
 		/* load bitmap resources data into FT800 */
 		if(APP_OK != appBmpToRamG(0, RAM_G, bmp_header, BITMAP_NUM)){
@@ -197,8 +192,6 @@ FTVOID allytech_bitmap (FTU32 para)
 
 AppFunc APPS_UI[] = {
     allytech_speed, 
-	allytech_bitmap,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	allytech_bitmap
 };
 

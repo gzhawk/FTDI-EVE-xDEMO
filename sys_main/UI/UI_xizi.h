@@ -249,10 +249,6 @@ FTU16 leaves[30][2] =
 	{454, 254},
 	{452, 262}
 };
-	/* just for debug */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
-
 	/* pre-stored the first two screen information */
 	len = dxt1File(&ScnPath,m1.addr);
 	if (len == 0) {
@@ -457,8 +453,6 @@ FTU16 leaves[30][2] =
 }
 
 AppFunc APPS_UI[] = {
-	playdxt1,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	playdxt1
 };
 

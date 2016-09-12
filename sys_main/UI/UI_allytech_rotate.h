@@ -611,12 +611,6 @@ FTVOID ally_rotate (FTU32 para)
 				 skip_it = 0;
     FTU32 offset;
 
-	/* 
-      this part just for this routine jump out 
-      the outside caller when error happen 
-     */
-	appGP.appIndex = 2;
-
 	/* run it once */
 	if (!len_fDL1) {
 		/* load bitmap resources data into FT800 */
@@ -700,8 +694,6 @@ FTVOID ally_rotate (FTU32 para)
 
 AppFunc APPS_UI[] = {
     allytech_speed,
-	ally_rotate,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	ally_rotate
 };
 

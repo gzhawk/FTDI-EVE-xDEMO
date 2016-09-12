@@ -563,8 +563,6 @@ AppFunc APPS_UI[] = {
 #endif
 	background_blobs,
 	background_spk,
-	background_fizz,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	background_fizz
 };
 

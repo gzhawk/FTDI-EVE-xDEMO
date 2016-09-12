@@ -73,9 +73,6 @@ FTVOID ally_font_main (FTU32 para)
     FTU16 h,x,y;
     static FTU16 angle = 0;
 
-	/* if something wrong in the code, force out */
-	appGP.appIndex = 1;
-	
 	if (!init) {
 	    /* load the bitmap resources into FT800 */
 		if(APP_OK != appBmpToRamG(0, BMP_ADDR, bmp_header, PIC_NUM)){
@@ -200,8 +197,6 @@ FTVOID ally_font_main (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	ally_font_main,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	ally_font_main
 };
 

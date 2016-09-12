@@ -12,9 +12,6 @@ typedef enum APPINDEX_e {
 	I_CLOCK,
 	I_END
 } APPINDEX;
-/* make the error routine be shown in end screen */
-#define SET_ERR_END appGP.appIndex = I_END
-
 #define COLOR_BAKGRD_CLR CLEAR_COLOR_RGB(33,33,33)
 
 #define ALPHA_STEP  5
@@ -77,8 +74,6 @@ FTVOID screen_lock (FTU32 para)
 		  opn_hdl = ULCK_UOPN_HDL,
 		  lck_x = L_ICON_ULCK_X*FT800_PIXEL_UNIT;
 
-	SET_ERR_END;
-	
 	/* only load the file once */
 	if (f_loaded == 0) {
 		/* load bitmap resources data into EVE */
@@ -255,8 +250,6 @@ FTVOID screen_main (FTU32 para)
 	FTU8 hdl_btm[M_TAG_PWR-M_TAG_ALM+1], alpha = 255,tag,i;
 	FTU32 ram_offset;
 	
-	SET_ERR_END;
-
 	/* only load the file once */
 	if (f_loaded == 0) {
 		/* load bitmap resources data into EVE */
@@ -473,8 +466,6 @@ FTVOID screen_clock (FTU32 para)
 	FTU8 alpha = 255;
 	static FTU32 f_loaded = 0, r_h = 0, r_m = 0;
 	
-	SET_ERR_END;
-
 	/* only load the file once */
 	if (f_loaded == 0) {
 		/* load bitmap resources data into EVE */
@@ -582,8 +573,6 @@ FTVOID screen_clock (FTU32 para)
 AppFunc APPS_UI[] = {
 	screen_lock,
 	screen_main,
-	screen_clock,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	screen_clock
 };
 

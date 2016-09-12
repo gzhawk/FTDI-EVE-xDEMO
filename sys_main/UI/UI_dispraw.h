@@ -24,12 +24,8 @@ FTVOID dispraw (FTU32 para)
 		272
 	};
 	static FTU8 flag = 0;
-	/* never mind, it's for debug,
-	 * this part just for this routine jump out the outside caller when error happen */
-	appGP.appIndex = 1;
-	appGP.appPara = 0;
-
-	/* only load the file once */
+	
+    /* only load the file once */
 	if (flag == 0) {
 		/* load bitmap resources data into FT800 */
 		if(APP_OK != appBmpToRamG(0, RAM_G, &bmp_header, 1)){
@@ -58,8 +54,6 @@ FTVOID dispraw (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	dispraw,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	dispraw
 };
 

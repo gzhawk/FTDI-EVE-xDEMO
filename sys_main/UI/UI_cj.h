@@ -697,6 +697,8 @@ FTVOID cj_main (FTU32 para)
 	}
 
 	cj_sensitive(&delay_tag,tag);
+
+	appGP.appIndex = 1;
 }
 
 FTVOID cj_init (FTU32 para)
@@ -709,8 +711,6 @@ FTVOID cj_init (FTU32 para)
 }
 AppFunc APPS_UI[] = {
 	cj_init,
-	cj_main,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	cj_main
 };
 

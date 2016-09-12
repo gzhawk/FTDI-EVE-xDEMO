@@ -434,8 +434,6 @@ AppFunc APPS_UI[] = {
 	/* Handling the data */
 	welling_data_handle,
 	/* Display on LCD */
-	welling_ui,
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	welling_ui
 };
 

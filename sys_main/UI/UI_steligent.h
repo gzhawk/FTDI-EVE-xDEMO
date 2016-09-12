@@ -1336,9 +1336,6 @@ FTVOID main_ui (FTU32 para)
 AppFunc APPS_UI[] = {
 	/* System bootup logo show */
 	bootup_ui,
-	main_ui,
-
-	/* Leave this NULL at the buttom of this array */
-	NULL
+	main_ui
 };
 
