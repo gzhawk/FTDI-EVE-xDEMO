@@ -8,18 +8,18 @@ b. The whole project was made and tested under the Win7 platform
 
 c. Execute "RunMe.bat" to build the related image, 
    and please DO read the words it gives out.
-c.1 DO change the define in platform.h depend on your real system
+d. DO change the define in platform.h depend on your real system
     e.g. LCD resolution: '320x240', '800x480', EVE version: '80X', '81X', etc.
-c.2 DO change the define in UI.h depend on what demo you would like to 
+e. DO change the define in UI.h depend on what demo you would like to 
     play. For example, active UI_AVI and comment others, and make sure you know
     the code limits while playing UI_AVI: it only works on DEF_81X 
     under the LCD_WVGA resolution.
 
-d. All the code are under the root directry of FT800, 
+f. All the code are under the root directry of FT800, 
    others like "STM32F4", "VC2010Express", etc. 
    is compile platform related, you can ignore them.
 
-e. This series of software is developed base on the learning from SampleApp, 
+g. This series of software is developed base on the learning from SampleApp, 
    SampleApp would have full supported function, 
    and may relatively easy be supported by R&D 
    (since SampleApp was developed by them, while this series 
@@ -31,18 +31,18 @@ e. This series of software is developed base on the learning from SampleApp,
 2. 整个工程是构建与Win7基础上，编译，调试，烧录等工具都是基于Windows
 
 3. 编译环境请运行“编译.bat”打开，并根据需求阅读里面文字。
-4.1 一定记得根据你实际系统修改platform.h
+4. 一定记得根据你实际系统修改platform.h
     比如LCD 像素: '320x240', '800x480', EVE 芯片版本: '80X', '81X', etc.
-4.2 一定记得根据你要运行的Demo修改UI.h
+5. 一定记得根据你要运行的Demo修改UI.h
     比如激活UI_AVI注释掉其它的，并且知道运行UI_AVI的限制: 只支持81X芯片，
     只支持LCD_WVGA屏幕
 
-5. 代码都在FT800文件夹根目录下，其他子目录“STM32F4”，“VC2010Express”，等等，
+6. 代码都在FT800文件夹根目录下，其他子目录“STM32F4”，“VC2010Express”，等等，
    里面都是平台相关代码，和主程序无关。
 
-6. 这个平台是基于公司官网发布的SampleApp修改而成，大部分也参考了SampleApp的主要意思
+7. 这个平台是基于公司官网发布的SampleApp修改而成，大部分也参考了SampleApp的主要意思
    个人感觉原版有些零乱和不太好懂，于是私下写了这个系列
    人各有好，SampleApp是相关研发写的，如果更喜欢那个风格，参考那边也是极好的。
 
-7. 公司所有的文档，理论上都应该是英文，所以，除了这个文件，其他都是英文，
+8. 公司所有的文档，理论上都应该是英文，所以，除了这个文件，其他都是英文，
    如有不便，实在对不住了。
