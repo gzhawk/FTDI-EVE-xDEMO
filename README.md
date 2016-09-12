@@ -7,9 +7,11 @@ b. The whole project was made and tested under the Win7 platform
    so the compile, debug, program all Windows based.
 
 c. Execute "RunMe.bat" to build the related image, 
-   and please DO read the words it gives out.
+   and please DO read the words it gives out:
+   
 d. DO change the define in platform.h depend on your real system
     e.g. LCD resolution: '320x240', '800x480', EVE version: '80X', '81X', etc.
+    
 e. DO change the define in UI.h depend on what demo you would like to 
     play. For example, active UI_AVI and comment others, and make sure you know
     the code limits while playing UI_AVI: it only works on DEF_81X 
@@ -30,9 +32,11 @@ g. This series of software is developed base on the learning from SampleApp,
 
 2. 整个工程是构建与Win7基础上，编译，调试，烧录等工具都是基于Windows
 
-3. 编译环境请运行“编译.bat”打开，并根据需求阅读里面文字。
+3. 编译环境请运行“编译.bat”打开，并根据需求阅读里面文字:
+
 4. 一定记得根据你实际系统修改platform.h
     比如LCD 像素: '320x240', '800x480', EVE 芯片版本: '80X', '81X', etc.
+
 5. 一定记得根据你要运行的Demo修改UI.h
     比如激活UI_AVI注释掉其它的，并且知道运行UI_AVI的限制: 只支持81X芯片，
     只支持LCD_WVGA屏幕
