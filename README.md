@@ -1,48 +1,48 @@
--1. Everything here is ONLY for learning EVE's purpose, I DO NOT have
+a. Everything here is ONLY for learning EVE's purpose, I DO NOT have
     any responsibility to any one or any organization, to their usage
 	on any peices of my codes. I'll delete related parts, if any meterials
 	have any license violate, just let me know.
 
-0. The whole project was made and tested under the Win7 platform
+b. The whole project was made and tested under the Win7 platform
    so the compile, debug, program all Windows based.
 
-1. Execute "RunMe.bat" to build the related image, 
+c. Execute "RunMe.bat" to build the related image, 
    and please DO read the words it gives out.
-1.1 DO change the define in platform.h depend on your real system
+c.1 DO change the define in platform.h depend on your real system
     e.g. LCD resolution: '320x240', '800x480', EVE version: '80X', '81X', etc.
-1.2 DO change the define in UI.h depend on what demo you would like to 
+c.2 DO change the define in UI.h depend on what demo you would like to 
     play. For example, active UI_AVI and comment others, and make sure you know
     the code limits while playing UI_AVI: it only works on DEF_81X 
     under the LCD_WVGA resolution.
 
-2. All the code are under the root directry of FT800, 
+d. All the code are under the root directry of FT800, 
    others like "STM32F4", "VC2010Express", etc. 
    is compile platform related, you can ignore them.
 
-3. This series of software is developed base on the learning from SampleApp, 
+e. This series of software is developed base on the learning from SampleApp, 
    SampleApp would have full supported function, 
    and may relatively easy be supported by R&D 
    (since SampleApp was developed by them, while this series 
    is developed by FAE).
 
--1. ËùÓĞ²ÄÁÏ½ö×öÑ§Ï°EVEÊ¹ÓÃ£¬ÎÒ²»¶ÔÈÎºÎÍÅÌå»òÕß¸öÈË£¬²Î¿¼ÕâÀïÈÎºÎÒ»¶Î´úÂëµ½×Ô¼º²úÆ·Àï
-    ²úÉúµÄÈÎºÎÎÊÌâ£¬¸ºÈÎºÎÔğÈÎ¡£ÀïÃæÊ¹ÓÃµ½ÈÎºÎËØ²Ä£¬ÈçÓĞÇÖÈ¨£¬¸æÖªÎÒºó»áÁ¢¿ÌÉ¾³ı
+1. æ‰€æœ‰ææ–™ä»…åšå­¦ä¹ EVEä½¿ç”¨ï¼Œæˆ‘ä¸å¯¹ä»»ä½•å›¢ä½“æˆ–è€…ä¸ªäººï¼Œå‚è€ƒè¿™é‡Œä»»ä½•ä¸€æ®µä»£ç åˆ°è‡ªå·±äº§å“é‡Œ
+    äº§ç”Ÿçš„ä»»ä½•é—®é¢˜ï¼Œè´Ÿä»»ä½•è´£ä»»ã€‚é‡Œé¢ä½¿ç”¨åˆ°ä»»ä½•ç´ æï¼Œå¦‚æœ‰ä¾µæƒï¼Œå‘ŠçŸ¥æˆ‘åä¼šç«‹åˆ»åˆ é™¤
 
-0. Õû¸ö¹¤³ÌÊÇ¹¹½¨ÓëWin7»ù´¡ÉÏ£¬±àÒë£¬µ÷ÊÔ£¬ÉÕÂ¼µÈ¹¤¾ß¶¼ÊÇ»ùÓÚWindows
+2. æ•´ä¸ªå·¥ç¨‹æ˜¯æ„å»ºä¸Win7åŸºç¡€ä¸Šï¼Œç¼–è¯‘ï¼Œè°ƒè¯•ï¼Œçƒ§å½•ç­‰å·¥å…·éƒ½æ˜¯åŸºäºWindows
 
-1. ±àÒë»·¾³ÇëÔËĞĞ¡°±àÒë.bat¡±´ò¿ª£¬²¢¸ù¾İĞèÇóÔÄ¶ÁÀïÃæÎÄ×Ö¡£
-1.1 Ò»¶¨¼ÇµÃ¸ù¾İÄãÊµ¼ÊÏµÍ³ĞŞ¸Äplatform.h
-    ±ÈÈçLCD ÏñËØ: '320x240', '800x480', EVE Ğ¾Æ¬°æ±¾: '80X', '81X', etc.
-1.2 Ò»¶¨¼ÇµÃ¸ù¾İÄãÒªÔËĞĞµÄDemoĞŞ¸ÄUI.h
-    ±ÈÈç¼¤»îUI_AVI×¢ÊÍµôÆäËüµÄ£¬²¢ÇÒÖªµÀÔËĞĞUI_AVIµÄÏŞÖÆ: Ö»Ö§³Ö81XĞ¾Æ¬£¬
-    Ö»Ö§³ÖLCD_WVGAÆÁÄ»
+3. ç¼–è¯‘ç¯å¢ƒè¯·è¿è¡Œâ€œç¼–è¯‘.batâ€æ‰“å¼€ï¼Œå¹¶æ ¹æ®éœ€æ±‚é˜…è¯»é‡Œé¢æ–‡å­—ã€‚
+4.1 ä¸€å®šè®°å¾—æ ¹æ®ä½ å®é™…ç³»ç»Ÿä¿®æ”¹platform.h
+    æ¯”å¦‚LCD åƒç´ : '320x240', '800x480', EVE èŠ¯ç‰‡ç‰ˆæœ¬: '80X', '81X', etc.
+4.2 ä¸€å®šè®°å¾—æ ¹æ®ä½ è¦è¿è¡Œçš„Demoä¿®æ”¹UI.h
+    æ¯”å¦‚æ¿€æ´»UI_AVIæ³¨é‡Šæ‰å…¶å®ƒçš„ï¼Œå¹¶ä¸”çŸ¥é“è¿è¡ŒUI_AVIçš„é™åˆ¶: åªæ”¯æŒ81XèŠ¯ç‰‡ï¼Œ
+    åªæ”¯æŒLCD_WVGAå±å¹•
 
-2. ´úÂë¶¼ÔÚFT800ÎÄ¼ş¼Ğ¸ùÄ¿Â¼ÏÂ£¬ÆäËû×ÓÄ¿Â¼¡°STM32F4¡±£¬¡°VC2010Express¡±£¬µÈµÈ£¬
-   ÀïÃæ¶¼ÊÇÆ½Ì¨Ïà¹Ø´úÂë£¬ºÍÖ÷³ÌĞòÎŞ¹Ø¡£
+5. ä»£ç éƒ½åœ¨FT800æ–‡ä»¶å¤¹æ ¹ç›®å½•ä¸‹ï¼Œå…¶ä»–å­ç›®å½•â€œSTM32F4â€ï¼Œâ€œVC2010Expressâ€ï¼Œç­‰ç­‰ï¼Œ
+   é‡Œé¢éƒ½æ˜¯å¹³å°ç›¸å…³ä»£ç ï¼Œå’Œä¸»ç¨‹åºæ— å…³ã€‚
 
-3. Õâ¸öÆ½Ì¨ÊÇ»ùÓÚ¹«Ë¾¹ÙÍø·¢²¼µÄSampleAppĞŞ¸Ä¶ø³É£¬´ó²¿·ÖÒ²²Î¿¼ÁËSampleAppµÄÖ÷ÒªÒâË¼
-   ¸öÈË¸Ğ¾õÔ­°æÓĞĞ©ÁãÂÒºÍ²»Ì«ºÃ¶®£¬ÓÚÊÇË½ÏÂĞ´ÁËÕâ¸öÏµÁĞ
-   ÈË¸÷ÓĞºÃ£¬SampleAppÊÇÏà¹ØÑĞ·¢Ğ´µÄ£¬Èç¹û¸üÏ²»¶ÄÇ¸ö·ç¸ñ£¬²Î¿¼ÄÇ±ßÒ²ÊÇ¼«ºÃµÄ¡£
+6. è¿™ä¸ªå¹³å°æ˜¯åŸºäºå…¬å¸å®˜ç½‘å‘å¸ƒçš„SampleAppä¿®æ”¹è€Œæˆï¼Œå¤§éƒ¨åˆ†ä¹Ÿå‚è€ƒäº†SampleAppçš„ä¸»è¦æ„æ€
+   ä¸ªäººæ„Ÿè§‰åŸç‰ˆæœ‰äº›é›¶ä¹±å’Œä¸å¤ªå¥½æ‡‚ï¼Œäºæ˜¯ç§ä¸‹å†™äº†è¿™ä¸ªç³»åˆ—
+   äººå„æœ‰å¥½ï¼ŒSampleAppæ˜¯ç›¸å…³ç ”å‘å†™çš„ï¼Œå¦‚æœæ›´å–œæ¬¢é‚£ä¸ªé£æ ¼ï¼Œå‚è€ƒé‚£è¾¹ä¹Ÿæ˜¯æå¥½çš„ã€‚
 
-4. ¹«Ë¾ËùÓĞµÄÎÄµµ£¬ÀíÂÛÉÏ¶¼Ó¦¸ÃÊÇÓ¢ÎÄ£¬ËùÒÔ£¬³ıÁËÕâ¸öÎÄ¼ş£¬ÆäËû¶¼ÊÇÓ¢ÎÄ£¬
-   ÈçÓĞ²»±ã£¬ÊµÔÚ¶Ô²»×¡ÁË¡£
+7. å…¬å¸æ‰€æœ‰çš„æ–‡æ¡£ï¼Œç†è®ºä¸Šéƒ½åº”è¯¥æ˜¯è‹±æ–‡ï¼Œæ‰€ä»¥ï¼Œé™¤äº†è¿™ä¸ªæ–‡ä»¶ï¼Œå…¶ä»–éƒ½æ˜¯è‹±æ–‡ï¼Œ
+   å¦‚æœ‰ä¸ä¾¿ï¼Œå®åœ¨å¯¹ä¸ä½äº†ã€‚
