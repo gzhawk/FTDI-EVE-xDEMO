@@ -128,7 +128,7 @@ FTVOID allytech_bitmap (FTU32 para)
 #define NUM_RED      80
 #define SHADOW_X     35//(800 - 598)/2
 	static FTU8 flag = 0;
-	static FTU32 needle = 0,i_shadow = 1,i_needle = 2;
+	static FTU32 i_shadow = 1,i_needle = 2;
     FTU32 speed = *(FTU32 *)para;
 
 	if (flag == 0) {
@@ -184,7 +184,6 @@ FTVOID allytech_bitmap (FTU32 para)
 	HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);
 
-    needle = speed;
 	appGP.appIndex = 0;
 
 	FTDELAY(STOP_PEROID);

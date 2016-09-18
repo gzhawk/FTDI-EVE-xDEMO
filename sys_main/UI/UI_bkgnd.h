@@ -110,12 +110,12 @@ bmpHDR_st bmpHD[BKGND_ICON_GROUP] = {
 	{(FTC8 *)PATH_BKGND_FISH,	0,0,ARGB1555,	0,0,	50,	50},
 };
 
-FTINDEF FT8 offset(FTVOID)
+STATIC FT8 offset(FTVOID)
 {
 	return FTRANDOM(BKGND_VALUE_2) - BKGND_VALUE_1;
 }
 
-FTINDEF FTVOID drawBlobs(FTU8 lo, FTU8 hi)
+STATIC FTVOID drawBlobs(FTU8 lo, FTU8 hi)
 {
 	FTU8 i = lo;
 
@@ -136,7 +136,7 @@ FTINDEF FTVOID drawBlobs(FTU8 lo, FTU8 hi)
 	}
 }
 
-FTINDEF FTVOID drawBlob(FTVOID)
+STATIC FTVOID drawBlob(FTVOID)
 {
 	HAL_CmdBufIn(SAVE_CONTEXT());
 	HAL_CmdBufIn(BEGIN(FTPOINTS));
@@ -150,7 +150,7 @@ FTINDEF FTVOID drawBlob(FTVOID)
 	HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
-FTINDEF FTVOID drawBitmap(icon_grp_e hdl)
+STATIC FTVOID drawBitmap(icon_grp_e hdl)
 {
 	FTU8 i, j;
 
@@ -174,7 +174,7 @@ FTINDEF FTVOID drawBitmap(icon_grp_e hdl)
 	HAL_CmdBufIn(END());
 }
 
-FTINDEF FTVOID initCoors(FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
+STATIC FTVOID initCoors(FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
 {
 	FTU8 k;
 
@@ -216,7 +216,7 @@ FTINDEF FTVOID initCoors(FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
 	}
 }
 
-FTINDEF FTVOID initSize (FTU8 init, coor_st *p, FTU8 stlen)
+STATIC FTVOID initSize (FTU8 init, coor_st *p, FTU8 stlen)
 {
 	FTU8 k;
 
@@ -230,7 +230,7 @@ FTINDEF FTVOID initSize (FTU8 init, coor_st *p, FTU8 stlen)
 	}
 }
 
-FTINDEF FTVOID spreadCoors (direct_e d, coor_st *p, FTU8 stlen)
+STATIC FTVOID spreadCoors (direct_e d, coor_st *p, FTU8 stlen)
 {
 	FTU8 k;
 
@@ -262,14 +262,14 @@ FTINDEF FTVOID spreadCoors (direct_e d, coor_st *p, FTU8 stlen)
 
 }
 
-FTINDEF FTVOID animCoor (FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
+STATIC FTVOID animCoor (FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
 {
 	initCoors(init, d, p, stlen);
 
 	spreadCoors(d, p, stlen);
 }
 
-FTINDEF FTVOID animSpark (FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
+STATIC FTVOID animSpark (FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
 {
 	FTU8 i,j;
 
@@ -296,7 +296,7 @@ FTINDEF FTVOID animSpark (FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
 	HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
-FTINDEF FTVOID animFizz (FTU8 init, FTU32 speed)
+STATIC FTVOID animFizz (FTU8 init, FTU32 speed)
 {
 	FTU8 i;
 	static FTU32 count;

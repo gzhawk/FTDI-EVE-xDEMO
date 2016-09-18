@@ -38,6 +38,7 @@
 #define FT800_FONT_INTERNAL   (16)
 
 #define ZLIB_LEN              (0xFFFFFFFF)
+#define EVE_DBG_BUF_LEN       (50)
 typedef struct bmpHDR_ {
     FTC8  *path;
     FTC8  *path_lut; //for palette only
@@ -84,6 +85,7 @@ FTU32 appResSize (FTU32 resHDL);
 FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeFunc);
 FTVOID appResClose (FTU32 resHDL);
 FTU32 appGetLinestride(bmpHDR_st bmpHD);
+FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
 FTVOID arduino_simugpio(FTU8 flag);
 FTVOID arduino_sdcardInit (FTVOID);

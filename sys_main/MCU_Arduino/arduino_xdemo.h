@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include <EEPROM.h>
-#ifdef FT800_PRINT
+#ifdef DBG_PRINT
 #include <Serial.h>
 #endif
 
@@ -34,23 +34,15 @@ typedef unsigned long  FTU32;
 #define CALD_TAG_DATA "CALD"
 #define CALD_TAG_LEN  4
 
-#define FTINDEF static inline
+#define STATIC static inline
 
-#ifdef FT800_PRINT
-#define DBGPRINT FTPRINT("\r\n");FTPRINT("Error ");FTPRINT(__FUNCTION__); \
-	             FTPRINT(':');FTPRINT(__LINE__)
-/* 
- * if you want to see the serial output
- * the delay is not necessary
- * only wait a while for you to manually open serial mornitor 
- * in Arduino IDE, to see the whole debug output from the beginning
- */
-#define SYS_INIT Serial.begin(9600);FTDELAY(5000); \
-	              FTPRINT("\r\n");FTPRINT("Ver: ");FTPRINT(APPS_VER)
+#ifdef DBG_PRINT
+#define DBGPRINT appUI_DbgPrint(__FUNCTION__,__LINE__)
 #else
 #define DBGPRINT
-#define SYS_INIT 
 #endif
+
+#define SYS_INIT arduino_apps_sys_init()
 
 #define FTRANDOM(M) random(M)
 
@@ -384,6 +376,7 @@ class Reader {
 		FTU8 sector;
 };
 
+FTVOID arduino_apps_sys_init(FTVOID);
 FTVOID arduino_dumy_print (char * p);
 FTVOID arduino_sdcardInit (FTVOID);
 FTU8 arduino_is_tag_vaild (FTVOID);

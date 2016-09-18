@@ -21,17 +21,16 @@ typedef unsigned long  FTU64;
 #define FTMAIN int main (FTVOID) 
 #define FTDUMMY
 
-#define FTINDEF static
+#define STATIC static
 
 #define ROOT_PATH 
 #define CDATA_PATH "cdata.bin"
 
-#ifdef FT800_PRINT
+#ifdef DBG_PRINT
 /* if stdio.h be included, printf is usable, 
    but uart_puts would cost less image space */
 #define FTPRINT(a) uart_puts(UART0,a) 
-#define DBGPRINT uart_puts(UART0,"\r\n"); \
-                 uart_puts(UART0,__FILE__)
+#define DBGPRINT appUI_DbgPrint(__FUNCTION__,__LINE__)
 #else
 #define FTPRINT ft9xx_dumy_print
 #define DBGPRINT

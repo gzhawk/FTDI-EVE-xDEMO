@@ -120,7 +120,7 @@ appRet_en loadBitmap (FTVOID)
 	HAL_CmdBufIn(TAG_MASK(0));
 	return APP_OK;
 }
-FTINDEF FTU8 getposition (FTC8 *p)
+STATIC FTU8 getposition (FTC8 *p)
 {
 	FTU8 i = 0;
 
@@ -132,7 +132,7 @@ FTINDEF FTU8 getposition (FTC8 *p)
 	return (i - 5);
 }
 
-FTINDEF FTVOID deselect (bitmap_st *pre, FTU8 tag)
+STATIC FTVOID deselect (bitmap_st *pre, FTU8 tag)
 {
 	FTU8 i = getposition((FTC8 *)pre->path);
 	if (tag == ANIMATION_TUB_TAG) {
@@ -147,7 +147,7 @@ FTINDEF FTVOID deselect (bitmap_st *pre, FTU8 tag)
 	}
 }
 
-FTINDEF FTVOID changename (bitmap_st *parry, FTU8 Tag, FTU8 i, FTU8 *p)
+STATIC FTVOID changename (bitmap_st *parry, FTU8 Tag, FTU8 i, FTU8 *p)
 {
 	if (Tag == ANIMATION_TUB_TAG) {
 		if (parry->path[i] >= '9') {

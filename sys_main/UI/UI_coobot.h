@@ -156,7 +156,7 @@ coobot_t UIData = {
 	DEFAULT_ERR
 };
 
-FTINDEF FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
+STATIC FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
 {
 	HAL_CmdBufIn(F_COLOR);
 	HAL_CmdBufIn(BEGIN(LINES));	
@@ -171,7 +171,7 @@ FTINDEF FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
 	HAL_CmdBufIn(END());	
 }
 
-FTINDEF FTVOID coobot_speed (FTVOID)
+STATIC FTVOID coobot_speed (FTVOID)
 {
 	HAL_CmdBufIn(T_COLOR);
 	CoCmd_TEXT(SPD_T_X,PUB_T_Y,PUB_FONT,OPT_CENTERY,"Speed Control");
@@ -236,7 +236,7 @@ FTINDEF FTVOID coobot_speed (FTVOID)
 	HAL_CmdBufIn(W_COLOR);
 }
 
-FTINDEF FTVOID coobot_info (FTVOID)
+STATIC FTVOID coobot_info (FTVOID)
 {
 	HAL_CmdBufIn(T_COLOR);
 	CoCmd_TEXT(INFO_T_X,INFO_T_Y,PUB_FONT,OPT_CENTERY,"Status Infomation");
@@ -271,7 +271,7 @@ FTINDEF FTVOID coobot_info (FTVOID)
 	CoCmd_NUMBER(INFO_DSP_X+DISP_W,INFO_DSP_ERR_Y,NUM_FONT,OPT_RIGHTX,UIData.err_code);
 }
 
-FTINDEF FTU8 isFilling(FTU8 tag)
+STATIC FTU8 isFilling(FTU8 tag)
 {
 	switch (tag) {
 		case TAG_DATA:
@@ -294,7 +294,7 @@ FTINDEF FTU8 isFilling(FTU8 tag)
 	}
 }
 
-FTINDEF FTVOID filling_handle (FTU8 data)
+STATIC FTVOID filling_handle (FTU8 data)
 {
 	static FTU8 init = 1;
 	FT32 speed = UIData.speed[SPD_FILL], tmp;
@@ -330,7 +330,7 @@ FTINDEF FTVOID filling_handle (FTU8 data)
 	UIData.speed[SPD_FILL] = speed;
 }
 
-FTINDEF FTVOID coobot_filling (FTVOID)
+STATIC FTVOID coobot_filling (FTVOID)
 {
 	/* make filling form appear only when tap the filling area */
 	if (isFilling(UIData.tag[T_PRE])) {
@@ -423,7 +423,7 @@ FTVOID coobot_data_handle (FTU32 para)
 	appGP.appIndex++;
 }
 
-FTINDEF FTVOID coobot_Zoomin (FTU8 handle, FT32 X, FT32 Y, FT32 W, FT32 H)
+STATIC FTVOID coobot_Zoomin (FTU8 handle, FT32 X, FT32 Y, FT32 W, FT32 H)
 {
 	FT32 step;
 	
@@ -448,7 +448,7 @@ FTINDEF FTVOID coobot_Zoomin (FTU8 handle, FT32 X, FT32 Y, FT32 W, FT32 H)
 	}
 }
 
-FTINDEF FTVOID coobot_Gradient(FTVOID)
+STATIC FTVOID coobot_Gradient(FTVOID)
 {
 	FT32 Y;
 

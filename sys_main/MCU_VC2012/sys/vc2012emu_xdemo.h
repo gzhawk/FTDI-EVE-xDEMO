@@ -55,12 +55,12 @@ typedef uint32_t argb8888;
 				  return 0; \
 			    }
 
-#define FTINDEF static
+#define STATIC static
 
-#ifdef FT800_PRINT
+#ifdef DBG_PRINT
 #define FTPRINT     printf
-#define DBGPRINT    printf("\r\nError %s:%d",__FUNCTION__,__LINE__)
-#define SYS_INIT   printf("\r\nVer: %s",APPS_VER)
+#define DBGPRINT    appUI_DbgPrint(__FUNCTION__,__LINE__)
+#define SYS_INIT    printf("\r\nVer: %s",APPS_VER)
 #else
 #define FTPRINT     vc2012emu_dumy_print
 #define DBGPRINT

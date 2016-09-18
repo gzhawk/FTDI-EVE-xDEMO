@@ -24,7 +24,7 @@
  * for RES touch engin, 10 would be enough 
  */
 #define CLK_DELAY 100
-
+FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = {0};
 FTU8 EVE_ID = 0;
 
 typedef struct wrFuncPara_ {
@@ -41,7 +41,7 @@ FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
 #endif
 
 #if defined(CAL_NEEDED)
-FTINDEF appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
+STATIC appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
 {
     FTU32 ret_addr;
 
@@ -62,7 +62,7 @@ FTINDEF appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
     return (0 != HAL_Read32(ret_addr))?APP_OK:APP_ERR_CALC;
 }
 
-FTINDEF appRet_en appCalForce (FTC8 *dataPath)
+STATIC appRet_en appCalForce (FTC8 *dataPath)
 {
     FTU32 CData[FT800_CAL_PARA_NUM] = {0},
           reg = REG_TOUCH_TRANSFORM_A, i = 0;
@@ -124,7 +124,7 @@ FTINDEF appRet_en appCalForce (FTC8 *dataPath)
     return APP_OK;
 }
 
-FTINDEF appRet_en appCal (FTU8 force, FTC8 *dPath)
+STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
 {
     FTU32 CData[FT800_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
@@ -263,7 +263,7 @@ FTVOID resWrBuf (FTU32 para)
  * in loop buffer in EVE (CMD buffer), or RAM_G, or DLP
  * set the length as return
  */
-FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
+STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
 {
     wrFuncPara *wfp = (wrFuncPara *) para;
     /* make sure the data length into EVE is 4bytes aligned */
@@ -663,12 +663,12 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
     return APP_OK;
 }
 
-FTVOID appUI_GetEVEID (FTVOID)
+STATIC FTVOID appUI_GetEVEID (FTVOID)
 {
     EVE_ID = HAL_Read8(EVE_ID_REG);
 }
 
-FTINDEF FTVOID appUI_SpiInit ( FTVOID )
+STATIC FTVOID appUI_SpiInit ( FTVOID )
 {
     /* 
        the SPI clock shall not exceed 11MHz before system clock is enabled. 
@@ -692,7 +692,7 @@ FTINDEF FTVOID appUI_SpiInit ( FTVOID )
     SPI.setDataMode(SPI_MODE0);
 #endif
 }
-FTVOID appUI_EVEPathCfg ( FTVOID )
+STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 {
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
     //do nothing
@@ -717,7 +717,7 @@ FTVOID appUI_EVEPathCfg ( FTVOID )
 
     appUI_SpiInit();
 }
-FTVOID appUI_EVEActive ( FTVOID )
+STATIC FTVOID appUI_EVEActive ( FTVOID )
 {
     HAL_Cfg(FT_GPU_ACTIVE_M);
 #ifdef DEF_81X
@@ -727,7 +727,7 @@ FTVOID appUI_EVEActive ( FTVOID )
     FTDELAY(50);
 }
 
-FTVOID appUI_EVEClk ( FTVOID )
+STATIC FTVOID appUI_EVEClk ( FTVOID )
 {
     FTPRINT("\nOSC: ");
 #if defined(TRIM_NEEDED)
@@ -747,7 +747,7 @@ FTVOID appUI_EVEClk ( FTVOID )
 }
 
 #define PWC_DELAY 20
-FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
+STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
 {
 #ifdef MSVC2010EXPRESS
     FT_WriteGPIO(ftHandle, 0xBB, OnOff?0x08:0x88);
@@ -785,7 +785,7 @@ FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
 
 }
 
-FTVOID appUI_EVEGPIOCfg ( FTVOID )
+STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
 {
     /* set DISP to output, then enable the DISP */
 #if defined(DEF_81X)
@@ -840,7 +840,7 @@ FTVOID appUI_EVEGPIOCfg ( FTVOID )
  * Add the FT81X support, with the CTP controller
  * you may change the delay time base on your own HW and CTP
  */
-FTVOID appUI_EVETchCfg ( FTVOID )
+STATIC FTVOID appUI_EVETchCfg ( FTVOID )
 {
 #if defined(DEF_CAP_NONMULTI) || defined(DEF_CAP_MULTI)
     FTDELAY(300);
@@ -868,7 +868,7 @@ FTVOID appUI_EVETchCfg ( FTVOID )
     HAL_Write16(REG_CYA_TOUCH,(HAL_Read16(REG_CYA_TOUCH) | 0x8000));
 #endif
 }
-FTVOID appUI_EVESetSPI (FTU32 type)
+STATIC FTVOID appUI_EVESetSPI (FTU32 type)
 {
 #ifdef DEF_81X
     if (type == 4) {
@@ -893,7 +893,7 @@ FTVOID appUI_EVESetSPI (FTU32 type)
 #define CAL_FONT 20
 #define CAL_WIDE 15
 #define SYS_HANG (0)
-FTVOID appUI_EVEBootupDisp ( FTU32 count )
+STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
 {
     static FTU8 init = 0;
     if (init == 0) {
@@ -966,7 +966,7 @@ FTVOID appUI_EVEBootupDisp ( FTU32 count )
     } while (SYS_HANG);
 }
 #if defined(TRIM_NEEDED)
-FTU32 appUI_EVEGetFrq (FTVOID)
+STATIC FTU32 appUI_EVEGetFrq (FTVOID)
 {
     FTU32 t0, t1;
     FT32 r = 15625;
@@ -1001,7 +1001,7 @@ FTU32 appUI_EVEGetFrq (FTVOID)
     return ((t1 - t0) * 64); 
 }
 #endif
-FTVOID appUI_EVEClkTrim ( FTVOID )
+STATIC FTVOID appUI_EVEClkTrim ( FTVOID )
 {
 #if defined(TRIM_NEEDED)
 #define LOW_FREQ_BOUND  58800000L//98% of 60Mhz
@@ -1019,7 +1019,7 @@ FTVOID appUI_EVEClkTrim ( FTVOID )
     HAL_Write32(REG_FREQUENCY,f);  
 #endif
 }
-FTVOID appUI_EVELCDCfg ( FTVOID )
+STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
 {
     /*
        Width Height 
@@ -1099,7 +1099,7 @@ FTVOID appUI_EVELCDCfg ( FTVOID )
     HAL_Write8(REG_PCLK,lcd.PCLK);
 }
 
-FTU8 verify (FTVOID)
+STATIC FTU8 appUI_EVEVerify (FTVOID)
 {
     FTU8 count = RETRY_COUNT;
 
@@ -1121,7 +1121,7 @@ FTU8 verify (FTVOID)
     return count;
 }
 
-FTVOID appUI_EVEClnScrn (FTVOID)
+STATIC FTVOID appUI_EVEClnScrn (FTVOID)
 {
     HAL_CmdBufIn(CMD_DLSTART);
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
@@ -1131,7 +1131,7 @@ FTVOID appUI_EVEClnScrn (FTVOID)
     HAL_BufToReg(RAM_CMD,0);
 }
 
-appRet_en appWaitCal (FTVOID)
+STATIC appRet_en appUI_WaitCal (FTVOID)
 {
 #if defined(CAL_NEEDED)
     FTU8 i = 0;
@@ -1171,6 +1171,10 @@ appRet_en appWaitCal (FTVOID)
     appUI_EVEClnScrn();
     return APP_OK; 
 }
+FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline)
+{
+    sprintf((char *)dbg_str_buf,"%s:%d",p_fname,(int)fline);
+}
 FTVOID UI_INIT (FTVOID)
 {
     FTPRINT("\nEVE init");
@@ -1187,7 +1191,7 @@ FTVOID UI_INIT (FTVOID)
 
     appUI_EVEClk();
 
-    if (!verify()) {
+    if (!appUI_EVEVerify()) {
         return;
     }
     
@@ -1211,8 +1215,10 @@ FTVOID UI_INIT (FTVOID)
        set the SPI base on real HW: SPI/DSPI/QSPI */
     appUI_EVESetSPI(EVE_SPI_TYPE); 
 
-    appWaitCal();
-
+    appUI_WaitCal();
+   
+    /* give a default string when DBG_PRINT not enable */
+    strcpy((char *)dbg_str_buf,"Display end by user, or error happen!");
 }
 /*
  * Only when error happen
@@ -1224,12 +1230,8 @@ FTVOID UI_END (FTVOID)
     HAL_CmdBufIn(CMD_DLSTART);
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
     HAL_CmdBufIn(CLEAR(1,1,1));
-
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3,24,
-            OPT_CENTERX,"Missing correct files in SD card");
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3*2,24,
-            OPT_CENTERX,"or image not for this platform");
-
+    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,24,
+               OPT_CENTER,dbg_str_buf);
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);

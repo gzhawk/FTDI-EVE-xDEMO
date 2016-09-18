@@ -359,7 +359,7 @@ FTVOID draw_halo(FT32 zx,FT32 zy,FTU8 type,FTU8 timetouch){
 
 }
 
-FTINDEF FTVOID defaultMatrix (FTVOID)
+STATIC FTVOID defaultMatrix (FTVOID)
 {
 	HAL_CmdBufIn(BITMAP_TRANSFORM_A(256));
 	HAL_CmdBufIn(BITMAP_TRANSFORM_B(0));
@@ -369,7 +369,7 @@ FTINDEF FTVOID defaultMatrix (FTVOID)
 	HAL_CmdBufIn(BITMAP_TRANSFORM_F(0));
 }
 
-FTINDEF FTVOID downFireBitmap()
+STATIC FTVOID downFireBitmap()
 {
 	static FTU8 ifLoaded = 0;
 	FTU8 i, j;
@@ -384,7 +384,7 @@ FTINDEF FTVOID downFireBitmap()
 	}
 }
 
-FTINDEF FTVOID downRotateBitmap()
+STATIC FTVOID downRotateBitmap()
 {
 	static FTU8 ifLoaded = 0;
 	FTU8 i, j;
@@ -399,7 +399,7 @@ FTINDEF FTVOID downRotateBitmap()
 	}
 }
 
-FTINDEF FTVOID downHaloBitmap()
+STATIC FTVOID downHaloBitmap()
 {
 	static FTU8 ifLoaded = 0;
 	FTU8 i, j;
@@ -414,7 +414,7 @@ FTINDEF FTVOID downHaloBitmap()
 	}
 }
 
-FTINDEF FTVOID downTrembleBitmap()
+STATIC FTVOID downTrembleBitmap()
 {
 	static FTU8 ifLoaded = 0;
 	FTU8 i, j;
@@ -429,7 +429,7 @@ FTINDEF FTVOID downTrembleBitmap()
 	}
 }
 
-FTINDEF FTVOID drawFireBitmap()
+STATIC FTVOID drawFireBitmap()
 {
 	FTU8 i,t;
 	t = HAL_Read8(REG_TOUCH_TAG);
@@ -466,7 +466,7 @@ FTINDEF FTVOID drawFireBitmap()
 }
 
 
-FTINDEF FTVOID drawHaloBitmap()
+STATIC FTVOID drawHaloBitmap()
 {
 	FTU8 i,t;
 	static FTU8 touch_time=0;
@@ -503,7 +503,7 @@ FTINDEF FTVOID drawHaloBitmap()
 	
 }
 
-FTINDEF FTVOID trembleBitmap()
+STATIC FTVOID trembleBitmap()
 {
 	FTU8 i,t;
 	t = HAL_Read8(REG_TOUCH_TAG);
@@ -539,7 +539,7 @@ FTINDEF FTVOID trembleBitmap()
 	
 }
 
-FTINDEF FTVOID rotateBitmap()
+STATIC FTVOID rotateBitmap()
 {
 	FTU8 i,t;
 	static FTU32 rangle=90;
@@ -762,7 +762,7 @@ FTVOID rotate_show (FTU32 para)
 
 
 
-FTINDEF FTVOID drawGIF(FTU32 para)  
+STATIC FTVOID drawGIF(FTU32 para)  
 {
 	FTU16 high = 0, flag = 0, count = 0;
 	FTU8 init = 1,i=1,x;

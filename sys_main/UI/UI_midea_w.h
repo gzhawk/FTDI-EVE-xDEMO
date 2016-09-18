@@ -42,7 +42,7 @@ FTU8 path_bkgnd[DISP_PATH_LEN] = PATH_BKGND;
 FTU8 path_icon_l[DISP_PATH_LEN] = PATH_Lx;
 
 
-FTINDEF FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
+STATIC FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
 {
 	FTU32 mfifo_rd, mfifo_wr;
 
@@ -77,7 +77,7 @@ FTINDEF FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr
 	return file_len;
 }
 
-FTINDEF FTU32 JPEGToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)
+STATIC FTU32 JPEGToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)
 {
 	FTU32 resHDL, Len;
 
@@ -105,7 +105,7 @@ FTINDEF FTU32 JPEGToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoS
 	return Len;
 }
 
-FTINDEF FTU8 valueChg_bup (FTU8 *p)
+STATIC FTU8 valueChg_bup (FTU8 *p)
 {
 #define BUP_END 399
 	static FTU32 index = 1;
@@ -120,7 +120,7 @@ FTINDEF FTU8 valueChg_bup (FTU8 *p)
 	return 1;
 }
 
-FTINDEF FTVOID valueChg_bkgnd (FTU8 *p)
+STATIC FTVOID valueChg_bkgnd (FTU8 *p)
 {
 #define BKGND_END 300
 	static FTU32 index = 1;
@@ -132,7 +132,7 @@ FTINDEF FTVOID valueChg_bkgnd (FTU8 *p)
 	}
 }
 
-FTINDEF FTVOID valueChg_icon_l (FTU8 *p)
+STATIC FTVOID valueChg_icon_l (FTU8 *p)
 {
 #define ICON_L_END 23
 	static FTU32 index = 1;
@@ -147,7 +147,7 @@ FTINDEF FTVOID valueChg_icon_l (FTU8 *p)
 	index++;
 }
 
-FTINDEF FTVOID JpegDisplay (FTU32 hdl, FTU32 addr, FTU32 X, FTU32 Y)
+STATIC FTVOID JpegDisplay (FTU32 hdl, FTU32 addr, FTU32 X, FTU32 Y)
 {
 	HAL_CmdBufIn(BITMAP_HANDLE(hdl));
 	HAL_CmdBufIn(BITMAP_SOURCE(addr));

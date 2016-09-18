@@ -1,6 +1,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include "stm32f4xx_spi.h"
@@ -25,16 +26,16 @@ typedef uint32_t     FTU32;
 #define FTMAIN int main (FTVOID) 
 #define FTDUMMY FTVOID _exit(FT32 status) {while(1);}
 
-#define FTINDEF static
+#define STATIC static
 
 #define ROOT_PATH 
 #define CDATA_PATH NULL
 
-#ifdef FT800_PRINT
-#define FTPRINT   stm32f4Print 
-#define DBGPRINT  stm32f4Dbg()
-#else
 #define FTPRINT stm32_dumy_print
+
+#ifdef DBG_PRINT
+#define DBGPRINT appUI_DbgPrint(__FUNCTION__,__LINE__)
+#else
 #define DBGPRINT
 #endif
 
@@ -64,12 +65,10 @@ typedef uint32_t     FTU32;
 
 extern unsigned int FILE_SADDR;
 void stm32_dumy_print(char * p);
-void stm32f4Print(char * p);
 void stm32f4Init(void);
 void stm32f4Delay(unsigned int nTime);
 void stm32f4Timing(void);
 unsigned int stm32f4Random(unsigned int r);
-void stm32f4Dbg(void);
 void stm32f4SPI1Init (unsigned short Prescaler);
 unsigned char STM32_SPISend(unsigned char data);
 unsigned int stm32f4_is_match (unsigned char *path, unsigned char *name);

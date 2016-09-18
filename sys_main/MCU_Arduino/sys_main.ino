@@ -7,6 +7,6 @@
 */
 #include <SPI.h>
 #include <EEPROM.h>
-#ifdef FT800_PRINT
+#ifdef DBG_PRINT
 #include <Serial.h>
 #endif

@@ -156,7 +156,7 @@ void timerISR(void)
     }
 #endif
 }
-FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,
+STATIC FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,
                                FTU32 disp_addr,FTU32 opt,FTU32 resHDL, 
                                FTU32 file_len)
 {
@@ -193,7 +193,7 @@ FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,
 	return file_len;
 }
 
-FTINDEF FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, 
+STATIC FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, 
                           FTU32 fifoAddr, FTU32 fifoSize)
 {
 	FTU32 resHDL, Len;

@@ -18,7 +18,7 @@ FTU32 mcuDLindex = 0;
 FTU8 mem_pool[USE_STATIC_MEM_LEN+FTU32_LEN] = {0};
 #endif
 
-FTINDEF FTVOID rdStart ( FTU32 addr )
+STATIC FTVOID rdStart ( FTU32 addr )
 {
 #ifdef MSVC2010EXPRESS
     FTU8 tmp[SPI_RXCMD_LEN] = {0};
@@ -63,7 +63,7 @@ FTINDEF FTVOID rdStart ( FTU32 addr )
 #endif
 }
 
-FTINDEF FTVOID wrStart ( FTU32 addr )
+STATIC FTVOID wrStart ( FTU32 addr )
 {
 #ifdef MSVC2010EXPRESS
     FTU8 tmp[SPI_TXCMD_LEN] = {0};
@@ -121,7 +121,7 @@ FTVOID HAL_CoReset (FTVOID)
     HAL_Write8(REG_CPURESET, 0);
     while (HAL_Read8(REG_CPURESET));
 }
-FTINDEF FTU32 cmdWait (FTVOID)
+STATIC FTU32 cmdWait (FTVOID)
 {
     while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ)) {
         if (0xFFF == HAL_Read32(REG_CMD_READ)) {
@@ -135,7 +135,7 @@ FTINDEF FTU32 cmdWait (FTVOID)
     return HAL_Read32(REG_CMD_READ);
 }
 
-FTINDEF FTVOID dlpWait (FTVOID)
+STATIC FTVOID dlpWait (FTVOID)
 {
     while (HAL_Read8(REG_DLSWAP)) ;
 

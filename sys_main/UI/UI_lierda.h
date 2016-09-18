@@ -16,7 +16,7 @@ typedef enum APPINDEX_e {
 
 #define ALPHA_STEP  5
 
-FTINDEF FTVOID screen_clean (FTVOID)
+STATIC FTVOID screen_clean (FTVOID)
 {
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(COLOR_BAKGRD_CLR);

@@ -72,7 +72,7 @@ void timerISR(void)
     }
 #endif
 }
-FTINDEF FTVOID Display (FTU32 opt, FTU32 start, FTU32 frame, FTU32 fIndex, FTU32 fLen)
+STATIC FTVOID Display (FTU32 opt, FTU32 start, FTU32 frame, FTU32 fIndex, FTU32 fLen)
 {
     FTU32 w,max = (fLen>65535)?65535:fLen,prog = (fLen>65535)?(fIndex/(fLen/65535)):fIndex;
 
@@ -133,7 +133,7 @@ FTINDEF FTVOID Display (FTU32 opt, FTU32 start, FTU32 frame, FTU32 fIndex, FTU32
 #endif
 }
 
-FTINDEF FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FTU32 flag_addr, FTU32 opt,FTU32 resHDL, FTU32 file_len)
+STATIC FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FTU32 flag_addr, FTU32 opt,FTU32 resHDL, FTU32 file_len)
 {
 	FTU32 mfifo_rd = HAL_Read32(REG_MEDIAFIFO_READ), mfifo_wr = HAL_Read32(REG_MEDIAFIFO_WRITE),
 		  l, first_block = (mfifo_size >= file_len)?file_len:mfifo_size;
@@ -250,7 +250,7 @@ FTINDEF FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,F
 	start = !start;
 	return file_len;
 }
-FTINDEF FTVOID cmdbufAviWrite (FTU32 resHDL, FTU32 file_len, FTU32 opt)
+STATIC FTVOID cmdbufAviWrite (FTU32 resHDL, FTU32 file_len, FTU32 opt)
 {
 	FTU32 i = 0, l = 0;
 
@@ -287,7 +287,7 @@ noice in audio playing next time
 	}
 }
 
-FTINDEF FTU32 AVIToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 flagAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)
+STATIC FTU32 AVIToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 flagAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)
 {
 	FTU32 resHDL, Len;
 

@@ -39,7 +39,7 @@ FTVOID PressAndRelease (FTVOID)
     };  //wait for release
 }
 
-FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
+STATIC FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
 {
 	FTU32 mfifo_rd, mfifo_wr;
 
@@ -74,7 +74,7 @@ FTINDEF FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_add
 	return file_len;
 }
 
-FTINDEF FTVOID cmdbufImageWrite (FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
+STATIC FTVOID cmdbufImageWrite (FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 file_len)
 {
     HAL_CmdToReg(CMD_LOADIMAGE);
 	HAL_CmdToReg(disp_addr);
@@ -83,7 +83,7 @@ FTINDEF FTVOID cmdbufImageWrite (FTU32 disp_addr,FTU32 opt,FTU32 resHDL, FTU32 f
 	appResToDes(resHDL, 0, 0, file_len, resWrEveCmd);
 }
 
-FTINDEF FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)
+STATIC FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)
 {
 	FTU32 resHDL, Len;
 
@@ -119,7 +119,7 @@ FTINDEF FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifo
 	return Len;
 }
 
-FTINDEF FTVOID DisplayJPG (FTU32 hdl, FTU32 addr, FTU32 opt)
+STATIC FTVOID DisplayJPG (FTU32 hdl, FTU32 addr, FTU32 opt)
 {
 	FTU32 len;
 

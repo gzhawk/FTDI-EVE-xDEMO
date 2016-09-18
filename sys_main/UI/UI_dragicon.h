@@ -131,7 +131,7 @@ list_st list_buf[ICON_CLASS_ITEMS*ICON_CLASS] = {0};
 
 /* dynamic generate each icon location(X,Y)
    based on the icon numbers on the screen */
-FTINDEF FTVOID genGrid (FTU8 num)
+STATIC FTVOID genGrid (FTU8 num)
 {
 	FTU32 i,w,h;
 
@@ -157,7 +157,7 @@ FTINDEF FTVOID genGrid (FTU8 num)
 }
 
 /* 0: not in target; 1: in target */
-FTINDEF FTU8 inTarget (icon_st *p, icon_st *target)
+STATIC FTU8 inTarget (icon_st *p, icon_st *target)
 {
 	if (target->handle == p->handle
 		&& target->cell == p->cell
@@ -171,7 +171,7 @@ FTINDEF FTU8 inTarget (icon_st *p, icon_st *target)
 	return 0;
 }
 
-FTINDEF FTU8 inCloset (icon_st *p)
+STATIC FTU8 inCloset (icon_st *p)
 {
 	FTU8 i;
 
@@ -186,7 +186,7 @@ FTINDEF FTU8 inCloset (icon_st *p)
 	return 0;
 }
 
-FTINDEF desktop_node_st * list_create (icon_st * p)
+STATIC desktop_node_st * list_create (icon_st * p)
 {
 	icon_st *tmp_i = NULL;
 	desktop_node_st *tmp_n = NULL;
@@ -207,7 +207,7 @@ FTINDEF desktop_node_st * list_create (icon_st * p)
 	return tmp_n;
 }
 
-FTINDEF FTVOID desktop_list_destory_tag (FTVOID)
+STATIC FTVOID desktop_list_destory_tag (FTVOID)
 {
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
 
@@ -219,7 +219,7 @@ FTINDEF FTVOID desktop_list_destory_tag (FTVOID)
 }
 
 #if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(STM32F4) && !defined(FT9XXEV)
-FTINDEF FTU8 desktop_list_check_tag (FTVOID)
+STATIC FTU8 desktop_list_check_tag (FTVOID)
 {
 	FTU8 tag[] = DESKTOP_TAG_DATA;
 	FTU32 addr = DESKTOP_TAG_ADDR, i;
@@ -234,7 +234,7 @@ FTINDEF FTU8 desktop_list_check_tag (FTVOID)
 }
 #endif
 
-FTINDEF desktop_node_st * desktop_list_search (icon_st *p, FTU8 *pindex)
+STATIC desktop_node_st * desktop_list_search (icon_st *p, FTU8 *pindex)
 {
 	desktop_node_st *tmp = phead;
 	
@@ -251,7 +251,7 @@ FTINDEF desktop_node_st * desktop_list_search (icon_st *p, FTU8 *pindex)
 	return NULL;
 }
 
-FTINDEF FTVOID desktop_list_save (FTVOID)
+STATIC FTVOID desktop_list_save (FTVOID)
 {
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
 
@@ -282,7 +282,7 @@ FTINDEF FTVOID desktop_list_save (FTVOID)
 }
 
 /* 0: not found, 1: deleted */
-FTINDEF FTU8 desktop_list_delete (icon_st * p, FTU8 save)
+STATIC FTU8 desktop_list_delete (icon_st * p, FTU8 save)
 {
 	FTU8 i = 0;
 	desktop_node_st *tmp = desktop_list_search(p, &i);
@@ -319,7 +319,7 @@ FTINDEF FTU8 desktop_list_delete (icon_st * p, FTU8 save)
 }
 
 /* 0: success, 1: error, 2: list full 3: node exsited */
-FTINDEF FTU8 desktop_list_insert_end (icon_st * p, FTU8 save)
+STATIC FTU8 desktop_list_insert_end (icon_st * p, FTU8 save)
 {
 	desktop_node_st *tmp = NULL;
 	FTU8 count;
@@ -366,7 +366,7 @@ FTINDEF FTU8 desktop_list_insert_end (icon_st * p, FTU8 save)
 	return 0;
 }
 
-FTINDEF FTU8 desktop_list_read (FTVOID)
+STATIC FTU8 desktop_list_read (FTVOID)
 {
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
 	return 0;
@@ -400,7 +400,7 @@ FTINDEF FTU8 desktop_list_read (FTVOID)
 #endif
 }
 
-FTINDEF FTVOID desktop_list_align (FTVOID)
+STATIC FTVOID desktop_list_align (FTVOID)
 {
 	desktop_node_st *tmp = phead;
 	FTU8 i = 0;
@@ -425,7 +425,7 @@ FTINDEF FTVOID desktop_list_align (FTVOID)
 }
 
 
-FTINDEF FTVOID defaultMatrix (FTVOID)
+STATIC FTVOID defaultMatrix (FTVOID)
 {
 	HAL_CmdBufIn(BITMAP_TRANSFORM_A(256));
 	HAL_CmdBufIn(BITMAP_TRANSFORM_B(0));
@@ -435,7 +435,7 @@ FTINDEF FTVOID defaultMatrix (FTVOID)
 	HAL_CmdBufIn(BITMAP_TRANSFORM_F(0));
 }
 
-FTINDEF FTVOID rects (FTU32 x0, FTU32 y0, FTU32 x1, FTU32 y1, FTU32 rgb)
+STATIC FTVOID rects (FTU32 x0, FTU32 y0, FTU32 x1, FTU32 y1, FTU32 rgb)
 {
 	HAL_CmdBufIn(BEGIN(RECTS)); 
 	HAL_CmdBufIn(rgb); 
@@ -444,7 +444,7 @@ FTINDEF FTVOID rects (FTU32 x0, FTU32 y0, FTU32 x1, FTU32 y1, FTU32 rgb)
 	HAL_CmdBufIn(END());
 }
 
-FTINDEF FTVOID Swing (icon_st *i)
+STATIC FTVOID Swing (icon_st *i)
 {
 	static FT8 R = 1;
 
@@ -469,7 +469,7 @@ FTINDEF FTVOID Swing (icon_st *i)
 	}
 }
 
-FTINDEF FTVOID fillCloset (FTU8 hdl)
+STATIC FTVOID fillCloset (FTU8 hdl)
 {
 	FTU8 i;
 
@@ -481,7 +481,7 @@ FTINDEF FTVOID fillCloset (FTU8 hdl)
 	}
 }
 
-FTINDEF FTVOID displayCloset (icon_st *p, tEvent_e event, FTU8 Touch)
+STATIC FTVOID displayCloset (icon_st *p, tEvent_e event, FTU8 Touch)
 {
 	FTU32 i = g_closet_line-CLOSET_W_BAR;
 
@@ -553,7 +553,7 @@ FTINDEF FTVOID displayCloset (icon_st *p, tEvent_e event, FTU8 Touch)
 	HAL_CmdBufIn(TAG_MASK(0));
 }
 
-FTINDEF FTVOID displayDesktop (icon_st *p, tEvent_e event, FTU8 Touch)
+STATIC FTVOID displayDesktop (icon_st *p, tEvent_e event, FTU8 Touch)
 {
 	desktop_node_st *tmp = phead;
 	
@@ -592,7 +592,7 @@ FTINDEF FTVOID displayDesktop (icon_st *p, tEvent_e event, FTU8 Touch)
 	}
 }
 
-FTINDEF FTVOID displayBar (FTVOID)
+STATIC FTVOID displayBar (FTVOID)
 {
 	/* display closet bar */
 	HAL_CmdBufIn(TAG_MASK(1));
@@ -603,7 +603,7 @@ FTINDEF FTVOID displayBar (FTVOID)
 }
 
 #if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(FT9XXEV)
-FTINDEF FTVOID displayToggle (FTU8 state)
+STATIC FTVOID displayToggle (FTU8 state)
 {
 	/*TODO: actuall, the deperator should be 0xFF "Unsave/xffSave"
 	 * but I just can not make it work, find the root case later*/
@@ -619,7 +619,7 @@ FTINDEF FTVOID displayToggle (FTU8 state)
 }
 #endif
 /* 1: finish display, 0: keep looping */
-FTINDEF FTU8 displayItems (icon_st *p, FTU8 Touch, FTU8 *pSave)
+STATIC FTU8 displayItems (icon_st *p, FTU8 Touch, FTU8 *pSave)
 {
 	FTU8 tmp;
 	static tEvent_e lastEvent = T_NON;

@@ -41,7 +41,6 @@
 #define UI_AMICON
 #define UI_DIAL
 #define UI_FV_INVENSYS
-#define UI_SLIP_M
 /* UI for customer: demonstration */
 #define UI_CJ
 #define UI_STELIGENT
@@ -51,6 +50,7 @@
 #define UI_XIZI
 #define UI_GRG
 #define UI_NJTOYO
+#define UI_SLIP_M
 #endif
 
 /*-------------------------------------------------Demo Related hardware setting
@@ -201,7 +201,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.40.1"
+#define APPS_VER "5.B.40.2"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -211,27 +211,25 @@
 #define BYTES4ALIGN(l) ((l)%4)?((l)+(4-(l)%4)):(l)
 
 /*
- * !!! define this length base on your own system mem !!!
+ * define this length base on your own system (MCU) memory
  */
 #define USE_STATIC_MEM_LEN 512 
 
 /* 
- * too limit resource on Arduino platform, 
- * may disable the print for resource saving
+ * may enable the print for debug purpose
  */
-#define FT800_PRINT
+#define DBG_PRINT
 
 /* 
- * when not using external OSC
- * you may do the clock trimming if needed
- * for H35R, it has to be internal OSC
+ * when not using external OSC, recommend to do the clock trimming
+ * for H35R, it only use internal OSC, so trimming is needed
  */
 #if defined(LCD_HVGA)
 #define TRIM_NEEDED
 #endif
 
 /* 
- * you may bypass the calibration phase
+ * you may bypass the calibration phase, when no touch in your UI
  */
 #define CAL_NEEDED
 

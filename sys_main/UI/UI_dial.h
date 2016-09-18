@@ -305,7 +305,7 @@ appRet_en dialBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, BMP_para *pbmpHD,FTU32 wid
 	return APP_OK;
 }
 
-FTINDEF FTVOID downBKBitmap(Ft_App_Scroller_t *pScroll)
+STATIC FTVOID downBKBitmap(Ft_App_Scroller_t *pScroll)
 {
 	static FTU8 ifLoaded = 0;
 	FTU8 i, j;

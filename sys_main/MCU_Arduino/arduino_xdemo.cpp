@@ -6,6 +6,22 @@
 
 sdcard SD;
 
+FTVOID arduino_apps_sys_init(FTVOID)
+{
+#ifdef DBG_PRINT
+    Serial.begin(9600);
+    /* 
+     * the delay is only for giving you some time
+     * to manually open serial mornitor (e.g. Arduino IDE's, or 3th party's)
+     * you may remove/modify it.
+     */
+    FTDELAY(5000);
+    FTPRINT("\r\n");
+    FTPRINT("Ver: ");
+    FTPRINT(APPS_VER);
+#endif
+}
+
 FTVOID arduino_apps_sys_dummy (FTU32 para)
 {
 

@@ -63,7 +63,7 @@ unsigned int stm32f4fileopen(unsigned char *path, unsigned int p)
 	unsigned int i, num, addr;
 
 	if (FILE_MAGIC != *(unsigned int *)FILE_SADDR) {
-		stm32f4Dbg();
+		DBGPRINT;
 		return 0;
 	}
 
@@ -87,34 +87,6 @@ unsigned int stm32f4Random(unsigned int r)
 {
 	while(!RNG_GetFlagStatus(RNG_FLAG_DRDY));
 	return (RNG_GetRandomNumber()%(r));
-}
-void stm32f4Print(char * p)
-{
-	/* DO NOT use LED3 it share with the PD# of EVE
-	   DO NOT use LED6 it share with the CS# of EVE
-     */
-	STM_EVAL_LEDOn(LED4);
-	stm32f4Delay(100);
-	STM_EVAL_LEDOff(LED4);
-	stm32f4Delay(100);
-	STM_EVAL_LEDOn(LED4);
-	stm32f4Delay(100);
-	STM_EVAL_LEDOff(LED4);
-	stm32f4Delay(100);
-}
-void stm32f4Dbg(void)
-{
-	/* DO NOT use LED3 it share with the PD# of EVE
-	   DO NOT use LED6 it share with the CS# of EVE
-     */
-	STM_EVAL_LEDOn(LED5);
-	stm32f4Delay(100);
-	STM_EVAL_LEDOff(LED5);
-	stm32f4Delay(100);
-	STM_EVAL_LEDOn(LED5);
-	stm32f4Delay(100);
-	STM_EVAL_LEDOff(LED5);
-	stm32f4Delay(100);
 }
 
 void stm32f4Delay(unsigned int nTime)

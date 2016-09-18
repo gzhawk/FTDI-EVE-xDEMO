@@ -16,7 +16,7 @@ FTU8 wav_buf1[WAV_BUF_LEN] = {0};
 FTU8 wav_buf2[WAV_BUF_LEN] = {0};
 FTU8 img_buf[FT800_LCD_WIDTH*FT800_LCD_HIGH*2] = {0};
 
-FTINDEF FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 file_len)
+STATIC FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 file_len)
 {
 	FTU32 mfifo_rd, mfifo_wr;
 
@@ -48,7 +48,7 @@ FTINDEF FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr
 	return file_len;
 }
 
-FTINDEF FTVOID Display (FTU32 addr)
+STATIC FTVOID Display (FTU32 addr)
 {
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0xFF,0xFF));

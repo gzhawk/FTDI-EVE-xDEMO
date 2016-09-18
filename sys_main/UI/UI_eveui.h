@@ -65,14 +65,14 @@ bubble_st Bubble[BUBBLE_NUM];
 #define BUBLE_OUT_ALPHA 0x20
 #define BUBLE_IN_ALPHA  0xFF
 
-FTINDEF FT8 offset(FTVOID)
+STATIC FT8 offset(FTVOID)
 {
 	return FTRANDOM(BUBBLE_VALUE_2) - BUBBLE_VALUE_1;
 }
 #endif
 
 #if defined(USE_BUBBLE)
-FTINDEF FTVOID init_bubble (FTVOID)
+STATIC FTVOID init_bubble (FTVOID)
 {
 	FTU32 i;
 
@@ -83,7 +83,7 @@ FTINDEF FTVOID init_bubble (FTVOID)
 	}
 }
 
-FTINDEF FTVOID pos_bubble (bubble_st *p)
+STATIC FTVOID pos_bubble (bubble_st *p)
 {
 	FTU8 k;
 
@@ -103,7 +103,7 @@ FTINDEF FTVOID pos_bubble (bubble_st *p)
 }
 #endif
 
-FTINDEF FTU32 ui_bootup_eve_show (FTVOID)
+STATIC FTU32 ui_bootup_eve_show (FTVOID)
 {
 #ifdef DEF_81X
 #define BOOTUP_FONT       34
@@ -195,7 +195,7 @@ FTVOID ui_bootup (FTU32 para)
 	}
 }
 
-FTINDEF FTU32 ui_standby_point_show (FTU32 X)
+STATIC FTU32 ui_standby_point_show (FTU32 X)
 {
 	FTU32 ret = 1;
 	static FTU8 alpha = 0, flag = 0;
@@ -470,7 +470,7 @@ FTU8 menu_c (FTVOID)
 }
 
 #if defined(USE_BUBBLE)
-FTINDEF FTVOID Bubbles(FTU8 lo, FTU8 hi, bubble_st *p)
+STATIC FTVOID Bubbles(FTU8 lo, FTU8 hi, bubble_st *p)
 {
 	FTU8 i = lo;
 
@@ -491,7 +491,7 @@ FTINDEF FTVOID Bubbles(FTU8 lo, FTU8 hi, bubble_st *p)
 	}
 }
 
-FTINDEF FTVOID draw_bubble(bubble_st *p)
+STATIC FTVOID draw_bubble(bubble_st *p)
 {
 	HAL_CmdBufIn(BEGIN(FTPOINTS));
 	HAL_CmdBufIn(COLOR_A(BUBLE_IN_ALPHA));
@@ -548,7 +548,7 @@ MenuAppFunc menuApp[] = {
 	menu_hide
 };
 
-FTINDEF FTU8 ui_main_title_show (FTU8 hide, FTU8 title_index)
+STATIC FTU8 ui_main_title_show (FTU8 hide, FTU8 title_index)
 {
 	FTU32 i,tag;
 	static FTU8 A_m = 0,j = 0,last_status = 1;

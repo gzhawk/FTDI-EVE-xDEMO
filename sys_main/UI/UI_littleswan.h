@@ -21,7 +21,7 @@
 
 FTU8 p_tmp[P_LEN] = {PATH_DISP};
 
-FTINDEF FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 file_len)
+STATIC FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 file_len)
 {
 	FTU32 mfifo_rd, mfifo_wr;
 
@@ -53,7 +53,7 @@ FTINDEF FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr
 	return file_len;
 }
 
-FTINDEF FTVOID Display (FTU32 hdl, FTU32 addr, FTU32 X, FTU32 Y)
+STATIC FTVOID Display (FTU32 hdl, FTU32 addr, FTU32 X, FTU32 Y)
 {
 #define POINT_SIZE_MIN 20
 #define POINT_SIZE_MAX 80

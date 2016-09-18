@@ -53,7 +53,7 @@ dxt1_path_st vPath = {
 	PATH_V1_B1
 };
 
-FTINDEF FTU32 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
+STATIC FTU32 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
 {
 	FTU32 len, addr = addrRAM;
 
@@ -85,7 +85,7 @@ FTINDEF FTU32 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
 	return (addr - addrRAM);
 }
 
-FTINDEF FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
+STATIC FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
 {
 	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
 	HAL_CmdBufIn(BITMAP_SOURCE(startAddr));
@@ -98,7 +98,7 @@ FTINDEF FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
 	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, W, H));
 }
 
-FTINDEF FTVOID dxt1FormatInfo (FTU8 startHdl, FTU16 X, FTU16 Y)
+STATIC FTVOID dxt1FormatInfo (FTU8 startHdl, FTU16 X, FTU16 Y)
 {
 	HAL_CmdBufIn(BLEND_FUNC(ONE,ZERO));
 	HAL_CmdBufIn(COLOR_A(0x55));
@@ -123,7 +123,7 @@ FTINDEF FTVOID dxt1FormatInfo (FTU8 startHdl, FTU16 X, FTU16 Y)
 	HAL_CmdBufIn(END());
 }
 
-FTINDEF FTVOID valueChg (FTU32 *paddr, FTU8 *phdl, dxt1_path_st *pst, FTU32 len)
+STATIC FTVOID valueChg (FTU32 *paddr, FTU8 *phdl, dxt1_path_st *pst, FTU32 len)
 {
 	if (pst->path_c0[DXT1_PATH_INDEX] == FRAME_LAST_CHAR) {
 		if (pst->path_c0[DXT1_PATH_INDEX-1] == FRAME_SECN_CHAR) {
@@ -177,7 +177,7 @@ FTINDEF FTVOID valueChg (FTU32 *paddr, FTU8 *phdl, dxt1_path_st *pst, FTU32 len)
 	}
 }
 
-FTINDEF FTVOID dxt1Display (FTU32 hdl, FTU32 addr, FTU8 t)
+STATIC FTVOID dxt1Display (FTU32 hdl, FTU32 addr, FTU8 t)
 {
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0x0,0x0,0x0));

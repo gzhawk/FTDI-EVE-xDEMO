@@ -28,12 +28,12 @@ typedef unsigned long  FTU64;
 #define FTMAIN FT32 main (FT32 argc,FT8 *argv[]) 
 #define FTDUMMY
 
-#define FTINDEF static
+#define STATIC static
 
-#ifdef FT800_PRINT
+#ifdef DBG_PRINT
 #define FTPRINT     printf
-#define DBGPRINT    printf("\r\nError %s:%d",__FUNCTION__,__LINE__)
-#define SYS_INIT   printf("\r\nVer: %s",APPS_VER)
+#define DBGPRINT    appUI_DbgPrint(__FUNCTION__,__LINE__)
+#define SYS_INIT    printf("\r\nVer: %s",APPS_VER)
 #else
 #define FTPRINT     vc2010_dumy_print
 #define DBGPRINT

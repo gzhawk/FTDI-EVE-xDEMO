@@ -135,7 +135,7 @@ welling_t UIData = {
 	DEFAULT_ERR
 };
 
-FTINDEF FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
+STATIC FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
 {
 	HAL_CmdBufIn(F_COLOR);
 	HAL_CmdBufIn(BEGIN(LINES));	
@@ -150,7 +150,7 @@ FTINDEF FTVOID rect_line (FTU32 X, FTU32 Y, FTU32 XX, FTU32 YY)
 	HAL_CmdBufIn(END());	
 }
 
-FTINDEF FTVOID welling_speed (FTVOID)
+STATIC FTVOID welling_speed (FTVOID)
 {
 	HAL_CmdBufIn(T_COLOR);
 	CoCmd_TEXT(SPD_T_X,PUB_T_Y,PUB_FONT,OPT_CENTERY,"Speed Control");
@@ -215,7 +215,7 @@ FTINDEF FTVOID welling_speed (FTVOID)
 	HAL_CmdBufIn(W_COLOR);
 }
 
-FTINDEF FTVOID welling_info (FTVOID)
+STATIC FTVOID welling_info (FTVOID)
 {
 	HAL_CmdBufIn(T_COLOR);
 	CoCmd_TEXT(INFO_T_X,INFO_T_Y,PUB_FONT,OPT_CENTERY,"Status Infomation");
@@ -250,7 +250,7 @@ FTINDEF FTVOID welling_info (FTVOID)
 	CoCmd_NUMBER(INFO_DSP_X+DISP_W,INFO_DSP_ERR_Y,NUM_FONT,OPT_RIGHTX,UIData.err_code);
 }
 
-FTINDEF FTU8 isFilling(FTU8 tag)
+STATIC FTU8 isFilling(FTU8 tag)
 {
 	switch (tag) {
 		case TAG_DATA:
@@ -273,7 +273,7 @@ FTINDEF FTU8 isFilling(FTU8 tag)
 	}
 }
 
-FTINDEF FTVOID filling_handle (FTU8 data)
+STATIC FTVOID filling_handle (FTU8 data)
 {
 	static FTU8 init = 1;
 	FT32 speed = UIData.speed[SPD_FILL], tmp;
@@ -309,7 +309,7 @@ FTINDEF FTVOID filling_handle (FTU8 data)
 	UIData.speed[SPD_FILL] = speed;
 }
 
-FTINDEF FTVOID welling_filling (FTVOID)
+STATIC FTVOID welling_filling (FTVOID)
 {
 	/* make filling form appear only when tap the filling area */
 	if (isFilling(UIData.tag[T_PRE])) {

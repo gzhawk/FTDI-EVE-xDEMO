@@ -57,7 +57,7 @@ FTU8 screen_title[BSH_NUM_END+1][BSH_TLT_LEN] = {
 FTU8 gIndex = 0;
 
 
-FTINDEF FTVOID animFizz (FTU8 init, FTU32 speed)
+STATIC FTVOID animFizz (FTU8 init, FTU32 speed)
 {
 	FTU8 i;
 	static FTU32 count;
@@ -98,7 +98,7 @@ FTINDEF FTVOID animFizz (FTU8 init, FTU32 speed)
 	HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
-FTINDEF FTVOID read_xy (FTU16 *pX, FTU16 *pY)
+STATIC FTVOID read_xy (FTU16 *pX, FTU16 *pY)
 {
 	FTU32 tmp;
 
@@ -107,7 +107,7 @@ FTINDEF FTVOID read_xy (FTU16 *pX, FTU16 *pY)
 	*pY = (FTU16)0x7FFF&tmp;
 }
 
-FTINDEF FTVOID title_change (FTU32 *phold_count, FTU8 *pstat, FTU8 *pnum_index)
+STATIC FTVOID title_change (FTU32 *phold_count, FTU8 *pstat, FTU8 *pnum_index)
 {
 	static FTU16 X1 = 0xFFFF,Y1 = 0xFFFF,X2 = 0xFFFF,Y2 = 0xFFFF,x,y;
 

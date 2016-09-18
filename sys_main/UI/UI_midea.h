@@ -57,7 +57,7 @@ dxt1_path_st dxt1MPath = {
 	PATH_M_B1
 };
 
-FTINDEF FTU32 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
+STATIC FTU32 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
 {
 	FTU32 len, addr = addrRAM;
 
@@ -89,7 +89,7 @@ FTINDEF FTU32 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
 	return (addr - addrRAM);
 }
 
-FTINDEF FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
+STATIC FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
 {
 	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
 	HAL_CmdBufIn(BITMAP_SOURCE(startAddr));
@@ -102,7 +102,7 @@ FTINDEF FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
 	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, W, H));
 }
 
-FTINDEF FTVOID dxt1FormatInfo (FTU8 startHdl, FTU16 X, FTU16 Y)
+STATIC FTVOID dxt1FormatInfo (FTU8 startHdl, FTU16 X, FTU16 Y)
 {
 	HAL_CmdBufIn(BLEND_FUNC(ONE,ZERO));
 	HAL_CmdBufIn(COLOR_A(0x55));
@@ -128,7 +128,7 @@ FTINDEF FTVOID dxt1FormatInfo (FTU8 startHdl, FTU16 X, FTU16 Y)
 
 }
 
-FTINDEF FTVOID valueChg (FTU32 *paddr, FTU8 *phdl, dxt1_path_st *pst, FTU32 len, FTU8 *ptouch)
+STATIC FTVOID valueChg (FTU32 *paddr, FTU8 *phdl, dxt1_path_st *pst, FTU32 len, FTU8 *ptouch)
 {
 	if (TOUCHED == 0) {
 		if (*ptouch == 0) {
@@ -162,7 +162,7 @@ FTINDEF FTVOID valueChg (FTU32 *paddr, FTU8 *phdl, dxt1_path_st *pst, FTU32 len,
 	}
 }
 
-FTINDEF FTVOID addBMP (dxt1_path_st *pst)
+STATIC FTVOID addBMP (dxt1_path_st *pst)
 {
 	HAL_CmdBufIn(BEGIN(BITMAPS));
 

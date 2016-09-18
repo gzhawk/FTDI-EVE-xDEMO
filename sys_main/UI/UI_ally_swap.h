@@ -71,7 +71,7 @@ dxt1_path_st dxt1_header[BITMAP_NUM] = {
 	{BG_B_C0,BG_B_C1,BG_B_B0,BG_B_B1}
 };
 
-FTINDEF FTU8 palFile (pal_path_st *path, FTU32 addrRAM)
+STATIC FTU8 palFile (pal_path_st *path, FTU32 addrRAM)
 {
 
 	if (!appFileToRamG(path->path_inx,addrRAM,0,0,0)) {
@@ -86,7 +86,7 @@ FTINDEF FTU8 palFile (pal_path_st *path, FTU32 addrRAM)
 
 	return 1;
 }
-FTINDEF FTU8 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
+STATIC FTU8 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
 {
 #define DXT1_LEN 48000
 	FTU32 addr = addrRAM;
@@ -114,7 +114,7 @@ FTINDEF FTU8 dxt1File (dxt1_path_st *path, FTU32 addrRAM)
 	return 1;
 }
 
-FTINDEF FTVOID pal8BitmapDL (FTU8 Hdl, FTU32 Addr, FTU16 W, FTU16 H)
+STATIC FTVOID pal8BitmapDL (FTU8 Hdl, FTU32 Addr, FTU16 W, FTU16 H)
 {
 	HAL_DlpBufIn(BITMAP_HANDLE(Hdl));
 	HAL_DlpBufIn(BITMAP_SOURCE(Addr));
@@ -124,7 +124,7 @@ FTINDEF FTVOID pal8BitmapDL (FTU8 Hdl, FTU32 Addr, FTU16 W, FTU16 H)
     HAL_DlpBufIn(BITMAP_SIZE_H(W>>9, H>>9));
 }
 
-FTINDEF FTVOID dxt1BitmapDL (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
+STATIC FTVOID dxt1BitmapDL (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
 {
 #define DXT1_BLOCK_NUMS (4)
 	HAL_DlpBufIn(BITMAP_HANDLE(startHdl));
@@ -142,7 +142,7 @@ FTINDEF FTVOID dxt1BitmapDL (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
     HAL_DlpBufIn(BITMAP_SIZE_H(W>>9, H>>9));
 }
 
-FTINDEF FTVOID fillBitmapDL (FTVOID)
+STATIC FTVOID fillBitmapDL (FTVOID)
 {
     pal8BitmapDL(HDL_PAL8,GRAM_ADDR_PAL8,BITMAP_W,BITMAP_H);
     
@@ -152,7 +152,7 @@ FTINDEF FTVOID fillBitmapDL (FTVOID)
     HAL_BufToReg(RAM_DL,0);
 }
 
-FTINDEF FTVOID DispDXT1 (FTU8 startHdl, FT16 X, FT16 Y)
+STATIC FTVOID DispDXT1 (FTU8 startHdl, FT16 X, FT16 Y)
 {
 	HAL_CmdBufIn(SAVE_CONTEXT());
 	HAL_CmdBufIn(BLEND_FUNC(ONE,ZERO));
@@ -185,7 +185,7 @@ FTINDEF FTVOID DispDXT1 (FTU8 startHdl, FT16 X, FT16 Y)
 	HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
-FTINDEF FTVOID ally_disp_dxt1 (FTU32 X, FTU32 Y, FTU32 addr, FTU32 hdl)
+STATIC FTVOID ally_disp_dxt1 (FTU32 X, FTU32 Y, FTU32 addr, FTU32 hdl)
 {
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
