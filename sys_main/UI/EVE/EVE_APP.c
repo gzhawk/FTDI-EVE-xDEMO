@@ -19,13 +19,17 @@
  * adaptability
  */
 #define READ_ID_WAIT 100
+
 /* 
  * longer delay for CAP touch engin ready
  * for RES touch engin, 10 would be enough 
+ * do longer delay anyway for safer status
  */
-#define CLK_DELAY 100
-FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = {0};
+#define CLK_DELAY 200
+
 FTU8 EVE_ID = 0;
+
+FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = "Error occur / Stop display";
 
 typedef struct wrFuncPara_ {
     FTRES res;
@@ -129,7 +133,6 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
     FTU32 CData[FT800_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
-    FTPRINT("\nCalibration");
 #if defined(MSVC2012EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
     if (force || (dPath == NULL)) {
 #else
@@ -666,6 +669,27 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 STATIC FTVOID appUI_GetEVEID (FTVOID)
 {
     EVE_ID = HAL_Read8(EVE_ID_REG);
+#if defined(DBG_PRINT)
+    FTPRINT("\nChip: ");
+    switch (EVE_ID) {
+        case 0x10:
+            FTPRINT("FT810");
+            break;
+        case 0x11:
+            FTPRINT("FT811");
+            break;
+        case 0x12:
+            FTPRINT("FT812");
+            break;
+        case 0x13:
+            FTPRINT("FT813");
+            break;
+        default:
+            /* only new FT81X able to read the EVE ID */
+            FTPRINT("EVE");
+            break;
+    }
+#endif
 }
 
 STATIC FTVOID appUI_SpiInit ( FTVOID )
@@ -736,14 +760,13 @@ STATIC FTVOID appUI_EVEClk ( FTVOID )
     FTPRINT("external");
     /* Set the clk to external clock */
     HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
-    FTDELAY(CLK_DELAY);
 #endif
 #ifndef DEF_81X
     /* default 48MHz, no need to config
     HAL_Cfg(FT_GPU_PLL_48M);  
-    FTDELAY(CLK_DELAY);
     */
 #endif
+    FTDELAY(CLK_DELAY);
 }
 
 #define PWC_DELAY 20
@@ -895,11 +918,6 @@ STATIC FTVOID appUI_EVESetSPI (FTU32 type)
 #define SYS_HANG (0)
 STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
 {
-    static FTU8 init = 0;
-    if (init == 0) {
-        FTPRINT("\nBootup info");
-        init = 1;
-    }
     do {
         HAL_CmdBufIn(CMD_DLSTART);
         HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
@@ -1103,15 +1121,17 @@ STATIC FTU8 appUI_EVEVerify (FTVOID)
 {
     FTU8 count = RETRY_COUNT;
 
-    FTPRINT("\nRead ID: ");
-    while (HAL_Read8(REG_ID) != FT800_ID && count) {
+    FTPRINT("\nVerify: ");
+    while ((HAL_Read8(REG_ID) != FT800_ID ||
+           HAL_Read8(REG_CPURESET)) &&
+           count) {
         FTPRINT(".");
         count--;
         FTDELAY(READ_ID_WAIT);
     }
 
     if (count) {
-        FTPRINT("Done");
+        FTPRINT("done");
         /* for FT81X, users are recommended to 
            read 4 bytes data from address 0xC0000 
            before application overwrites this address,
@@ -1177,8 +1197,6 @@ FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline)
 }
 FTVOID UI_INIT (FTVOID)
 {
-    FTPRINT("\nEVE init");
-    
     appUI_EVEPathCfg();
 
     /* in some very old BASIC board, 
@@ -1195,7 +1213,7 @@ FTVOID UI_INIT (FTVOID)
         return;
     }
     
-    FTPRINT("\nDisplay init");
+    FTPRINT("\nEVE inited");
     /* 
      * After recognizing the type of chip, 
      * perform the trimming if necessary 
@@ -1217,8 +1235,7 @@ FTVOID UI_INIT (FTVOID)
 
     appUI_WaitCal();
    
-    /* give a default string when DBG_PRINT not enable */
-    strcpy((char *)dbg_str_buf,"Display end by user, or error happen!");
+    FTPRINT("\nDisplay inited");
 }
 /*
  * Only when error happen

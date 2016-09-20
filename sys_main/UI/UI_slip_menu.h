@@ -272,13 +272,16 @@ FTU8 menu_init (FTVOID)
 	FTU8 i;
     
     for (i = 0; i < MENU_MAIN_NUM+1; i++) {
-        menu_load(i, 1);
+        if(!menu_load(i, 1)){
+            DBGPRINT;
+            return 0;
+        }
     }
 
     return 1;
 }
 
-FTVOID menu_move (FTU8 M_index, FT16 move, FTU8 release)
+FTU8 menu_move (FTU8 M_index, FT16 move, FTU8 release)
 {
     FTU8 i;
     /* in single touch, the first location is wrong, ignore it */
@@ -317,9 +320,14 @@ FTVOID menu_move (FTU8 M_index, FT16 move, FTU8 release)
 
         if (!main_menu[i].inRAM) {
             menu_new_path(i);
-            menu_load(i, 0);
+            if(!menu_load(i, 0)){
+                DBGPRINT;
+                return 0;
+            }
         }
     }
+
+    return 1;
 }
 
 /* 
@@ -433,19 +441,22 @@ FTU8 menu_detect (FTU32 *pMenuIndex)
             /* any touch during the inertia process would stop the inertia */
             inertiaing = 0;
         } else {
-            menu_move(*pMenuIndex,inertiaing, 0);
-            if (inertiaing > 0) {
-                inertiaing -= STEP;
-                if (inertiaing <= 0) {
-                    /* avoid endless loop to blow routine */
-                    inertiaing = 0;
+            if(menu_move(*pMenuIndex,inertiaing, 0)) {
+                if (inertiaing > 0) {
+                    inertiaing -= STEP;
+                    if (inertiaing <= 0) {
+                        /* avoid endless loop to blow routine */
+                        inertiaing = 0;
+                    }
+                } else {
+                    inertiaing += STEP;
+                    if (inertiaing >= 0) {
+                        /* avoid endless loop to above routine */
+                        inertiaing = 0;
+                    }
                 }
             } else {
-                inertiaing += STEP;
-                if (inertiaing >= 0) {
-                    /* avoid endless loop to above routine */
-                    inertiaing = 0;
-                }
+                return E_MENU_ERR;
             }
         }
     } else {
@@ -453,7 +464,9 @@ FTU8 menu_detect (FTU32 *pMenuIndex)
         if (released && D_inertia) {
             inertiaing = D_inertia;
         } else {
-            menu_move(*pMenuIndex,D_press, released);
+            if(!menu_move(*pMenuIndex,D_press, released)){
+                return E_MENU_ERR;
+            }
         }
     }
 
@@ -594,7 +607,10 @@ FTVOID submenu_disp (FTU32 para)
             *(FTU8 *)(main_menu[MENU_MAIN_NUM].menuInfo.path_lut + UPDATE_PATH_INDEX) =
                       main_menu[para].menuInfo.path[UPDATE_PATH_INDEX];
         }
-        menu_load(MENU_MAIN_NUM, 0);
+        if(!menu_load(MENU_MAIN_NUM, 0)){
+            DBGPRINT;
+            return;
+        }
     }
 	
     HAL_CmdBufIn(CMD_DLSTART);
@@ -634,6 +650,9 @@ FTVOID menu_main (FTU32 para)
 
 	if (!inited) {
 		inited = menu_init();
+        if (!inited) {
+            return;
+        }
 	}
 
     appGP.appIndex = menu_detect(&(appGP.appPara));
