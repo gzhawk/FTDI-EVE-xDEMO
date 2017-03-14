@@ -100,6 +100,8 @@ app_para_t appGP = {0};
 #include "UI_boms_hid.h"
 #elif defined(UI_SLIP_M)
 #include "UI_slip_menu.h"
+#elif defined(UI_VJDZ)
+#include "UI_vjdz.h"
 #else
 #error "no UI be selected"
 #endif

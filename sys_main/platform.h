@@ -51,6 +51,7 @@
 #define UI_GRG
 #define UI_NJTOYO
 #define UI_SLIP_M
+#define UI_VJDZ
 #endif
 
 /*-------------------------------------------------Demo Related hardware setting
@@ -110,6 +111,7 @@
     defined(UI_NJTOYO) || \
     defined(UI_BOMS_HID) || \
     defined(UI_ALLY_ROTATE) || \
+	defined(UI_VJDZ) || \
     defined(UI_STELIGENT)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
@@ -201,7 +203,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.40.3"
+#define APPS_VER "5.B.41.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
