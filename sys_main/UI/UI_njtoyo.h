@@ -259,7 +259,7 @@ FTU32 Code_fixed (FTVOID)
 {
     FTU8 i;
 
-    FillBmpDL(0, BMPADDR, jpeg_bmp, 4);
+    appUI_FillBmpDL(0, BMPADDR, jpeg_bmp, 4);
 
     HAL_CmdBufIn(CMD_DLSTART);
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
