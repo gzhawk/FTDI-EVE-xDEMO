@@ -8,7 +8,7 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-#define UI_EVEUI
+#define UI_AUPU
 #if 0
 /* UI for customer: technical support */
 #define UI_EVEUI
@@ -52,6 +52,7 @@
 #define UI_NJTOYO
 #define UI_SLIP_M
 #define UI_VJDZ
+#define UI_AUPU
 #endif
 
 /*-------------------------------------------------Demo Related hardware setting
@@ -136,6 +137,13 @@
 #define DEF_DISPLAY
 #endif
 
+#if defined(UI_AUPU)
+#define DEF_81X
+#define LCD_HVGA
+#define EVE_SPI_TYPE 1
+#define DEF_DISPLAY
+#endif
+
 #endif
 
 /*--------------------------------------------------MSVC platform, None STM32 */
@@ -203,7 +211,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.41.1"
+#define APPS_VER "5.B.42.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

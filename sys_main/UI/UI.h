@@ -102,6 +102,8 @@ app_para_t appGP = {0};
 #include "UI_slip_menu.h"
 #elif defined(UI_VJDZ)
 #include "UI_vjdz.h"
+#elif defined(UI_AUPU)
+#include "UI_aupu.h"
 #else
 #error "no UI be selected"
 #endif
