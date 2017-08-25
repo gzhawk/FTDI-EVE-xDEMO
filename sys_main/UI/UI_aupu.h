@@ -719,7 +719,7 @@ STATIC FTVOID sortDateAll (FTVOID)
     sortDate(stMonth);
     sortDate(stDay);
 
-    DatSetValue = getDateSelected(stYear)*10000+getDateSelected(stMonth)*100+getDateSelected(stMonth);
+    DatSetValue = getDateSelected(stYear)*10000+getDateSelected(stMonth)*100+getDateSelected(stDay);
 }
 
 STATIC FTVOID moveDate (FTU32 track)
