@@ -18,12 +18,18 @@
 #define PATH_HOME     ROOT_PATH"aupu\\home.raw"
 #define PATH_OK       ROOT_PATH"aupu\\ok.raw"
 #define PATH_CLOCK    ROOT_PATH"aupu\\clock.raw"
+#define PATH_MASK_I   ROOT_PATH"aupu\\mask_index.bin"
+#define PATH_MASK_L   ROOT_PATH"aupu\\mask_lut.bin"
+#define PATH_MASKD_I   ROOT_PATH"aupu\\mask_d_index.bin"
+#define PATH_MASKD_L   ROOT_PATH"aupu\\mask_d_lut.bin"
 
 #define LCD_W         480
 #define LCD_H         320
 
-#define IMG_NUMBER    6
+#define IMG_NUMBER    8
 
+#define MASK_W        1
+#define MASK_H        30
 #define NUMBER_W      36
 #define NUMBER_H      41
 #define LEFT_W        43
@@ -46,13 +52,12 @@
 #define BUTM_W        ((LCD_W-10)/2)
 #define BUTM_H        (47)
 
-#define DATE_POS_NUM    (7) /* up 3(1 invisable), middle 1, down 3(1 invisable) */
+#define DATE_POS_NUM    (5) /* up 2, middle 1, down 2 */
 
 #define DATE_RATIO_MAX  (100)
 #define DATE_RATIO_MIN  (20)
 
-#define DATE_H      156
-#define DATE_NUM_H  36
+#define DATE_NUM_H  30
 #define DATE_NUM_Y  74
 
 #define DATEYEAR_W  98
@@ -62,28 +67,31 @@
 #define DATEDAY_X   314
 #define DATEDAY_W   51
 
-#define DATE_NUM_UP_INVIS_Y   (54)
-#define DATE_NUM_UP_2_Y       (74)
-#define DATE_NUM_UP_1_Y       (100)
-#define DATE_NUM_MID_Y        (130)
-#define DATE_NUM_DOWN_1_Y     (160)
-#define DATE_NUM_DOWN_2_Y     (186)
-#define DATE_NUM_DOWN_INVIS_Y (210)
+#define DATE_NUM_UP_INVIS_Y   (DATE_NUM_Y-DATE_NUM_H/2)
+#define DATE_NUM_UP_2_Y       DATE_NUM_Y
+#define DATE_NUM_UP_1_Y       (DATE_NUM_UP_2_Y+DATE_NUM_H-4)
+#define DATE_NUM_MID_Y        (DATE_NUM_UP_1_Y+DATE_NUM_H)
+#define DATE_NUM_DOWN_1_Y     (DATE_NUM_MID_Y+DATE_NUM_H)
+#define DATE_NUM_DOWN_2_Y     (DATE_NUM_DOWN_1_Y+DATE_NUM_H-4)
+#define DATE_NUM_DOWN_INVIS_Y (DATE_NUM_DOWN_2_Y+DATE_NUM_H/2)
+#define DATE_H                (DATE_NUM_DOWN_INVIS_Y-DATE_NUM_UP_2_Y)
 
 #define TRACK_MAX   65536
 
 typedef enum HDL_ {
-    HDL_BKG_START  = 0,
-    /* font and bitmap share the same handle,
-       and DXT1 need to use two handle */
-    HDL_TXT_FNT    = 2, 
-    HDL_NUMBER, 
+    HDL_NUMBER = 0, 
     HDL_LEFT, 
     HDL_RIGHT, 
     HDL_HOME, 
     HDL_OK,
     HDL_CLOCK,
-    HDL_FONT
+    HDL_MASK,
+    HDL_MASK_D,
+    /* same order in imgHeader */
+    HDL_BKG_START,
+    /* font and bitmap share the same handle,
+       and DXT1 need to use two handle */
+    HDL_FONT    = HDL_BKG_START+2, 
 } HDL_e;
 
 typedef enum TAG_ {
@@ -99,13 +107,17 @@ typedef enum TAG_ {
     TAG_DAY
 } TAG_e;
 
+/* !!!Attention: the items order MUST be the same as HDL_e */
 bmpHDR_st imgHeader[IMG_NUMBER] = {
     {PATH_NUMBER,0,0,L8,      0,0,NUMBER_W,NUMBER_H},
-    {PATH_LEFT, 0,0,ARGB1555,0,0,LEFT_W,LEFT_H},
+    {PATH_LEFT,  0,0,ARGB1555,0,0,LEFT_W,LEFT_H},
     {PATH_RIGHT, 0,0,ARGB1555,0,0,LEFT_W,LEFT_H},
     {PATH_HOME,  0,0,ARGB1555,0,0,HOME_W,HOME_H},
     {PATH_OK,    0,0,ARGB1555,0,0,OK_W,OK_H},
-    {PATH_CLOCK, 0,0,ARGB1555,0,0,CLOCK_W,CLOCK_H}};
+    {PATH_CLOCK, 0,0,ARGB1555,0,0,CLOCK_W,CLOCK_H},
+    {PATH_MASK_I,PATH_MASK_L,0,PALETTED8,0,0,MASK_W,MASK_H},
+    {PATH_MASKD_I,PATH_MASKD_L,0,PALETTED8,0,0,MASK_W,MASK_H},
+    };
 
 typedef struct DateTime_  {
     FTU32 year;
@@ -199,9 +211,44 @@ STATIC FTU32 loadResources (FTVOID)
         if (l > bg_start_addr) {
             return loadImg(l);
         }
+        DBGPRINT;
         return 0;
     }
+    DBGPRINT;
     return 0;
+}
+
+FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
+{
+    /* every thing after this commands would not display
+       if not use save/restore context */
+    HAL_CmdBufIn(SAVE_CONTEXT());
+    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
+    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(cell));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+
+    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
+    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(cell));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+
+    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(cell));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+
+    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
+    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
+    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
+    HAL_CmdBufIn(CELL(cell));
+    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
 STATIC FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
@@ -527,12 +574,17 @@ STATIC FTU32 setClock (FTU32 clkValue, FTU32 clkTrack)
 STATIC FTU32 getNumRatio (FT32 oY)
 {
     /* up and down offset quite the same, use down as countiong sample */
-    FTU32 unit = (DATE_NUM_DOWN_INVIS_Y - DATE_NUM_MID_Y)/(DATE_RATIO_MAX - DATE_RATIO_MIN);
+	FTU32 H = (DATE_NUM_DOWN_INVIS_Y - DATE_NUM_MID_Y);
+	FTU32 R = (DATE_RATIO_MAX - DATE_RATIO_MIN);
     FT32 offset = oY - DATE_NUM_MID_Y;
 
     offset = (offset < 0)?(offset*(-1)):offset;
 
-    return DATE_RATIO_MAX - offset / unit;
+	if (H >= R) {
+		return DATE_RATIO_MAX - offset / (H/R);
+	} else {
+		return DATE_RATIO_MAX - offset * (R/H);
+	}
 }
 
 STATIC FTU32 getPosData (DateDisp_st *stDate, FTU8 TopButm)
@@ -584,7 +636,7 @@ STATIC FT32 getSavedDate (DateDisp_st *stDate, FT8 seed)
             return (tmp < 1)?1:tmp;
         }
     } else if (stDay == stDate) {
-        tmp = (DatSetValue/10)%10;
+        tmp = DatSetValue%100;
         if (!seed) {
             return tmp;
         }
@@ -602,31 +654,72 @@ STATIC FT32 getSavedDate (DateDisp_st *stDate, FT8 seed)
 STATIC FTVOID initDate (DateDisp_st *stDate)
 {
     /* first time display */
-    stDate[0].Y = DATE_NUM_UP_INVIS_Y;
-    stDate[0].data = getSavedDate(stDate,-3);
+    stDate[0].Y = DATE_NUM_UP_2_Y;
+    stDate[0].data = getSavedDate(stDate,-2);
 
-    stDate[1].Y = DATE_NUM_UP_2_Y;
-    stDate[1].data = getSavedDate(stDate,-2);
+    stDate[1].Y = DATE_NUM_UP_1_Y;
+    stDate[1].data = getSavedDate(stDate,-1);
 
-    stDate[2].Y = DATE_NUM_UP_1_Y;
-    stDate[2].data = getSavedDate(stDate,-1);
+    stDate[2].Y = DATE_NUM_MID_Y;
+    stDate[2].data = getSavedDate(stDate,0);
 
-    stDate[3].Y = DATE_NUM_MID_Y;
-    stDate[3].data = getSavedDate(stDate,0);
+    stDate[3].Y = DATE_NUM_DOWN_1_Y;
+    stDate[3].data = getSavedDate(stDate,1);
 
-    stDate[4].Y = DATE_NUM_DOWN_1_Y;
-    stDate[4].data = getSavedDate(stDate,1);
-
-    stDate[5].Y = DATE_NUM_DOWN_2_Y;
-    stDate[5].data = getSavedDate(stDate,2);
-
-    stDate[6].Y = DATE_NUM_DOWN_INVIS_Y;
-    stDate[6].data = getSavedDate(stDate,3);
+    stDate[4].Y = DATE_NUM_DOWN_2_Y;
+    stDate[4].data = getSavedDate(stDate,2);
 }
 
-STATIC FTVOID sortDate (FTVOID)
+STATIC FTVOID sortDate (DateDisp_st *stp)
 {
     /* sort the data after release */
+    FTU8 in,out;
+    FT32 offset,tmp,found = DATE_POS_NUM;
+    FTU32 pos[DATE_POS_NUM] = {DATE_NUM_UP_2_Y,DATE_NUM_UP_1_Y,
+                               DATE_NUM_MID_Y,DATE_NUM_DOWN_1_Y,
+                               DATE_NUM_DOWN_2_Y};
+
+    for (out = 0;out < DATE_POS_NUM;out++) {
+        tmp = LCD_H;/* give a largest number */ 
+        found = DATE_POS_NUM;
+        for (in = 0;in < DATE_POS_NUM;in++) {
+            offset = (pos[out] - stp[in].Y);
+            if (offset < 0) {
+                offset *= (-1);
+            }
+            if (tmp > offset) {
+                tmp = offset;
+                found = in;
+            }
+        }
+        if (found != DATE_POS_NUM) {
+            stp[found].Y = pos[out];
+        }
+    }
+}
+
+STATIC FTU32 getDateSelected (DateDisp_st *stp)
+{
+    FTU8 i;
+
+    for (i = 0;i < DATE_POS_NUM;i++) {
+        if (stp[i].Y == DATE_NUM_MID_Y) {
+            return stp[i].data;
+        }
+    }
+    return 0;
+}
+
+STATIC FTVOID sortDateAll (FTVOID)
+{
+
+    /* TODO: not work yet */
+    //return;
+    sortDate(stYear);
+    sortDate(stMonth);
+    sortDate(stDay);
+
+    DatSetValue = getDateSelected(stYear)*10000+getDateSelected(stMonth)*100+getDateSelected(stMonth);
 }
 
 STATIC FTVOID moveDate (FTU32 track)
@@ -653,7 +746,7 @@ STATIC FTVOID moveDate (FTU32 track)
     } else if(TAG_DAY == (track & 0xFF)) {
         stp = stDay;
     } else {
-        sortDate();
+        sortDateAll();
         t = 0;
         return;
     }
@@ -772,6 +865,7 @@ STATIC FTVOID dispDateNumber (FTU32 X, FTU32 Y, FTU32 number, FTU32 ratio)
 
 STATIC FTVOID dispDate (FTVOID)
 {
+#define MASK_ENLARGE ((DATEDAY_X + DATEDAY_W - DATEYEAR_X)/MASK_W)
     FTU8 i;
 
 	HAL_CmdBufIn(TAG_MASK(1));
@@ -800,18 +894,32 @@ STATIC FTVOID dispDate (FTVOID)
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_NUMBER));
-    
-    /* cutted area: show the cutted part */
-    HAL_CmdBufIn(SAVE_CONTEXT());
-    HAL_CmdBufIn(SCISSOR_XY(DATEYEAR_X,DATE_NUM_UP_1_Y));
-    HAL_CmdBufIn(SCISSOR_SIZE((DATEDAY_X-DATEYEAR_X)+DATEDAY_W,(DATE_NUM_DOWN_INVIS_Y-DATE_NUM_UP_1_Y)));
     for (i = 0;i < DATE_POS_NUM;i++) {
         dispDateNumber(DATEYEAR_X,stYear[i].Y,stYear[i].data,getNumRatio(stYear[i].Y));
         dispDateNumber(DATEMONTH_X,stMonth[i].Y,stMonth[i].data,getNumRatio(stMonth[i].Y));
         dispDateNumber(DATEDAY_X,stDay[i].Y,stDay[i].data,getNumRatio(stDay[i].Y));
     }
-    HAL_CmdBufIn(RESTORE_CONTEXT());
 
+    /* use a mask bitmap to give an effect */
+    HAL_CmdBufIn(BITMAP_HANDLE(HDL_MASK));
+    HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,MASK_ENLARGE*imgHeader[HDL_MASK].wide,imgHeader[HDL_MASK].high));
+#ifdef DEF_81X
+    HAL_CmdBufIn(BITMAP_SIZE_H(MASK_ENLARGE*imgHeader[HDL_MASK].wide >> 9,imgHeader[HDL_MASK].high>>9));
+#endif
+    HAL_CmdBufIn(BITMAP_HANDLE(HDL_MASK_D));
+    HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,MASK_ENLARGE*imgHeader[HDL_MASK_D].wide,imgHeader[HDL_MASK_D].high));
+#ifdef DEF_81X
+    HAL_CmdBufIn(BITMAP_SIZE_H(MASK_ENLARGE*imgHeader[HDL_MASK_D].wide >> 9,imgHeader[HDL_MASK_D].high>>9));
+#endif
+
+    HAL_CmdBufIn(SAVE_CONTEXT());
+	CoCmd_LOADIDENTITY;
+    CoCmd_SCALE(MASK_ENLARGE*FT800_TRANSFORM_MAX,FT800_TRANSFORM_MAX);
+	CoCmd_SETMATRIX;
+    dispPal8(DATEYEAR_X,DATE_NUM_UP_2_Y,imgHeader[HDL_MASK].lut_src,HDL_MASK,0);
+    dispPal8(DATEYEAR_X,DATE_NUM_DOWN_2_Y+15,imgHeader[HDL_MASK_D].lut_src,HDL_MASK_D,0);
+	HAL_CmdBufIn(RESTORE_CONTEXT());
+   
     HAL_CmdBufIn(END());
 }
 
@@ -835,6 +943,15 @@ STATIC FTVOID dispDateTxt (FTVOID)
 
 }
 
+STATIC FTVOID okAction (FTVOID)
+{
+    stDateTime.year  = DatSetValue/10000;
+    stDateTime.month = (DatSetValue/100)%100;
+    stDateTime.day   = DatSetValue%100;
+    stDateTime.hour  = (ClkSetValue/60)%100;
+    stDateTime.minute = (ClkSetValue - 60*stDateTime.hour);
+}
+
 STATIC FTVOID tagAction (FTU32 tagValue)
 {
     static FTU8 butm = 0, arrow = 0;
@@ -850,12 +967,7 @@ STATIC FTVOID tagAction (FTU32 tagValue)
         case TAG_OK:
             dispButm(1,1);
             dispArrow(0,0);
-            /*butm = 1;
-              don't exit to home
-              you may do some real
-              value update after
-              press OK
-              */
+            okAction();
             break;
         case TAG_LEFT:
             dispArrow(0,1);
@@ -944,19 +1056,19 @@ FTVOID aupu_main_ui (FTU32 para)
     }
 
     HAL_CmdBufIn(CMD_DLSTART);
-    HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
+    HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0xFF,0xFF));
     HAL_CmdBufIn(CLEAR(1,1,1));
 
-    /* set the LCD rotation
-       after the rotation the PC emulation API
-       does not handle properly for track, tag, etc. fucntion
-       try on real chip to see if the 
-       code work
-       to rotate on PC emulator, need to use HAL_Write32(REG_ROTATE,2)
-       but, as I said above, the over all function of rotat
-       is not working well on PC
+    /* after the rotation, the PC emulation API
+       does not handle properly for track, tag, etc.
+       try on real chip to see if the code works.
+       to rotate on PC emulator, need to use 
+       HAL_Write32(REG_ROTATE,2), or HAL_Write32(REG_ROTATE,0)
+       but, as I said above, the over all function of rotate
+       is not working well on PC emulator.
     */
 	CoCmd_SETROTATE(ROTATE_VALUE);
+    //HAL_Write32(REG_ROTATE,0);
 
     /* set the user font */
 	CoCmd_SETFONT(HDL_FONT, RAM_G, &stTxtFnt);
@@ -965,7 +1077,7 @@ FTVOID aupu_main_ui (FTU32 para)
     dispBKG(bg_start_addr);
 
     /* just for setting result display */
-    HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
+    HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
     CoCmd_NUMBER(TEST_X,0,30,OPT_CENTERX,stDateTime.year);
     CoCmd_NUMBER(TEST_X,TEST_H,30,OPT_CENTERX,stDateTime.month);
     CoCmd_NUMBER(TEST_X,2*TEST_H,30,OPT_CENTERX,stDateTime.day);

@@ -8,7 +8,7 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-#define UI_AUPU
+#define UI_EVEUI
 #if 0
 /* UI for customer: technical support */
 #define UI_EVEUI
@@ -211,7 +211,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.42.0"
+#define APPS_VER "5.B.42.1"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
