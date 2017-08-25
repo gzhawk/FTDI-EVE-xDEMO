@@ -949,7 +949,7 @@ STATIC FTVOID okAction (FTVOID)
     stDateTime.month = (DatSetValue/100)%100;
     stDateTime.day   = DatSetValue%100;
     stDateTime.hour  = (ClkSetValue/60)%100;
-    stDateTime.minute = (ClkSetValue - 60*stDateTime.hour);
+    stDateTime.minute = ClkSetValue%60;
 }
 
 STATIC FTVOID tagAction (FTU32 tagValue)
