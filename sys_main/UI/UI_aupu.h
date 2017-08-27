@@ -537,38 +537,51 @@ STATIC FTVOID dispClock (FTVOID)
 
 STATIC FTU32 setClock (FTU32 clkValue, FTU32 clkTrack)
 {
-#define SETCLK_MAX_HOUR   12
+/* maxium move(in minute) between two track read for track critical point check */
+/* x:30 track=1; x:00 track=65536/2; x:29=65536 */
+#define SETCLK_MAX_MOVE   15 
 #define SETCLK_MAX_MINUTE 60
+#define SETCLK_MAX_CLOCK  12*60
 
-    static FT32 offset = 0, preTrack = 0;
+    static FT32 newValue = 0, preTrack = 0;
     FTU32 track;
+    FTU32 moveUnit = (TRACK_MAX/SETCLK_MAX_MINUTE);
+    FT32  move;
 
     if (TAG_CLOCK != (FTU8)clkTrack) {
-        offset = ((clkValue/SETCLK_MAX_MINUTE)*TRACK_MAX) +
-                 (clkValue%SETCLK_MAX_MINUTE)*(TRACK_MAX/SETCLK_MAX_MINUTE);
+        newValue = clkValue*moveUnit;
         preTrack = 0;
         return clkValue;
     }
 
     track = clkTrack>>16;
 
-    if (!preTrack) {
+    /* skip the non-touch and non-move value */
+    if (!preTrack || preTrack == track) {
         preTrack = track;
         return clkValue;
     }
-
-    offset += (FT32)(track - preTrack);
-
-	if (offset < 0) {
-	    offset += (SETCLK_MAX_HOUR*TRACK_MAX);
+    move = (FT32)(track - preTrack);
+    
+    /* cross track critical point check */
+    if (move > 0 && move > (FT32)(SETCLK_MAX_MOVE*moveUnit)) {
+        move = (1 - preTrack) + (track - TRACK_MAX);
+    } else if (move < 0 && move*(-1) > (FT32)(SETCLK_MAX_MOVE*moveUnit)) {
+        move = (TRACK_MAX - preTrack) + (track - 1);
     }
 
-	if (offset >= (SETCLK_MAX_HOUR*TRACK_MAX)) {
-	    offset -= (SETCLK_MAX_HOUR*TRACK_MAX);
+    newValue += move;
+
+    /* cross clock critical point check */
+	if (newValue < 0) {
+	    newValue += SETCLK_MAX_CLOCK*moveUnit;
+    }
+	if (newValue >= (FT32)(SETCLK_MAX_CLOCK*moveUnit)) {
+	    newValue -= SETCLK_MAX_CLOCK*moveUnit;
     }
 
     preTrack = track;
-    return offset/(TRACK_MAX/SETCLK_MAX_MINUTE);
+    return newValue/moveUnit;
 }
 
 STATIC FTU32 getNumRatio (FT32 oY)
@@ -1099,7 +1112,7 @@ FTVOID aupu_main_ui (FTU32 para)
             return;
         }
     }
-    appGP.appIndex = 0;        
+    appGP.appIndex = 0; 
 }
 
 AppFunc APPS_UI[] = {
