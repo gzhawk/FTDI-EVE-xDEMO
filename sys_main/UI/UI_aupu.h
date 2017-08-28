@@ -1090,7 +1090,6 @@ FTVOID aupu_main_ui (FTU32 para)
        is not working well on PC emulator.
     */
 	CoCmd_SETROTATE(ROTATE_VALUE);
-    //HAL_Write32(REG_ROTATE,0);
 
     /* set the user font */
 	CoCmd_SETFONT(HDL_FONT, RAM_G, &stTxtFnt);
