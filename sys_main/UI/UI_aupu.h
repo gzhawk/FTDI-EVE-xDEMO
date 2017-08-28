@@ -13,11 +13,14 @@
 #define PATH_TXT_F    ROOT_PATH"aupu\\txt.raw"
 
 #define PATH_NUMBER   ROOT_PATH"aupu\\num.raw"
-#define PATH_LEFT     ROOT_PATH"aupu\\left.raw"
-#define PATH_RIGHT    ROOT_PATH"aupu\\right.raw"
-#define PATH_HOME     ROOT_PATH"aupu\\home.raw"
-#define PATH_OK       ROOT_PATH"aupu\\ok.raw"
-#define PATH_CLOCK    ROOT_PATH"aupu\\clock.raw"
+#define PATH_LEFT_I   ROOT_PATH"aupu\\left_index.bin"
+#define PATH_LEFT_L   ROOT_PATH"aupu\\left_lut.bin"
+#define PATH_HOME_I   ROOT_PATH"aupu\\home_index.bin"
+#define PATH_HOME_L   ROOT_PATH"aupu\\home_lut.bin"
+#define PATH_OK_I     ROOT_PATH"aupu\\ok_index.bin"
+#define PATH_OK_L     ROOT_PATH"aupu\\ok_lut.bin"
+#define PATH_CLOCK_I  ROOT_PATH"aupu\\clock_index.bin"
+#define PATH_CLOCK_L  ROOT_PATH"aupu\\clock_lut.bin"
 #define PATH_MASK_I   ROOT_PATH"aupu\\mask_index.bin"
 #define PATH_MASK_L   ROOT_PATH"aupu\\mask_lut.bin"
 #define PATH_MASKD_I   ROOT_PATH"aupu\\mask_d_index.bin"
@@ -26,7 +29,6 @@
 #define LCD_W         480
 #define LCD_H         320
 
-#define IMG_NUMBER    8
 
 #define MASK_W        1
 #define MASK_H        30
@@ -36,8 +38,8 @@
 #define LEFT_H        46
 #define HOME_W        38
 #define HOME_H        32
-#define OK_W          44
-#define OK_H          31
+#define OK_W          29
+#define OK_H          32
 #define CLOCK_W       200
 #define CLOCK_H       200
 #define CLOCK_RI      98
@@ -81,7 +83,6 @@
 typedef enum HDL_ {
     HDL_NUMBER = 0, 
     HDL_LEFT, 
-    HDL_RIGHT, 
     HDL_HOME, 
     HDL_OK,
     HDL_CLOCK,
@@ -92,7 +93,10 @@ typedef enum HDL_ {
     /* font and bitmap share the same handle,
        and DXT1 need to use two handle */
     HDL_FONT    = HDL_BKG_START+2, 
+    HDL_MP_F, 
 } HDL_e;
+
+#define IMG_NUMBER    HDL_BKG_START
 
 typedef enum TAG_ {
     TAG_HOME       = 1,
@@ -110,11 +114,10 @@ typedef enum TAG_ {
 /* !!!Attention: the items order MUST be the same as HDL_e */
 bmpHDR_st imgHeader[IMG_NUMBER] = {
     {PATH_NUMBER,0,0,L8,      0,0,NUMBER_W,NUMBER_H},
-    {PATH_LEFT,  0,0,ARGB1555,0,0,LEFT_W,LEFT_H},
-    {PATH_RIGHT, 0,0,ARGB1555,0,0,LEFT_W,LEFT_H},
-    {PATH_HOME,  0,0,ARGB1555,0,0,HOME_W,HOME_H},
-    {PATH_OK,    0,0,ARGB1555,0,0,OK_W,OK_H},
-    {PATH_CLOCK, 0,0,ARGB1555,0,0,CLOCK_W,CLOCK_H},
+    {PATH_LEFT_I,PATH_LEFT_L,0,PALETTED4444,0,0,LEFT_W,LEFT_H},
+    {PATH_HOME_I,PATH_HOME_L,0,PALETTED4444,0,0,HOME_W,HOME_H},
+    {PATH_OK_I,PATH_OK_L,0,PALETTED4444,0,0,OK_W,OK_H},
+    {PATH_CLOCK_I,PATH_CLOCK_L,0,PALETTED4444,0,0,CLOCK_W,CLOCK_H},
     {PATH_MASK_I,PATH_MASK_L,0,PALETTED8,0,0,MASK_W,MASK_H},
     {PATH_MASKD_I,PATH_MASKD_L,0,PALETTED8,0,0,MASK_W,MASK_H},
     };
@@ -363,6 +366,7 @@ STATIC FTVOID dispButm (FTU8 HomeOK, FTU8 Pressed)
 	HAL_CmdBufIn(TAG(TAG_HOME));
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_HOME));
     HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_HOME].lut_src));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(HOME_W/2*FT800_TRANSFORM_MAX, HOME_H/2*FT800_TRANSFORM_MAX);
@@ -376,6 +380,7 @@ STATIC FTVOID dispButm (FTU8 HomeOK, FTU8 Pressed)
 	HAL_CmdBufIn(TAG(TAG_OK));
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_OK));
     HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_OK].lut_src));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(HOME_W/2*FT800_TRANSFORM_MAX, HOME_H/2*FT800_TRANSFORM_MAX);
@@ -408,6 +413,7 @@ STATIC FTVOID dispArrow (FTU8 LeftRight, FTU8 Pressed)
 	HAL_CmdBufIn(TAG(TAG_LEFT));
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_LEFT));
     HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_LEFT].lut_src));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(LEFT_W/2*FT800_TRANSFORM_MAX, LEFT_H/2*FT800_TRANSFORM_MAX);
@@ -419,12 +425,13 @@ STATIC FTVOID dispArrow (FTU8 LeftRight, FTU8 Pressed)
 	HAL_CmdBufIn(RESTORE_CONTEXT());
 
 	HAL_CmdBufIn(TAG(TAG_RIGHT));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_RIGHT));
+    HAL_CmdBufIn(BITMAP_HANDLE(HDL_LEFT));
     HAL_CmdBufIn(CELL(0));
-
+    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_LEFT].lut_src));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(LEFT_W/2*FT800_TRANSFORM_MAX, LEFT_H/2*FT800_TRANSFORM_MAX);
+    CoCmd_ROTATE(180*FT800_TRANSFORM_MAX/360);
     CoCmd_SCALE(RightR*FT800_TRANSFORM_MAX/100,RightR*FT800_TRANSFORM_MAX/100);
     CoCmd_TRANSLATE(LEFT_W/2*FT800_TRANSFORM_MAX*(-1), LEFT_H/2*FT800_TRANSFORM_MAX*(-1));
 	CoCmd_SETMATRIX;
@@ -442,6 +449,7 @@ STATIC FTVOID dispClockBkg (FTVOID)
     HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_CLOCK));
     HAL_CmdBufIn(CELL(0));
+    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_CLOCK].lut_src));
 	HAL_CmdBufIn(VERTEX2F(((LCD_W-CLOCK_W)/2)*FT800_PIXEL_UNIT,
                           ((LCD_H-CLOCK_H)/2)*FT800_PIXEL_UNIT));
     HAL_CmdBufIn(END());
@@ -1054,8 +1062,9 @@ FTVOID aupu_date_ui (FTU32 para)
 
 FTVOID aupu_main_ui (FTU32 para)
 {
-#define TEST_H 36
+#define TEST_H (40)
 #define TEST_X (LCD_W/2)
+#define TEST_W (30)
 
     static FTU32 load = 0, touched = 0;
 
@@ -1091,11 +1100,21 @@ FTVOID aupu_main_ui (FTU32 para)
 
     /* just for setting result display */
     HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-    CoCmd_NUMBER(TEST_X,0,30,OPT_CENTERX,stDateTime.year);
-    CoCmd_NUMBER(TEST_X,TEST_H,30,OPT_CENTERX,stDateTime.month);
-    CoCmd_NUMBER(TEST_X,2*TEST_H,30,OPT_CENTERX,stDateTime.day);
-    CoCmd_NUMBER(TEST_X,3*TEST_H,30,OPT_CENTERX,stDateTime.hour);
-    CoCmd_NUMBER(TEST_X,4*TEST_H,30,OPT_CENTERX,stDateTime.minute);
+    CoCmd_ROMFONT(HDL_MP_F,32);
+
+    CoCmd_NUMBER(TEST_X-8*(TEST_W),TEST_H,HDL_MP_F,0,stDateTime.year);
+    CoCmd_TEXT(TEST_X-4*(TEST_W),TEST_H,HDL_MP_F,0,"/");
+    CoCmd_NUMBER(TEST_X-3*TEST_W,TEST_H,HDL_MP_F,0,stDateTime.month);
+    CoCmd_TEXT(TEST_X-2*TEST_W,TEST_H,HDL_MP_F,0,"/");
+    CoCmd_NUMBER(TEST_X-TEST_W,TEST_H,HDL_MP_F,0,stDateTime.day);
+    CoCmd_NUMBER(TEST_X+3*TEST_W,TEST_H,HDL_MP_F,0,stDateTime.hour);
+    CoCmd_TEXT(TEST_X+5*TEST_W,TEST_H,HDL_MP_F,0,":");
+    CoCmd_NUMBER(TEST_X+6*TEST_W,TEST_H,HDL_MP_F,0,stDateTime.minute);
+    if (stDateTime.open) {
+        CoCmd_TEXT(TEST_X,LCD_H-TEST_H,HDL_MP_F,OPT_CENTER,"System ON");
+    } else {
+        CoCmd_TEXT(TEST_X,LCD_H-TEST_H,HDL_MP_F,OPT_CENTER,"System OFF");
+    }
 
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
