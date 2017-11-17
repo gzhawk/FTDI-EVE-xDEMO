@@ -190,6 +190,21 @@ typedef struct FT800_LCD_st {
 
 #define TOUCHED                     (!(HAL_Read16(REG_CTOUCH_TOUCH0_XY)&0x8000))
 
+#ifdef DEF_81X
+#define CoCmd_SETFONT(f, s, pf)     HAL_CmdBufIn(BITMAP_HANDLE((FTU32)(f))); \
+                                    HAL_CmdBufIn(BITMAP_SOURCE(((FT_Gpu_Fonts_t *)(pf))->PointerToFontGraphicsData)); \
+                                    HAL_CmdBufIn(BITMAP_LAYOUT(((FT_Gpu_Fonts_t *)(pf))->FontBitmapFormat, \
+                                    ((FT_Gpu_Fonts_t *)(pf))->FontLineStride,((FT_Gpu_Fonts_t *)(pf))->FontHeightInPixels)); \
+                                    HAL_CmdBufIn(BITMAP_LAYOUT_H((((FT_Gpu_Fonts_t *)(pf))->FontLineStride)>>10, \
+                                    (((FT_Gpu_Fonts_t *)(pf))->FontHeightInPixels)>>9)); \
+                                    HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,((FT_Gpu_Fonts_t *)(pf))->FontWidthInPixels, \
+                                    ((FT_Gpu_Fonts_t *)(pf))->FontHeightInPixels)); \
+                                    HAL_CmdBufIn(BITMAP_SIZE_H((((FT_Gpu_Fonts_t *)(pf))->FontWidthInPixels)>>9, \
+                                    (((FT_Gpu_Fonts_t *)(pf))->FontHeightInPixels)>>9)); \
+                                    HAL_CmdBufIn(CMD_SETFONT); \
+                                    HAL_CmdBufIn((FTU32)(f)); \
+                                    HAL_CmdBufIn((FTU32)(s))
+#else
 #define CoCmd_SETFONT(f, s, pf)     HAL_CmdBufIn(BITMAP_HANDLE((FTU32)(f))); \
                                     HAL_CmdBufIn(BITMAP_SOURCE(((FT_Gpu_Fonts_t *)(pf))->PointerToFontGraphicsData)); \
                                     HAL_CmdBufIn(BITMAP_LAYOUT(((FT_Gpu_Fonts_t *)(pf))->FontBitmapFormat, \
@@ -199,6 +214,7 @@ typedef struct FT800_LCD_st {
                                     HAL_CmdBufIn(CMD_SETFONT); \
                                     HAL_CmdBufIn((FTU32)(f)); \
                                     HAL_CmdBufIn((FTU32)(s))
+#endif
 
 #define CoCmd_MEMCPY(des,src,len)   HAL_CmdBufIn(CMD_MEMCPY); \
                                     HAL_CmdBufIn(des); \
