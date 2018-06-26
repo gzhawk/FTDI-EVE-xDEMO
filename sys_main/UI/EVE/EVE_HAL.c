@@ -32,7 +32,7 @@ STATIC FTVOID rdStart ( FTU32 addr )
     SPI_Write(ftHandle,tmp,SPI_RXCMD_LEN,&send,
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FT8XXEMU_cs(1);
     FT8XXEMU_transfer((FTU8)(addr >> 16));
     FT8XXEMU_transfer((FTU8)(addr >> 8));
@@ -76,7 +76,7 @@ STATIC FTVOID wrStart ( FTU32 addr )
     SPI_Write(ftHandle,tmp,SPI_TXCMD_LEN,&send,
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FT8XXEMU_cs(1);
     FT8XXEMU_transfer((FTU8)(addr >> 16) | 0x80);
     FT8XXEMU_transfer((FTU8)(addr >> 8));
@@ -157,7 +157,7 @@ FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrStart(addr);
     FT8XXEMU_transfer(data);
     FT8XXEMU_cs(0);
@@ -191,7 +191,7 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
     SPI_Write(ftHandle,src,len,&i,
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     for (i = 0; i < len; i++) {
         FT8XXEMU_transfer(src[i]);
     }
@@ -232,7 +232,7 @@ FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrStart(addr);
 
     FT8XXEMU_transfer((FTU8)data&0xFF);
@@ -280,7 +280,7 @@ FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrStart(addr);
 
     FT8XXEMU_transfer((FTU8)data&0xFF);
@@ -329,7 +329,7 @@ FTVOID HAL_Cfg ( FTU8 cfg )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FT8XXEMU_transfer(cfg);
 #elif defined(STM32F4)
     FT800_CS_LOW;
@@ -374,7 +374,7 @@ FTU8 HAL_Read8 ( FTU32 addr )
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 
     return tmp[0];
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU8 tmp;
 
     rdStart(addr);
@@ -411,7 +411,70 @@ FTU8 HAL_Read8 ( FTU32 addr )
     return tmp;
 #endif
 }
+FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len )
+{
+#ifdef MSVC2010EXPRESS
+    FTU32 recv;
 
+    rdStart(addr);
+
+    SPI_Read(ftHandle,buff,len,&recv,
+            SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
+            SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
+
+    return recv;
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
+    FTU32 tmp = len;
+    FTU8 *p = buff;
+
+    rdStart(addr);
+
+    while (tmp--) {
+        *p = FT8XXEMU_transfer(0);
+        p++;
+    }
+
+    FT8XXEMU_cs(0);
+
+    return len;
+#elif defined(STM32F4)
+    FTU32 tmp = len;
+    FTU8 *p = buff;
+
+    rdStart(addr);
+
+    while (tmp--) {
+        *p = STM32_SPISend(0);
+        p++;
+    }
+
+    FT800_CS_HIGH;
+
+    return len;
+#elif defined(FT9XXEV)
+    rdStart(addr);
+
+    spi_readn(SPIM,buff,spi_dummy+len);
+    
+    FT9XX_CS_HIGH;
+    
+    return len;
+#else
+    FTU32 tmp = len;
+    FTU8 *p = buff;
+
+    rdStart(addr);
+
+    while (tmp--) {
+        *p = SPI.transfer(0);
+        p++;
+    }
+
+    digitalWrite(FT800_SPI_CS, HIGH);
+
+    return len;
+#endif
+}
 FTU16 HAL_Read16 ( FTU32 addr )
 {
 #ifdef MSVC2010EXPRESS
@@ -425,7 +488,7 @@ FTU16 HAL_Read16 ( FTU32 addr )
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 
     return (tmp[0]|(tmp[1]<<8));
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU16 tmp = 0;
 
     rdStart(addr);
@@ -485,7 +548,7 @@ FTU32 HAL_Read32 ( FTU32 addr )
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 
     return (tmp[0]|(tmp[1]<<8)|(tmp[2]<<16)|(tmp[3]<<24));
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU32 tmp = 0;
 
     rdStart(addr);

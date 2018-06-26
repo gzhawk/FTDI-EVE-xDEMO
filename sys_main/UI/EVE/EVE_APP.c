@@ -40,7 +40,7 @@ typedef struct wrFuncPara_ {
 
 wrFuncPara fPara = {0};
 
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)
 FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
 #endif
 
@@ -76,6 +76,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
     stm32f4_invaild_tag();
 #elif defined(MSVC2012EMU)
     vc2012emu_invaild_tag(dataPath);
+#elif defined(MSVC2017EMU)
+    vc2017emu_invaild_tag(dataPath);
 #elif defined(MSVC2010EXPRESS)
     vc2010_invaild_tag(dataPath);
 #elif defined(FT9XXEV)
@@ -89,6 +91,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (STM32F4)",dataPath)) {
 #elif defined(MSVC2012EMU)
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2012Emu)",dataPath)) {
+#elif defined(MSVC2017EMU)
+    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2017Emu)",dataPath)) {
 #elif defined(MSVC2010EXPRESS)
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2010)",dataPath)) {
 #elif defined(FT9XXEV)
@@ -104,6 +108,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
         stm32f4_save_cdata((FTU16 *)CData);
 #elif defined(MSVC2012EMU)
         vc2012emu_save_cdata(dataPath, (FTU8 *)CData);
+#elif defined(MSVC2017EMU)
+        vc2017emu_save_cdata(dataPath, (FTU8 *)CData);
 #elif defined(MSVC2010EXPRESS)
         vc2010_save_cdata(dataPath, (FTU8 *)CData);
 #elif defined(FT9XXEV)
@@ -117,6 +123,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
         stm32f4_vaild_tag();
 #elif defined(MSVC2012EMU)
         vc2012emu_vaild_tag();
+#elif defined(MSVC2017EMU)
+        vc2017emu_vaild_tag();
 #elif defined(MSVC2010EXPRESS)
         vc2010_vaild_tag();
 #elif defined(FT9XXEV)
@@ -133,7 +141,7 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
     FTU32 CData[FT800_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
-#if defined(MSVC2012EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
+#if defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
     if (force || (dPath == NULL)) {
 #else
         if (force) {
@@ -145,6 +153,8 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
     if (!stm32f4_is_tag_vaild()) {
 #elif defined(MSVC2012EMU)
     if (!vc2012emu_is_tag_vaild(dPath)) {
+#elif defined(MSVC2017EMU)
+    if (!vc2017emu_is_tag_vaild(dPath)) {
 #elif defined(MSVC2010EXPRESS)
     if (!vc2010_is_tag_vaild(dPath)) {
 #elif defined(FT9XXEV)
@@ -159,6 +169,8 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
     stm32f4_restore_cdata((FTU16 *)CData);
 #elif defined(MSVC2012EMU)
     vc2012emu_restore_cdata(dPath, (FTU8 *)CData);
+#elif defined(MSVC2017EMU)
+    vc2017emu_restore_cdata(dPath, (FTU8 *)CData);
 #elif defined(MSVC2010EXPRESS)
     vc2010_restore_cdata(dPath, (FTU8 *)CData);
 #elif defined(FT9XXEV)
@@ -192,7 +204,7 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
         case L8:
         case ARGB2:
         case RGB332:
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
         case PALETTED8:
         case PALETTED565:
         case PALETTED4444:
@@ -220,7 +232,7 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
 FTVOID resWrBuf (FTU32 para)
 {
     wrFuncPara *wfp = (wrFuncPara *) para;
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     fseek(wfp->res,wfp->Src,SEEK_SET);
     if (wfp->len > 0) {
         fread((FTVOID *)wfp->Des,1,wfp->len,wfp->res);
@@ -279,7 +291,7 @@ STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
         block = MCU_BLOCK_SIZE;
     }
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     p = (FTU8 *)malloc(block);
     if (p == 0) {
         FTPRINT("\neve mem: no memory");
@@ -304,7 +316,7 @@ STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
 
     for (i = 0; i < file_len; i += l) {
         l = ((file_len - i) > block)?block:(file_len - i);
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)        
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
         fread(p,1,l,wfp->res);
 #elif defined(FT9XXEV)
         /* 
@@ -324,7 +336,7 @@ STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
         }
     }
     wfp->len = file_len;
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     free(p);
 #endif
 }
@@ -343,7 +355,7 @@ FTVOID resIsZlib(FTU32 para)
     FTU8 header[2] = {0};
     header[0] = *(FTU8 *)(wfp->res+wfp->Src);
     header[1] = *(FTU8 *)(wfp->res+wfp->Src+1);
-#elif defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#elif defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU8 header[2] = {0};
     fread(header,1,2,wfp->res);
     fseek(wfp->res,wfp->Src,SEEK_SET);
@@ -395,7 +407,7 @@ FTVOID resIsZlib(FTU32 para)
 }
 FTU32 appResOpen (FTU8 *path)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrFuncPara *pwfp = 0;
     FILE *pFile;
 
@@ -451,7 +463,7 @@ FTU32 appResOpen (FTU8 *path)
 }
 FTU32 appResSize (FTU32 resHDL)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrFuncPara *para = (wrFuncPara *)resHDL;
     FTU32 size;
 
@@ -498,7 +510,7 @@ FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeF
 }
 FTVOID appResClose (FTU32 resHDL)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrFuncPara *para = (wrFuncPara *)resHDL;
     fclose(para->res);
 #elif defined(STM32F4)
@@ -563,7 +575,7 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
             return APP_ERR_LEN;
         }
         src += pbmpHD[i].len;
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
         if (PALETTED8 == pbmpHD[i].format || 
             PALETTED565 == pbmpHD[i].format || 
             PALETTED4444 == pbmpHD[i].format) {
@@ -624,7 +636,7 @@ FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
         HAL_DlpBufIn(BITMAP_HANDLE(i+bmpHdl));
         HAL_DlpBufIn(BITMAP_SOURCE(src));
         HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
         HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(pbmpHD[i]) >> 10,pbmpHD[i].high>>9));
 #endif       
         /* 
@@ -633,11 +645,11 @@ FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
          * BILINEAR: make the image shap smooth
          */
         HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
         HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
 #endif         
         src += pbmpHD[i].len;
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
         if (PALETTED8 == pbmpHD[i].format || 
                 PALETTED565 == pbmpHD[i].format || 
                 PALETTED4444 == pbmpHD[i].format) {
@@ -701,7 +713,7 @@ STATIC FTVOID appUI_SpiInit ( FTVOID )
      */
 #ifdef MSVC2010EXPRESS
     vc2010_spi_init();
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     //do nothing
 #elif defined(STM32F4)
     stm32f4SPI1Init(SPI_BaudRatePrescaler_8);
@@ -718,7 +730,7 @@ STATIC FTVOID appUI_SpiInit ( FTVOID )
 }
 STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     //do nothing
 #elif defined(STM32F4)
     //do nothing
@@ -744,11 +756,11 @@ STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 STATIC FTVOID appUI_EVEActive ( FTVOID )
 {
     HAL_Cfg(FT_GPU_ACTIVE_M);
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
     /* 81X need more action for the active */
     HAL_Cfg(FT_GPU_ACTIVE_M);
 #endif
-    FTDELAY(50);
+    FTDELAY(300);
 }
 
 STATIC FTVOID appUI_EVEClk ( FTVOID )
@@ -761,7 +773,7 @@ STATIC FTVOID appUI_EVEClk ( FTVOID )
     /* Set the clk to external clock */
     HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
 #endif
-#ifndef DEF_81X
+#if !defined(DEF_81X) && !defined(DEF_BT81X)
     /* default 48MHz, no need to config
     HAL_Cfg(FT_GPU_PLL_48M);  
     */
@@ -778,7 +790,7 @@ STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
 
     FT_WriteGPIO(ftHandle, 0xBB, OnOff?0x88:0x08);
     FTDELAY(PWC_DELAY);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     /* Do nothing */
 #elif defined(STM32F4)
     /* Share the PD13/LED3 pin with PD pin of EVE */
@@ -811,7 +823,7 @@ STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
 STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
 {
     /* set DISP to output, then enable the DISP */
-#if defined(DEF_81X)
+#if defined(DEF_81X) || defined(DEF_BT81X)
     /*
        Bit 31-16: Reserved
        Bit 15 : Controlling the direction of pin DISP. For DISP functionality, this bit
@@ -893,7 +905,7 @@ STATIC FTVOID appUI_EVETchCfg ( FTVOID )
 }
 STATIC FTVOID appUI_EVESetSPI (FTU32 type)
 {
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
     if (type == 4) {
         HAL_Write8(REG_SPI_WIDTH, EVE_QSPI | FT800_SPI_DUMMY);
     } else if (type == 2) {
@@ -1009,7 +1021,7 @@ STATIC FTU32 appUI_EVEGetFrq (FTVOID)
          /* Inputs */  : "r"(r)
          /* Using */   : "$r0"
         );
-#elif defined(STM32F4) || defined(MSVC2012EMU) || defined(MSVC2010EXPRESS)
+#elif defined(STM32F4) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(MSVC2010EXPRESS)
     FTDELAY(r/1000);
 #else
     delayMicroseconds(r);
@@ -1191,9 +1203,42 @@ STATIC appRet_en appUI_WaitCal (FTVOID)
     appUI_EVEClnScrn();
     return APP_OK; 
 }
+
+#if defined(DEF_BT81X)
+FTVOID appUI_CoProFaultRecovery (FTVOID)
+{
+	FTU16 p_addr = HAL_Read16(PATCH_ADDR);
+	
+	/* Set REG_CPURESET to 1, to hold the coprocessor in the reset condition */
+    HAL_Write32(REG_CPURESET, 1);
+	
+    /* Set REG_CMD_READ and REG_CMD_WRITE to zero */
+	HAL_Write32(REG_CMD_READ, 0);
+	HAL_Write32(REG_CMD_WRITE, 0);
+	HAL_Write32(REG_CMD_DL, 0);
+    
+    /* j1 will set the pclk to 0 for that error case */
+	HAL_Write32(REG_PCLK, 2);
+	
+	/* Set REG_CPURESET to 0, to restart the coprocessor */
+	HAL_Write32(REG_CPURESET, 0);
+	FTDELAY(100);
+	
+    HAL_Write16(PATCH_ADDR, p_addr);
+
+    /* you may set the flash to full mode, I'm not doing this step here */
+}
+#endif
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline)
 {
     sprintf((char *)dbg_str_buf,"%s:%d",p_fname,(int)fline);
+}
+FTVOID appUI_EVEBeforeLaunch(FTVOID)
+{
+#if defined(DEF_BT81X)
+    // clean up the error report area
+	HAL_Write8(RAM_ERR_REPORT, 0);
+#endif    
 }
 FTVOID UI_INIT (FTVOID)
 {
@@ -1232,9 +1277,13 @@ FTVOID UI_INIT (FTVOID)
     /* after use single SPI to config the EVE
        set the SPI base on real HW: SPI/DSPI/QSPI */
     appUI_EVESetSPI(EVE_SPI_TYPE); 
-
-    appUI_WaitCal();
    
+    /* you may put some initial steps
+       before launch here */
+    appUI_EVEBeforeLaunch();
+    
+    appUI_WaitCal();
+
     FTPRINT("\nDisplay inited");
 }
 /*
@@ -1244,7 +1293,25 @@ FTVOID UI_INIT (FTVOID)
  */
 FTVOID UI_END (FTVOID)
 {
+#if defined(DEF_BT81X)
+	FTU8 reg_rd = HAL_Read8(RAM_ERR_REPORT);
+    /* 
+       in company's sampleapp code if fault reported, 
+       read REG_CMD_READ == 0xFFF, for the fault report indicater
+       but in my real pratice, read the RAM_ERR_REPORT 
+       if any none '\0', means some error message in it
+       should be better
+     */
+	if (reg_rd)	{
+		HAL_Read8Buff(RAM_ERR_REPORT, dbg_str_buf, EVE_DBG_BUF_LEN);
+
+        /* make co-processor recovery from the fault
+           for later information display */
+        appUI_CoProFaultRecovery();
+	}
+#endif
     HAL_CmdBufIn(CMD_DLSTART);
+    // give a RED background to highlight the error
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
     HAL_CmdBufIn(CLEAR(1,1,1));
     CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,24,
@@ -1252,4 +1319,7 @@ FTVOID UI_END (FTVOID)
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);
+    
+    FTPRINT("\nEVE ended");
+	FTDELAY(3000);
 }

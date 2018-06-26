@@ -190,7 +190,7 @@ typedef struct FT800_LCD_st {
 
 #define TOUCHED                     (!(HAL_Read16(REG_CTOUCH_TOUCH0_XY)&0x8000))
 
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
 #define CoCmd_SETFONT(f, s, pf)     HAL_CmdBufIn(BITMAP_HANDLE((FTU32)(f))); \
                                     HAL_CmdBufIn(BITMAP_SOURCE(((FT_Gpu_Fonts_t *)(pf))->PointerToFontGraphicsData)); \
                                     HAL_CmdBufIn(BITMAP_LAYOUT(((FT_Gpu_Fonts_t *)(pf))->FontBitmapFormat, \
@@ -239,13 +239,14 @@ typedef struct FT800_LCD_st {
                                     HAL_CmdBufIn(addr); \
                                     HAL_CmdBufIn(nums)
 
-#if defined(DEF_81X)
+#if defined(DEF_81X) || defined(DEF_BT81X)
 #define CoCmd_SETROTATE(r)          HAL_CmdBufIn(CMD_SETROTATE); \
                                     HAL_CmdBufIn(r)
 #endif
 
 FTVOID HAL_Cfg ( FTU8 cfg );
 FTU8 HAL_Read8 ( FTU32 addr );
+FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len );
 FTU16 HAL_Read16 ( FTU32 addr );
 FTU32 HAL_Read32 ( FTU32 addr );
 FTVOID HAL_Write8 ( FTU32 addr, FTU8 data );

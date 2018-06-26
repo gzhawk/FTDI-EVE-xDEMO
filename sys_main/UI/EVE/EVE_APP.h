@@ -12,7 +12,7 @@
  * WINDOWS: consider it as unlimited memory
  * FT9xx  : totally got 64K memory
  */
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 #define MCU_BLOCK_SIZE      (10*1024)
 #else
 /* limited by sdcard sector size
@@ -24,7 +24,7 @@
  * if you define the number larger than system allow
  * e.g. in Mege328 system (no external memory) MAX should not larger than 32K
  * UL define may be used when you have to use a number larger than 32K */
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
 #define FT800_RAMG_SIZE       (1*1024*1024UL)
 #else
 #define FT800_RAMG_SIZE       (256*1024UL)
@@ -38,7 +38,11 @@
 #define FT800_FONT_INTERNAL   (16)
 
 #define ZLIB_LEN              (0xFFFFFFFF)
+#if defined(DEF_BT81X)
+#define EVE_DBG_BUF_LEN       (128)
+#else
 #define EVE_DBG_BUF_LEN       (50)
+#endif
 typedef struct bmpHDR_ {
     FTC8  *path;
     FTC8  *path_lut; //for palette only
@@ -86,7 +90,10 @@ FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeF
 FTVOID appResClose (FTU32 resHDL);
 FTU32 appGetLinestride(bmpHDR_st bmpHD);
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
+#if defined(DEF_BT81X)
+FTVOID appUI_CoProFaultRecovery (FTVOID);
+#endif
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
 FTVOID arduino_simugpio(FTU8 flag);
 FTVOID arduino_sdcardInit (FTVOID);
 #endif
