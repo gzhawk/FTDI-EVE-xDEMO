@@ -694,7 +694,9 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
             FTPRINT("\nmcu cmd buf: mcuCMDBufSize <= mcuCMDindex");
             return;
         }
-        /* set the cmd tag */
+        /* mcuCMDBuf would be used both DLP and CMD for the buffering
+           set the CMD tag, to indicate CMD is using
+           when tag not match, previous command may using DLP*/
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_CMD;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD) {
@@ -787,7 +789,9 @@ FTVOID HAL_DlpBufIn (FTU32 Dlp)
             FTPRINT("\nmcu dlp buf: EVE_DLP_SIZE <= index");
             return;
         }
-        /* set the dlp tag */
+        /* mcuCMDBuf would be used both DLP and CMD for the buffering
+           set the DLP tag, to indicate DLP is using
+           when tag not match, previous command may using CMD*/
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_DL;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL) {

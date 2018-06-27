@@ -213,6 +213,50 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
 #endif 
             linestride = bmpHD.wide;
             break;
+#if defined(DEF_BT81X)
+        case COMPRESSED_RGBA_ASTC_10x10_KHR:
+            linestride = bmpHD.wide*128/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_10x5_KHR:
+            linestride = bmpHD.wide*213/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_10x6_KHR:
+            linestride = bmpHD.wide*200/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_10x8_KHR:
+            linestride = bmpHD.wide*160/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_12x10_KHR:
+            linestride = bmpHD.wide*107/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_12x12_KHR:
+            linestride = bmpHD.wide*89/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_4x4_KHR:
+            linestride = bmpHD.wide;
+            break;
+        case COMPRESSED_RGBA_ASTC_5x4_KHR:
+            linestride = bmpHD.wide*640/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_5x5_KHR:
+            linestride = bmpHD.wide*512/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_6x5_KHR:
+            linestride = bmpHD.wide*427/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_6x6_KHR:
+            linestride = bmpHD.wide*356/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_8x5_KHR:
+            linestride = bmpHD.wide*320/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_8x6_KHR:
+            linestride = bmpHD.wide*267/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_8x8_KHR:
+            linestride = bmpHD.wide*256/800;
+            break;
+#endif
         case ARGB4:
         case RGB565:
         case ARGB1555:
@@ -622,6 +666,38 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 
     return APP_OK;
 }
+FTU8 appUseSetBitmp(FTU32 s, bmpHDR_st *p)
+{
+#if defined(DEF_81X) || defined(DEF_BT81X)
+    /* 
+     * when using SETBITMAP 
+     * NEAREST,BORDER,BORDER would be the only
+     * option in size, you may use size seperatly
+     * when you wish to set other option such as BILINEAR
+     */
+    CoCmd_SETBITMAP(s,p->format,p->wide,p->high);
+    return 1;
+#else
+    return 0;
+#endif
+}
+FTVOID appPalette(FTU32 *ps, bmpHDR_st *p)
+{
+#if defined(DEF_81X) || defined(DEF_BT81X)
+    FTU32 format = p->format, src = *ps;
+
+    switch (format) {
+        case PALETTED8:
+        case PALETTED565:
+        case PALETTED4444:
+            src += p->len_lut;
+            *ps = src;
+            break;
+        default:
+            break;
+    }
+#endif
+}
 /*
  * You may do this bitmap related display list setup here
  * or do it in your own routine
@@ -632,34 +708,27 @@ FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 {
     FTU32 i, src;
 
+    HAL_CmdBufIn(CMD_DLSTART);
     for (i = 0, src = ramgAddr; i < nums; i++) {
-        HAL_DlpBufIn(BITMAP_HANDLE(i+bmpHdl));
-        HAL_DlpBufIn(BITMAP_SOURCE(src));
-        HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
-#if defined(DEF_81X) || defined(DEF_BT81X)
-        HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(pbmpHD[i]) >> 10,pbmpHD[i].high>>9));
-#endif       
-        /* 
-         * select NEAREST or BILINEAR base on your image and requirement
-         * NEAREST: make the image shap clear
-         * BILINEAR: make the image shap smooth
-         */
-        HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
-#if defined(DEF_81X) || defined(DEF_BT81X)
-        HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
-#endif         
-        src += pbmpHD[i].len;
-#if defined(DEF_81X) || defined(DEF_BT81X)
-        if (PALETTED8 == pbmpHD[i].format || 
-                PALETTED565 == pbmpHD[i].format || 
-                PALETTED4444 == pbmpHD[i].format) {
-            src += pbmpHD[i].len_lut;
+        HAL_CmdBufIn(BITMAP_HANDLE(i+bmpHdl));
+        if (!appUseSetBitmp(src, pbmpHD+i)) {
+            HAL_CmdBufIn(BITMAP_SOURCE(src));
+            HAL_CmdBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
+            /* 
+             * select NEAREST or BILINEAR base on your image and requirement
+             * NEAREST: make the image shap clear
+             * BILINEAR: make the image shap smooth
+             */
+            HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
         }
-#endif
+        src += pbmpHD[i].len;
+
+        appPalette(&src, pbmpHD + i);
     }
 
-    HAL_DlpBufIn(DISPLAY());
-    HAL_BufToReg(RAM_DL,0);
+    HAL_CmdBufIn(DISPLAY());
+    HAL_CmdBufIn(CMD_SWAP);
+    HAL_BufToReg(RAM_CMD,0);
 }
 
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
@@ -695,6 +764,12 @@ STATIC FTVOID appUI_GetEVEID (FTVOID)
             break;
         case 0x13:
             FTPRINT("FT813");
+            break;
+        case 0x15:
+            FTPRINT("BT815");
+            break;
+        case 0x16:
+            FTPRINT("BT816");
             break;
         default:
             /* only new FT81X able to read the EVE ID */
@@ -951,6 +1026,14 @@ STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
             case 0x13:
                 CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT813");
+                break;
+            case 0x15:
+                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                        VER_FONT,OPT_CENTERX,"BT815");
+                break;
+            case 0x16:
+                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                        VER_FONT,OPT_CENTERX,"BT816");
                 break;
             default:
                 /* only new FT81X able to read the EVE ID */

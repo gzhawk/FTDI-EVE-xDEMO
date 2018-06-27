@@ -242,6 +242,11 @@ typedef struct FT800_LCD_st {
 #if defined(DEF_81X) || defined(DEF_BT81X)
 #define CoCmd_SETROTATE(r)          HAL_CmdBufIn(CMD_SETROTATE); \
                                     HAL_CmdBufIn(r)
+
+#define CoCmd_SETBITMAP(s, f, w, h) HAL_CmdBufIn(CMD_SETBITMAP); \
+                                    HAL_CmdBufIn(s); \
+                                    HAL_CmdBufIn(((FT32)(w)<<16)|(f & 0xFFFF)); \
+                                    HAL_CmdBufIn(h)
 #endif
 
 FTVOID HAL_Cfg ( FTU8 cfg );
