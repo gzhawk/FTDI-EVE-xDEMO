@@ -92,6 +92,7 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD);
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
 #if defined(DEF_BT81X)
 FTVOID appUI_CoProFaultRecovery (FTVOID);
+FTU8 appFlashSetFull(FTVOID);
 #endif
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
 FTVOID arduino_simugpio(FTU8 flag);

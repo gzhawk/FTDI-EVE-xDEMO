@@ -21,17 +21,17 @@
 #define HVGA_HIGH   480
 
 #if defined(LCD_WVGA)
-#define FT800_LCD_WIDTH WVGA_WIDTH
-#define FT800_LCD_HIGH  WVGA_HIGH
+#define EVE_LCD_WIDTH WVGA_WIDTH
+#define EVE_LCD_HIGH  WVGA_HIGH
 #elif defined(LCD_QVGA)
-#define FT800_LCD_WIDTH QVGA_WIDTH
-#define FT800_LCD_HIGH  QVGA_HIGH
+#define EVE_LCD_WIDTH QVGA_WIDTH
+#define EVE_LCD_HIGH  QVGA_HIGH
 #elif defined(LCD_HVGA)
-#define FT800_LCD_WIDTH HVGA_WIDTH
-#define FT800_LCD_HIGH  HVGA_HIGH
+#define EVE_LCD_WIDTH HVGA_WIDTH
+#define EVE_LCD_HIGH  HVGA_HIGH
 #else
-#define FT800_LCD_WIDTH WQVGA_WIDTH
-#define FT800_LCD_HIGH  WQVGA_HIGH
+#define EVE_LCD_WIDTH WQVGA_WIDTH
+#define EVE_LCD_HIGH  WQVGA_HIGH
 #endif
 
 #define EVE_ID_REG            (0xC0001)
@@ -61,7 +61,7 @@ typedef enum FT800_CMD_EXE_st {
     CMD_BUF,
     CMD_BUF_END
 } FT800_CMD_EXE;
-typedef struct FT800_LCD_st {
+typedef struct EVE_LCD_st {
     FT16 Width;
     FT16 Height;
     FT16 HCycle;
@@ -92,10 +92,7 @@ typedef struct FT800_LCD_st {
                                     HAL_CmdBufIn((FTU32)(o)<<16|(FTU32)(f)); \
                                     HAL_CmdBufIn((FT32)n)
 
-#define CoCmd_TEXT(x, y, f, o, p)   HAL_CmdBufIn(CMD_TEXT); \
-                                    HAL_CmdBufIn((FT32)(y)<<16|(FT32)(x)); \
-                                    HAL_CmdBufIn((FTU32)(o)<<16|(FTU32)(f)); \
-                                    HAL_CmdBufInStr((FTC8 *)(p))
+FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
 
 #define CoCmd_SLIDER(x, y, w, h, o, v, r)	HAL_CmdBufIn(CMD_SLIDER); \
                                     HAL_CmdBufIn((FT32)(y)<<16|(FT32)(x)); \
@@ -247,6 +244,12 @@ typedef struct FT800_LCD_st {
                                     HAL_CmdBufIn(s); \
                                     HAL_CmdBufIn(((FT32)(w)<<16)|(f & 0xFFFF)); \
                                     HAL_CmdBufIn(h)
+
+#define CoCmd_ANIMFRAME(x, y, o, f) HAL_CmdBufIn(CMD_ANIMFRAME); \
+                                    HAL_CmdBufIn(((FT32)(y)<<16)|(x & 0xFFFF)); \
+                                    HAL_CmdBufIn(o); \
+                                    HAL_CmdBufIn(f)
+
 #endif
 
 FTVOID HAL_Cfg ( FTU8 cfg );
@@ -270,5 +273,6 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum);
 FTVOID HAL_CmdToReg (FTU32 Cmd);
 FTVOID HAL_McuCmdBufInit (FTVOID);
 FTU32 HAL_CmdBufSize (FTVOID);
+FTVOID HAL_CmdExeNow(FTU32 * pCL, FTU32 l);
 #endif
 

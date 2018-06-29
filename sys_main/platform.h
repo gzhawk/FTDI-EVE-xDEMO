@@ -41,6 +41,7 @@
 #define UI_AMICON
 #define UI_DIAL
 #define UI_FV_INVENSYS
+#define UI_FLASH_ANIM
 /* UI for customer: demonstration */
 #define UI_CJ
 #define UI_STELIGENT
@@ -57,6 +58,7 @@
 
 /*-------------------------------------------------Demo Related hardware setting
  * DEF_81X          when using FT81X, or DEMO run as FT80X 
+ * DEF_BT81X        when using BT81X, or DEMO run as BT80X 
  * DEF_CAP_MULTI    Cap touch with multiple touch control, or DEMO run as res TCP 
  * DEF_CAP_NONMULTI Cap touch with single touch control, or DEMO run as res TCP 
  * LCD_QVGA         320x240
@@ -97,8 +99,14 @@
 #define DEF_DISPLAY
 #endif
 
+#if defined(UI_FLASH_ANIM)
+#define DEF_BT81X
+#define LCD_WVGA
+#define EVE_SPI_TYPE 1
+#define DEF_DISPLAY
+#endif
 /*-------------------------------------------FT9XX, MSVC platform, None STM32 */
-#if (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
+#if (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU))
 
 #if (defined(UI_AVI) || \
     defined(UI_BITMAP) || \
@@ -147,7 +155,7 @@
 #endif
 
 /*--------------------------------------------------MSVC platform, None STM32 */
-#if (defined(MSVC2010EXPRESS) || defined(MSVC2012EMU))
+#if (defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU))
 
 #if defined(UI_XIZI)
 #define LCD_WQVGA
@@ -211,7 +219,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.42.3"
+#define APPS_VER "6.A.43.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -249,6 +257,9 @@
 /*-----------------------------------------------------------------MSVC2012EMU*/
 #elif defined(MSVC2012EMU)
 #include "vc2012emu_xdemo.h"
+/*-----------------------------------------------------------------MSVC2017EMU*/
+#elif defined(MSVC2017EMU)
+#include "vc2017emu_xdemo.h"
 /*---------------------------------------------------------------------STM32F4*/
 #elif defined(STM32F4)
 #include "stm32_xdemo.h"

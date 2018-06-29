@@ -781,7 +781,44 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
 
     return;
 }
+FTU8 COUNT_ARGS(FTC8 * str)
+{
+	FTU8 count = 0;
+	FTC8 *tmp = str;
 
+	while (tmp = strstr(tmp, "%"))
+	{
+		if (*(tmp + 1) == '%') {
+			tmp += 2;
+		}
+		else {
+			count++;
+			tmp++;
+		}
+	}
+	return count;
+}
+FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...)
+{
+	va_list args;
+	FTU8 i, num=0;
+	FTU8 len = (FTU8)strlen(s);
+	va_start(args, s);
+	
+#if defined(DEF_BT81X)
+    //Only check % characters if option OPT_FORMAT is set 
+	num = (opt & OPT_FORMAT) ? (COUNT_ARGS(s)) : (0); 
+#endif
+	HAL_CmdBufIn(CMD_TEXT);
+	HAL_CmdBufIn((((FTU32)y << 16) | (x & 0xffff)));
+	HAL_CmdBufIn((((FTU32)opt << 16) | (font & 0xffff)));
+	HAL_CmdBufInStr(s);
+	for (i = 0; i < num; i++)
+	{
+	    HAL_CmdBufIn((FTU32)va_arg(args, FTU32));
+	}
+	va_end(args);
+}
 FTVOID HAL_DlpBufIn (FTU32 Dlp)
 {
     if (mcuCMDBuf) {
@@ -859,5 +896,14 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum)
         mcuCMDindex = 0;
     }
 }
+FTVOID HAL_CmdExeNow(FTU32 * pCL, FTU32 l)
+{
+    FTU32 i = l, *p = pCL;
 
+    while (i--) {
+	    HAL_CmdToReg(*p);
+        p++;
+    }
+    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
+}
 

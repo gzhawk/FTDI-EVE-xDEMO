@@ -55,8 +55,8 @@ STATIC appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
     HAL_CmdBufIn(CLEAR(1,1,1));
     HAL_CmdBufIn(COLOR_RGB(255,255,255));
 
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,font,OPT_CENTER,str1);
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3*2,font,OPT_CENTER,
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,font,OPT_CENTER,str1);
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/3*2,font,OPT_CENTER,
                (str2 == NULL)?"NULL":str2);
     HAL_CmdBufIn(CMD_CALIBRATE);
     HAL_CmdBufIn(0);
@@ -698,6 +698,64 @@ FTVOID appPalette(FTU32 *ps, bmpHDR_st *p)
     }
 #endif
 }
+appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+{
+    if (nums > FT800_BMP_EXT_HANDLE || bmpHdl >= FT800_BMP_EXT_HANDLE) {
+        FTPRINT("\nappBmpToRamG: items exceed");
+        return APP_ERR_HDL_EXC;
+    }
+
+    if (APP_OK != appLoadBmp(ramgAddr,pbmpHD,nums) ) {
+        return APP_ERR_LEN;
+    }
+
+    appUI_FillBmpDL(bmpHdl, ramgAddr, pbmpHD, nums);
+
+    return APP_OK;
+}
+FTU8 appFlashSetFull(FTVOID)
+{
+    FTU32 addr, a[2];
+
+    a[0] = CMD_FLASHDETACH;
+    HAL_CmdExeNow(a, 1);
+    
+    a[0] = CMD_FLASHATTACH;
+    HAL_CmdExeNow(a, 1);
+    
+    a[0] = CMD_FLASHFAST;
+    a[1] = 0;
+    /* the result would be saved in co-processor's command buffer
+       so need to mark the current offset down
+       then do the read out at result offset
+       to tell the result*/
+    addr = HAL_Read32(REG_CMD_WRITE);
+    HAL_CmdExeNow(a, 2);
+    
+    switch (HAL_Read32(RAM_CMD+addr+4)) {
+        case 0:
+            FTPRINT("\nFlash: successful set full");
+            return 0;
+        case 0xE001:
+            FTPRINT("\nFlash: flash is not supported");
+            return 1; 
+        case 0xE002:
+            FTPRINT("\nFlash: no header detected in sector 0");
+            return 1; 
+        case 0xE003:
+            FTPRINT("\nFlash: sector 0 data failed integrity check");
+            return 1; 
+        case 0xE004:
+            FTPRINT("\nFlash: device/blob mismatch");
+            return 1; 
+        case 0xE005:
+            FTPRINT("\nFlash: failed full-speed test");
+            return 1; 
+        default:
+            FTPRINT("\nFlash: unknown failure");
+            return 1; 
+    }
+}
 /*
  * You may do this bitmap related display list setup here
  * or do it in your own routine
@@ -729,22 +787,6 @@ FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);
-}
-
-appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
-{
-    if (nums > FT800_BMP_EXT_HANDLE || bmpHdl >= FT800_BMP_EXT_HANDLE) {
-        FTPRINT("\nappBmpToRamG: items exceed");
-        return APP_ERR_HDL_EXC;
-    }
-
-    if (APP_OK != appLoadBmp(ramgAddr,pbmpHD,nums) ) {
-        return APP_ERR_LEN;
-    }
-
-    appUI_FillBmpDL(bmpHdl, ramgAddr, pbmpHD, nums);
-
-    return APP_OK;
 }
 
 STATIC FTVOID appUI_GetEVEID (FTVOID)
@@ -1012,64 +1054,64 @@ STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
 
         switch (EVE_ID) {
             case 0x10:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT810");
                 break;
             case 0x11:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT811");
                 break;
             case 0x12:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT812");
                 break;
             case 0x13:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT813");
                 break;
             case 0x15:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"BT815");
                 break;
             case 0x16:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"BT816");
                 break;
             default:
                 /* only new FT81X able to read the EVE ID */
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"EVE Chip");
                 break;
         }
 #if defined(DEF_CAP_MULTI)
-        CoCmd_TEXT(FT800_LCD_WIDTH/3*2,FT800_LCD_HIGH/4,
+        CoCmd_TEXT(EVE_LCD_WIDTH/3*2,EVE_LCD_HIGH/4,
                 VER_FONT,OPT_CENTERX,"CAP-M");
 #elif defined(DEF_CAP_NONMULTI)
-        CoCmd_TEXT(FT800_LCD_WIDTH/3*2,FT800_LCD_HIGH/4,
+        CoCmd_TEXT(EVE_LCD_WIDTH/3*2,EVE_LCD_HIGH/4,
                 VER_FONT,OPT_CENTERX,"CAP-NM");
 #else
-        CoCmd_TEXT(FT800_LCD_WIDTH/3*2,FT800_LCD_HIGH/4,
+        CoCmd_TEXT(EVE_LCD_WIDTH/3*2,EVE_LCD_HIGH/4,
                 VER_FONT,OPT_CENTERX,"RES");
 #endif
-        CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,
+        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,
                 VER_FONT,OPT_CENTERX,"Ver: "APPS_VER);
-        CoCmd_TEXT(FT800_LCD_WIDTH/2-10,FT800_LCD_HIGH/4*3,
+        CoCmd_TEXT(EVE_LCD_WIDTH/2-10,EVE_LCD_HIGH/4*3,
                 CAL_FONT,OPT_CENTERX,"MCU CMD Buf: ");
-        CoCmd_NUMBER(FT800_LCD_WIDTH/2+40,FT800_LCD_HIGH/4*3,
+        CoCmd_NUMBER(EVE_LCD_WIDTH/2+40,EVE_LCD_HIGH/4*3,
                 CAL_FONT,OPT_CENTERX,HAL_CmdBufSize());
 #if defined(STM32F4)
-        CoCmd_TEXT(FT800_LCD_WIDTH/2-30,FT800_LCD_HIGH/4*3+10,
+        CoCmd_TEXT(EVE_LCD_WIDTH/2-30,EVE_LCD_HIGH/4*3+10,
                 CAL_FONT,OPT_CENTERX,"File addr: ");
-        CoCmd_NUMBER(FT800_LCD_WIDTH/2+40,FT800_LCD_HIGH/4*3+10,
+        CoCmd_NUMBER(EVE_LCD_WIDTH/2+40,EVE_LCD_HIGH/4*3+10,
                 CAL_FONT,OPT_CENTERX,FILE_SADDR);
 #endif
         if (SYS_HANG) {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE*2,
+            CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH - CAL_WIDE*2,
                     CAL_FONT,OPT_CENTERX,"system hange due to memory limit!");
         } else {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE*2,
+            CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH - CAL_WIDE*2,
                     CAL_FONT,OPT_CENTERX,"press and hold to force in calibration");
-            CoCmd_NUMBER(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE,
+            CoCmd_NUMBER(EVE_LCD_WIDTH/2,EVE_LCD_HIGH - CAL_WIDE,
                     CAL_FONT,OPT_CENTERX,count);
         }
 
@@ -1140,7 +1182,7 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
        VCycle VOffset VSync0 VSync1 
        PCLK Swizzle PCLKPol Cspread Dither
      */
-    FT800_LCD lcd = {FT800_LCD_WIDTH,FT800_LCD_HIGH, 
+    FT800_LCD lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
 #if defined(LCD_WVGA)
         /* PCLK is critical,
            sometime it may need to set to larger number (2,3)
@@ -1397,7 +1439,7 @@ FTVOID UI_END (FTVOID)
     // give a RED background to highlight the error
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
     HAL_CmdBufIn(CLEAR(1,1,1));
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,24,
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,24,
                OPT_CENTER,dbg_str_buf);
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
