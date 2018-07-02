@@ -3,24 +3,27 @@
     Author: Hawk
 	Email : hawk.gao@ftdichip.com
 	Date  : 2015/May
+            2018/Jun (adding a fault report catch for BT81X)
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 #define PATH_JPG_A ROOT_PATH"jpgdisp\\a.jpg"
 #define PATH_JPG_B ROOT_PATH"jpgdisp\\b.jpg" /* higher compressed with smoothing effect */
 #define PATH_PNG_A ROOT_PATH"jpgdisp\\a.png"
 #define PATH_PNG_B ROOT_PATH"jpgdisp\\b.png" /* paletted PNG with dithering effect */
+#define PATH_PNG_X ROOT_PATH"jpgdisp\\x.png" /* unsupported image, to simulate fault catch */
 #else
 #define PATH_JPG_A ROOT_PATH"a.jpg"
 #define PATH_JPG_B ROOT_PATH"b.jpg"
 #define PATH_PNG_A ROOT_PATH"a.png"
 #define PATH_PNG_B ROOT_PATH"b.png"
+#define PATH_PNG_X ROOT_PATH"x.png"
 #endif
 
 /* make sure FIFOSIZE larger than JPG file size
    and less than (1024-LCD_WIDTH*LCD_HIGH*2/1024) */
 #define FIFOSIZE        (200*1024)
-#define FIFOADDR        (FT800_RAMG_SIZE - FIFOSIZE)
+#define FIFOADDR        (EVE_RAMG_SIZE - FIFOSIZE)
 
 FTVOID PressAndRelease (FTVOID)
 {
@@ -31,7 +34,7 @@ FTVOID PressAndRelease (FTVOID)
         HAL_CmdBufIn(CLEAR(1,1,1));
 
         HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-        CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,25,OPT_CENTERX,"Next...");
+        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,25,OPT_CENTERX,"Next...");
 
         HAL_CmdBufIn(DISPLAY());
         HAL_CmdBufIn(CMD_SWAP);
@@ -94,7 +97,7 @@ STATIC FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoS
 	}
 
 	Len = appResSize(resHDL);
-	if (FT800_RAMG_SIZE < ramgAddr + Len) {
+	if (EVE_RAMG_SIZE < ramgAddr + Len) {
 		appResClose(resHDL);
 		DBGPRINT;
 		return 0;
@@ -160,10 +163,10 @@ STATIC FTVOID DisplayJPG (FTU32 hdl, FTU32 addr, FTU32 opt)
 
 	if (OPT_MEDIAFIFO&opt) {
 		HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,25,OPT_CENTERX,"show JPEG using MEDIAFIFO");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,25,OPT_CENTERX,"show JPEG using MEDIAFIFO");
 	} else {
 		HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,25,OPT_CENTERX,"show JPEG using CMD buffer");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,25,OPT_CENTERX,"show JPEG using CMD buffer");
 	}
 
 	HAL_CmdBufIn(DISPLAY());
@@ -207,7 +210,7 @@ FTVOID pngdisp (FTU32 para)
 	HAL_CmdBufIn(END());
 
     HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,25,OPT_CENTERX,"show PNG using CMD buffer");
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,25,OPT_CENTERX,"show PNG using CMD buffer");
 
 	HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);
@@ -215,7 +218,11 @@ FTVOID pngdisp (FTU32 para)
 
     PressAndRelease();
 	
-    appGP.appIndex = 0;
+#if defined(DEF_BT81X)
+    appGP.appIndex = 2;
+#else
+	appGP.appIndex = 0;
+#endif
 }
 
 FTVOID jpgdisp (FTU32 para)
@@ -237,8 +244,42 @@ FTVOID jpgdisp (FTU32 para)
     appGP.appIndex = 1;
 }
 
+FTVOID faultdisp (FTU32 para)
+{
+#if defined(DEF_BT81X)
+	FTU32 len;
+
+	HAL_CmdBufIn(CMD_DLSTART);
+	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
+	HAL_CmdBufIn(CLEAR(1,1,1));
+	
+    HAL_BufToReg(RAM_CMD,0);
+    
+    len = ImageToRamG((FTU8 *)PATH_PNG_X,RAM_G,0,0,0);
+    if (len == 0) {
+        DBGPRINT;
+        return;
+    }
+	
+    HAL_CmdBufIn(BEGIN(BITMAPS));
+	HAL_CmdBufIn(VERTEX2F(0,0));
+	HAL_CmdBufIn(END());
+
+    HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,25,OPT_CENTERX,"it should not be shown out");
+
+	HAL_CmdBufIn(DISPLAY());
+	HAL_CmdBufIn(CMD_SWAP);
+	HAL_BufToReg(RAM_CMD,0);
+
+	FTDELAY(2000);
+#endif
+    return;
+}
+
 AppFunc APPS_UI[] = {
 	jpgdisp,
-    pngdisp
+    pngdisp,
+    faultdisp // never put more routine under here, it would goes out forever
 };
 
