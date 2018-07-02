@@ -4,10 +4,10 @@
     Email : hawk.gao@ftdichip.com	
 	Date  : 2013/May
 */
-#define FT800_AUD_BLOCK_SIZE  (5*1024UL)
+#define EVE_AUD_BLOCK_SIZE  (5*1024UL)
 /* WINDOW SIZE has to base on BLOCK SIZE */
-#define FT800_AUD_WINDOW_SIZE (3*FT800_AUD_BLOCK_SIZE)
-#define FT800_AUD_MEM_ADDR    RAM_G
+#define EVE_AUD_WINDOW_SIZE (3*EVE_AUD_BLOCK_SIZE)
+#define EVE_AUD_MEM_ADDR    RAM_G
 
 #define WAV_HEAD_LEN  44
 #define WAV_HEAD_DLEN 40
@@ -55,15 +55,15 @@ FTU8 parseWAV (audio_hd_t *paudio_hd)
 	}
 }
 /* 
- * change the FT800_AUD_MEM_ADDR and FT800_AUD_WINDOW_SIZE
+ * change the EVE_AUD_MEM_ADDR and EVE_AUD_WINDOW_SIZE
  * to limit the audio playing space be used in RAM_G
  * when you have your own assignment in RAM_G
- * but pay attentation on the MAX RAM_G is FT800_RAMG_SIZE
+ * but pay attentation on the MAX RAM_G is EVE_RAMG_SIZE
  */
 FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 {
 	FTU8 loop;
-	FTU32 rdaddr = 0, wraddr = FT800_AUD_MEM_ADDR;
+	FTU32 rdaddr = 0, wraddr = EVE_AUD_MEM_ADDR;
 	FTU32 fBlock = 0, audioLen;
 	FTU32 resHDL;
 	
@@ -75,14 +75,14 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 
 	resHDL = appResOpen(paudio_hd->path);
 	
-	loop = (paudio_hd->dsize > FT800_AUD_WINDOW_SIZE)?1:0;
-	audioLen = (paudio_hd->dsize < FT800_AUD_WINDOW_SIZE)?paudio_hd->dsize:FT800_AUD_WINDOW_SIZE;
+	loop = (paudio_hd->dsize > EVE_AUD_WINDOW_SIZE)?1:0;
+	audioLen = (paudio_hd->dsize < EVE_AUD_WINDOW_SIZE)?paudio_hd->dsize:EVE_AUD_WINDOW_SIZE;
 
 	/* stop the previous playing just for save */		
 	HAL_Write32(REG_PLAYBACK_LENGTH,0);
 	HAL_Write8(REG_PLAYBACK_PLAY,0);
 	/* setup the audio related reg */
-	HAL_Write32(REG_PLAYBACK_START,FT800_AUD_MEM_ADDR);
+	HAL_Write32(REG_PLAYBACK_START,EVE_AUD_MEM_ADDR);
 	HAL_Write32(REG_PLAYBACK_LENGTH,audioLen);
 	HAL_Write16(REG_PLAYBACK_FREQ,paudio_hd->freq);
 	HAL_Write8(REG_PLAYBACK_FORMAT,paudio_hd->type);
@@ -93,7 +93,7 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 	HAL_Write8(REG_GPIO,0xff);
 	HAL_Write8(REG_VOL_SOUND,paudio_hd->vol);
 	while ( paudio_hd->dsize ) {
-		fBlock = (paudio_hd->dsize < FT800_AUD_BLOCK_SIZE) ? paudio_hd->dsize : FT800_AUD_BLOCK_SIZE;
+		fBlock = (paudio_hd->dsize < EVE_AUD_BLOCK_SIZE) ? paudio_hd->dsize : EVE_AUD_BLOCK_SIZE;
 
 		appResToDes(resHDL,wraddr,paudio_hd->index,fBlock,resWrEve);
 
@@ -128,7 +128,7 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 			if (!paudio_hd->dsize) {
 				/* last track */
 				HAL_Write8(REG_PLAYBACK_LOOP, 0);
-				HAL_Write32(REG_PLAYBACK_LENGTH,wraddr - FT800_AUD_MEM_ADDR);
+				HAL_Write32(REG_PLAYBACK_LENGTH,wraddr - EVE_AUD_MEM_ADDR);
 				break;
 			}
 		} else {
@@ -149,9 +149,9 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 			}
 		}
 
-		/* limit the audio playing space in FT800_AUD_WINDOW_SIZE */
-		if ((wraddr - FT800_AUD_MEM_ADDR) >= FT800_AUD_WINDOW_SIZE) {
-			wraddr = FT800_AUD_MEM_ADDR;
+		/* limit the audio playing space in EVE_AUD_WINDOW_SIZE */
+		if ((wraddr - EVE_AUD_MEM_ADDR) >= EVE_AUD_WINDOW_SIZE) {
+			wraddr = EVE_AUD_MEM_ADDR;
 		}
 	
 		disp_func((FTU32)paudio_hd);
@@ -169,7 +169,7 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 
 	/* reuse loop to see if the readptr never changed */
 	loop = 0;
-	while ((rdaddr < wraddr) && (rdaddr != FT800_AUD_MEM_ADDR)) {
+	while ((rdaddr < wraddr) && (rdaddr != EVE_AUD_MEM_ADDR)) {
 		if (rdaddr == HAL_Read16(REG_PLAYBACK_READPTR)) {
 			if (loop++ >= AUD_END_RETRY) break;
 		}
@@ -192,11 +192,11 @@ FTVOID screenShow (FTU32 para)
 	HAL_CmdBufIn(CLEAR(1,1,1));
 	HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
 	if (paud->dsize == 0) {
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,23,OPT_CENTER,paud->path);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,23,OPT_CENTER,paud->path);
 	} else {
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,23,OPT_CENTER,paud->path);
-		CoCmd_TEXT(FT800_LCD_WIDTH/2-80,FT800_LCD_HIGH/2+30,23,OPT_CENTER,"Length:");
-		CoCmd_NUMBER(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2+30,23,OPT_CENTER,paud->dsize);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,23,OPT_CENTER,paud->path);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2-80,EVE_LCD_HIGH/2+30,23,OPT_CENTER,"Length:");
+		CoCmd_NUMBER(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2+30,23,OPT_CENTER,paud->dsize);
 	}
 	HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);

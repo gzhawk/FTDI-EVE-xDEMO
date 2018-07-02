@@ -1,12 +1,12 @@
 /* 
-    Hardware Abstract Layer for FT800 
+    Hardware Abstract Layer for EVE 
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/May
  */
 
-#ifndef _FT800_HAL_H_
-#define _FT800_HAL_H_
+#ifndef _EVE_HAL_H_
+#define _EVE_HAL_H_
 
 #define WVGA_WIDTH  800
 #define WVGA_HIGH   480
@@ -35,32 +35,32 @@
 #endif
 
 #define EVE_ID_REG            (0xC0001)
-#define FT800_ID              (0x7C)
-#define FT800_CMD_WAIT_MAX    50
-#define FT800_DLP_WAIT_MAX    100
-#define FT800_TOUCH_THRESHOLD 1800
-#define FT800_PIXEL_UNIT      (16)
+#define EVE_ID              (0x7C)
+#define EVE_CMD_WAIT_MAX    50
+#define EVE_DLP_WAIT_MAX    100
+#define EVE_TOUCH_THRESHOLD 1800
+#define EVE_PIXEL_UNIT      (16)
 
 #define EVE_DLP_SIZE          (8*1024)
 #define REG_FLAG_CLN          (0xFFFFFFFF)
-#define FT800_TRACK_VALUE_MAX (0xFFFF)
-#define FT800_TRANSFORM_MAX   (0x10000)
+#define EVE_TRACK_VALUE_MAX (0xFFFF)
+#define EVE_TRANSFORM_MAX   (0x10000)
 #define FTU32_LEN             4
 #define FTU16_LEN             2
 #define FTU8_LEN              1
 
-#define FT800_SPI_DUMMY       (0x04)
+#define EVE_SPI_DUMMY       (0x04)
 
 typedef enum {
     EVE_SSPI = 0,
     EVE_DSPI,
     EVE_QSPI
 }EVE_SPI_NUM;
-typedef enum FT800_CMD_EXE_st {
+typedef enum EVE_CMD_EXE_st {
     CMD_BUF_START = 0,
     CMD_BUF,
     CMD_BUF_END
-} FT800_CMD_EXE;
+} EVE_CMD_EXE;
 typedef struct EVE_LCD_st {
     FT16 Width;
     FT16 Height;
@@ -77,7 +77,7 @@ typedef struct EVE_LCD_st {
     FT8 PCLKPol;
     FT16 Cspread;
     FT16 Dither;	
-} FT800_LCD;
+} EVE_LCD;
 
 #define CoCmd_TRACK(x, y, w, h, t)  HAL_CmdBufIn(CMD_TRACK); \
                                     HAL_CmdBufIn((FT32)(y)<<16|(FT32)(x)); \

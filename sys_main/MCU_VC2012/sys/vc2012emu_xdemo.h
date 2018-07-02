@@ -85,7 +85,7 @@ typedef uint32_t argb8888;
 
 #define FTRES FILE*
 
-#define FT800_CAL_PARA_NUM    (6)
+#define EVE_CAL_PARA_NUM    (6)
 
 #define APPS_SYS vc2012emu_apps_sys_dummy
 

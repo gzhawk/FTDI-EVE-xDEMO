@@ -15,8 +15,8 @@
 
 #define BSH_HOLD_TIME 150
 
-#define BSH_DELTA_MODE (FT800_LCD_WIDTH/4)
-#define BSH_DELTA_NUM  (FT800_LCD_HIGH/4)
+#define BSH_DELTA_MODE (EVE_LCD_WIDTH/4)
+#define BSH_DELTA_NUM  (EVE_LCD_HIGH/4)
 
 typedef enum SCREEN_STAT_ {
 	STAT_MODE1 = 0,
@@ -72,9 +72,9 @@ STATIC FTVOID animFizz (FTU8 init, FTU32 speed)
 
 	if (count++ == 0) {
 		for (i = 0; i< BSH_FIZZ_NUM; i++) {
-			fz[i].s = FTRANDOM(BSH_FIZZ_SIZE_MAX)*FT800_PIXEL_UNIT;
-			fz[i].x = FTRANDOM(FT800_LCD_WIDTH)*FT800_PIXEL_UNIT;
-			fz[i].y = FTRANDOM(FT800_LCD_HIGH)*FT800_PIXEL_UNIT;
+			fz[i].s = FTRANDOM(BSH_FIZZ_SIZE_MAX)*EVE_PIXEL_UNIT;
+			fz[i].x = FTRANDOM(EVE_LCD_WIDTH)*EVE_PIXEL_UNIT;
+			fz[i].y = FTRANDOM(EVE_LCD_HIGH)*EVE_PIXEL_UNIT;
 			fz[i].r = FTRANDOM(0xFF);
 			fz[i].g = FTRANDOM(0xFF);
 			fz[i].b = FTRANDOM(0xFF);
@@ -203,7 +203,7 @@ FTVOID bsh_main_win (FTU32 para)
 
 	static FT_Gpu_Fonts_t stFB;
 
-	/* load the font resources into FT800 */
+	/* load the font resources into EVE */
 	if (init) {
 		if (0 == appFileToRamG(PATH_BSH_FNT,ADDR_BSH_FNT,0,(FTU8 *)&stFB,sizeof(FT_Gpu_Fonts_t))) {
 			DBGPRINT;
@@ -228,10 +228,10 @@ FTVOID bsh_main_win (FTU32 para)
 	CoCmd_SETFONT(BSH_TLT_FONT, ADDR_BSH_FNT, &stFB);
 
 	if (!hold_count) {
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,BSH_TLT_FONT,OPT_CENTERX,&screen_title[screen_title_index][0]);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,BSH_TLT_FONT,OPT_CENTERX,&screen_title[screen_title_index][0]);
 	} else {
 		hold_count--;
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,BSH_TLT_FONT,OPT_CENTERX,&screen_title[screen_stat][0]);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,BSH_TLT_FONT,OPT_CENTERX,&screen_title[screen_stat][0]);
 	}
 
 	HAL_CmdBufIn(DISPLAY());

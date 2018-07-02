@@ -7,7 +7,7 @@
 #include <math.h>
 #define PI 3.1415926
 
-#define BKGND_BLOB_GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,FT800_LCD_HIGH,0)
+#define BKGND_BLOB_GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,EVE_LCD_HIGH,0)
 
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
 #define PATH_BK_ICON ROOT_PATH"dial\\L8_H400.raw"
@@ -282,7 +282,7 @@ appRet_en dialBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, BMP_para *pbmpHD,FTU32 wid
 {
 	FTU32 i, src;
 	src = ramgAddr;
-	if (bmpHdl >= FT800_BMP_EXT_HANDLE) {
+	if (bmpHdl >= EVE_BMP_EXT_HANDLE) {
 		DBGPRINT;
 		return APP_ERR_HDL_EXC;
 	}
@@ -312,7 +312,7 @@ STATIC FTVOID downBKBitmap(Ft_App_Scroller_t *pScroll)
 	FTU32 addr=0;
 	    addr = RAM_G;
 	//if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != dialBmpToRamG(H400_HDL, addr, &bmpSetting[0],pScroll->len,pScroll->high)){
 			DBGPRINT;
 			return;

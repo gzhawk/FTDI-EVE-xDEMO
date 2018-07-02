@@ -1,11 +1,11 @@
 /* 
-    Applicaton, Integrated function for FT800
+    Applicaton, Integrated function for EVE
     Author: Hawk
     Date  : 2013/Oct
  */
 
-#ifndef _FT800_APP_H_
-#define _FT800_APP_H_
+#ifndef _EVE_APP_H_
+#define _EVE_APP_H_
 
 /* you need to carfully consider the size of the block
  * base on your system available memory and data transfer buffering space 
@@ -25,17 +25,17 @@
  * e.g. in Mege328 system (no external memory) MAX should not larger than 32K
  * UL define may be used when you have to use a number larger than 32K */
 #if defined(DEF_81X) || defined(DEF_BT81X)
-#define FT800_RAMG_SIZE       (1*1024*1024UL)
+#define EVE_RAMG_SIZE       (1*1024*1024UL)
 #else
-#define FT800_RAMG_SIZE       (256*1024UL)
+#define EVE_RAMG_SIZE       (256*1024UL)
 #endif
 /* 0~15, 15 can only be used when no GRADIENT, BUTTON, KEYS be used 
  * at current display list */
-#define FT800_BMP_EXT_HANDLE  (16) 
-#define FT800_APP_ERR_CODE    (0xFF00UL) 
+#define EVE_BMP_EXT_HANDLE  (16) 
+#define EVE_APP_ERR_CODE    (0xFF00UL) 
 
-#define FT800_PIC_MEM_ADDR    RAM_G
-#define FT800_FONT_INTERNAL   (16)
+#define EVE_PIC_MEM_ADDR    RAM_G
+#define EVE_FONT_INTERNAL   (16)
 
 #define ZLIB_LEN              (0xFFFFFFFF)
 #if defined(DEF_BT81X)
@@ -63,7 +63,7 @@ typedef struct audio_hd_st {
 }audio_hd_t;
 typedef enum appRet_ {
     APP_OK          = 0,
-    APP_ERR_CALC    = FT800_APP_ERR_CODE,
+    APP_ERR_CALC    = EVE_APP_ERR_CODE,
     APP_ERR_NULL,
     APP_ERR_OPEN,
     APP_ERR_HDL_EXC,

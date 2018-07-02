@@ -90,7 +90,7 @@ extern BT8XXEMU_Emulator *gEmulator;
 
 #define FTRES FILE*
 
-#define FT800_CAL_PARA_NUM    (6)
+#define EVE_CAL_PARA_NUM    (6)
 
 #define APPS_SYS vc2017emu_apps_sys_dummy
 

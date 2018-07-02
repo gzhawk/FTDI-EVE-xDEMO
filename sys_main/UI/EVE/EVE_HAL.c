@@ -1,5 +1,5 @@
 /* 
-    Hardware Abstract Layer for FT800 
+    Hardware Abstract Layer for EVE 
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/Oct
@@ -39,7 +39,7 @@ STATIC FTVOID rdStart ( FTU32 addr )
     FT8XXEMU_transfer((FTU8)addr);
     FT8XXEMU_transfer(0);
 #elif defined(STM32F4)
-    FT800_CS_LOW;
+    EVE_CS_LOW;
     STM32_SPISend((FTU8)(addr >> 16));
     STM32_SPISend((FTU8)(addr >> 8));
     STM32_SPISend((FTU8)addr);
@@ -54,7 +54,7 @@ STATIC FTVOID rdStart ( FTU32 addr )
     FT9XX_CS_LOW;
     spi_writen(SPIM,tmp,FT9XX_SPI_RXLEN);
 #else
-    digitalWrite(FT800_SPI_CS, LOW);
+    digitalWrite(EVE_SPI_CS, LOW);
     SPI.transfer((FTU8)(addr >> 16));
     SPI.transfer(highByte(addr));
     SPI.transfer(lowByte(addr));
@@ -82,7 +82,7 @@ STATIC FTVOID wrStart ( FTU32 addr )
     FT8XXEMU_transfer((FTU8)(addr >> 8));
     FT8XXEMU_transfer((FTU8)addr);
 #elif defined(STM32F4)
-    FT800_CS_LOW;
+    EVE_CS_LOW;
     STM32_SPISend((FTU8)(0x80 | (addr >> 16)));
     STM32_SPISend((FTU8)(addr >> 8));
     STM32_SPISend((FTU8)addr);
@@ -96,7 +96,7 @@ STATIC FTVOID wrStart ( FTU32 addr )
     FT9XX_CS_LOW;
     spi_writen(SPIM,tmp,FT9XX_SPI_TXLEN);
 #else
-    digitalWrite(FT800_SPI_CS, LOW);
+    digitalWrite(EVE_SPI_CS, LOW);
     SPI.transfer(0x80 | (addr >> 16));
     SPI.transfer(highByte(addr));
     SPI.transfer(lowByte(addr));
@@ -166,8 +166,8 @@ FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
 
     STM32_SPISend(data);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     wrStart(addr);
 
@@ -179,7 +179,7 @@ FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
 
     SPI.transfer(data);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
@@ -201,8 +201,8 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
         STM32_SPISend(src[i]);
     }
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     i = len; /* just to remove compile warning */
     spi_writen(SPIM,src,i);
@@ -213,7 +213,7 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
         SPI.transfer(src[i]);
     }
 
-    digitalWrite(FT800_SPI_CS, HIGH);	
+    digitalWrite(EVE_SPI_CS, HIGH);	
 #endif
 }
 FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
@@ -245,8 +245,8 @@ FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
     STM32_SPISend((FTU8)data&0xFF);
     STM32_SPISend((FTU8)(data>>8)&0xFF);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     wrStart(addr);
 
@@ -259,7 +259,7 @@ FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
     SPI.transfer((FTU8)data&0xFF);
     SPI.transfer((FTU8)(data>>8)&0xFF);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
@@ -297,8 +297,8 @@ FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
     STM32_SPISend((FTU8)(data>>16)&0xFF);
     STM32_SPISend((FTU8)(data>>24)&0xFF);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     wrStart(addr);
 
@@ -313,7 +313,7 @@ FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
     SPI.transfer((FTU8)(data>>16)&0xFF);
     SPI.transfer((FTU8)(data>>24)&0xFF);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 
@@ -332,7 +332,7 @@ FTVOID HAL_Cfg ( FTU8 cfg )
 #elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FT8XXEMU_transfer(cfg);
 #elif defined(STM32F4)
-    FT800_CS_LOW;
+    EVE_CS_LOW;
 
     STM32_SPISend(cfg);
 
@@ -340,8 +340,8 @@ FTVOID HAL_Cfg ( FTU8 cfg )
 
     STM32_SPISend(0);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     FTU8 tmp[FT9XX_SPI_TXLEN] = {0};
     tmp[0] = cfg;
@@ -352,11 +352,11 @@ FTVOID HAL_Cfg ( FTU8 cfg )
     spi_writen(SPIM,tmp,FT9XX_SPI_TXLEN);
     FT9XX_CS_HIGH;
 #else
-    digitalWrite(FT800_SPI_CS, LOW);
+    digitalWrite(EVE_SPI_CS, LOW);
     SPI.transfer(cfg);
     SPI.transfer(0);
     SPI.transfer(0);
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 
@@ -390,7 +390,7 @@ FTU8 HAL_Read8 ( FTU32 addr )
     rdStart(addr);
     tmp = STM32_SPISend(0);
 
-    FT800_CS_HIGH;
+    EVE_CS_HIGH;
 
     return tmp;
 #elif defined(FT9XXEV)
@@ -406,7 +406,7 @@ FTU8 HAL_Read8 ( FTU32 addr )
 
     tmp = SPI.transfer(0);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
     return tmp;
 #endif
@@ -448,7 +448,7 @@ FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len )
         p++;
     }
 
-    FT800_CS_HIGH;
+    EVE_CS_HIGH;
 
     return len;
 #elif defined(FT9XXEV)
@@ -470,7 +470,7 @@ FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len )
         p++;
     }
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
     return len;
 #endif
@@ -508,8 +508,8 @@ FTU16 HAL_Read16 ( FTU32 addr )
     tmp = (FTU16)STM32_SPISend(0);
     tmp |= (FTU16)STM32_SPISend(0) << 8;
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 
     return tmp;
 #elif defined(FT9XXEV)
@@ -529,7 +529,7 @@ FTU16 HAL_Read16 ( FTU32 addr )
     tmp = (FTU16)SPI.transfer(0);
     tmp |= (FTU16)SPI.transfer(0) << 8;
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
     return tmp;
 #endif
@@ -572,8 +572,8 @@ FTU32 HAL_Read32 ( FTU32 addr )
     tmp |= (FTU32)STM32_SPISend(0) << 16;
     tmp |= (FTU32)STM32_SPISend(0) << 24;
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 
     return tmp;
 #elif defined(FT9XXEV)
@@ -597,7 +597,7 @@ FTU32 HAL_Read32 ( FTU32 addr )
     tmp |= (FTU32)SPI.transfer(0) << 16;
     tmp |= (FTU32)SPI.transfer(0) << 24;
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
     return tmp;
 #endif

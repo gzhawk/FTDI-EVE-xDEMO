@@ -6,7 +6,7 @@
 */
 
 #define FIFOSIZE        (18*1024)/* make sure this size larger than JPG file size */
-#define FIFOADDR        (FT800_RAMG_SIZE - FIFOSIZE)
+#define FIFOADDR        (EVE_RAMG_SIZE - FIFOSIZE)
 
 #define PATH_BUP ROOT_PATH"midea_w\\bup\\m (1).jpg"
 #define PATH_BKGND ROOT_PATH"midea_w\\bkgnd\\b (1).jpg"
@@ -88,7 +88,7 @@ STATIC FTU32 JPEGToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoSi
 	}
 
 	Len = appResSize(resHDL);
-	if (FT800_RAMG_SIZE < ramgAddr + Len) {
+	if (EVE_RAMG_SIZE < ramgAddr + Len) {
 		appResClose(resHDL);
 		DBGPRINT;
 		return 0;
@@ -151,10 +151,10 @@ STATIC FTVOID JpegDisplay (FTU32 hdl, FTU32 addr, FTU32 X, FTU32 Y)
 {
 	HAL_CmdBufIn(BITMAP_HANDLE(hdl));
 	HAL_CmdBufIn(BITMAP_SOURCE(addr));
-	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, (FT800_LCD_WIDTH * 2), FT800_LCD_HIGH));
-	HAL_CmdBufIn(BITMAP_LAYOUT_H((FT800_LCD_WIDTH * 2) >> 10, FT800_LCD_HIGH >> 9)); 
-	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, FT800_LCD_WIDTH, FT800_LCD_HIGH));
-	HAL_CmdBufIn(BITMAP_SIZE_H(FT800_LCD_WIDTH>>9, FT800_LCD_HIGH>>9));
+	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, (EVE_LCD_WIDTH * 2), EVE_LCD_HIGH));
+	HAL_CmdBufIn(BITMAP_LAYOUT_H((EVE_LCD_WIDTH * 2) >> 10, EVE_LCD_HIGH >> 9)); 
+	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, EVE_LCD_WIDTH, EVE_LCD_HIGH));
+	HAL_CmdBufIn(BITMAP_SIZE_H(EVE_LCD_WIDTH>>9, EVE_LCD_HIGH>>9));
 	HAL_CmdBufIn(BEGIN(BITMAPS));
 	HAL_CmdBufIn(VERTEX2F(X,Y));
 	HAL_CmdBufIn(END());
@@ -205,7 +205,7 @@ FTVOID main_m (FTU32 para)
 	static FTU32 bkgnd_offset, icon_l_offset;
 
 	if (flag == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(0, RAM_G, bmp_header, 3)){
 			DBGPRINT;
 			return;
@@ -234,20 +234,20 @@ FTVOID main_m (FTU32 para)
 
 	/* L */
 	HAL_CmdBufIn(BITMAP_HANDLE(HDL_L));
-	HAL_CmdBufIn(VERTEX2F(L_X*FT800_PIXEL_UNIT,L_Y*FT800_PIXEL_UNIT));
+	HAL_CmdBufIn(VERTEX2F(L_X*EVE_PIXEL_UNIT,L_Y*EVE_PIXEL_UNIT));
 
 	/* Lx */
 	HAL_CmdBufIn(BITMAP_HANDLE(HDL_Lx));
-	HAL_CmdBufIn(VERTEX2F(Lx_X*FT800_PIXEL_UNIT,Lx_Y*FT800_PIXEL_UNIT));
+	HAL_CmdBufIn(VERTEX2F(Lx_X*EVE_PIXEL_UNIT,Lx_Y*EVE_PIXEL_UNIT));
 
 	/* rotate R */
 	CoCmd_LOADIDENTITY;	      
-	CoCmd_TRANSLATE(bmp_header[HDL_R].wide/2*FT800_TRANSFORM_MAX,bmp_header[HDL_R].high/2*FT800_TRANSFORM_MAX);
-	CoCmd_ROTATE(angle*FT800_TRANSFORM_MAX/360);
-	CoCmd_TRANSLATE(-1*bmp_header[HDL_R].wide/2*FT800_TRANSFORM_MAX,-1*bmp_header[HDL_R].high/2*FT800_TRANSFORM_MAX);
+	CoCmd_TRANSLATE(bmp_header[HDL_R].wide/2*EVE_TRANSFORM_MAX,bmp_header[HDL_R].high/2*EVE_TRANSFORM_MAX);
+	CoCmd_ROTATE(angle*EVE_TRANSFORM_MAX/360);
+	CoCmd_TRANSLATE(-1*bmp_header[HDL_R].wide/2*EVE_TRANSFORM_MAX,-1*bmp_header[HDL_R].high/2*EVE_TRANSFORM_MAX);
 	CoCmd_SETMATRIX;
 	HAL_CmdBufIn(BITMAP_HANDLE(HDL_R));
-	HAL_CmdBufIn(VERTEX2F(R_X*FT800_PIXEL_UNIT,R_Y*FT800_PIXEL_UNIT));
+	HAL_CmdBufIn(VERTEX2F(R_X*EVE_PIXEL_UNIT,R_Y*EVE_PIXEL_UNIT));
 	SETDEFAULT;
 
 	HAL_CmdBufIn(END());

@@ -122,7 +122,11 @@
     defined(UI_ALLY_ROTATE) || \
 	defined(UI_VJDZ) || \
     defined(UI_STELIGENT)
+#if 0 // enable the BT81X define here when needed
+#define DEF_BT81X 
+#else
 #define DEF_81X
+#endif
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 
@@ -204,7 +208,7 @@
 /*
  * Version: A.B.C.D
  * A: Basic version number, increase it when modify happen on core function
- (FT800, APP, HAL, etc.), or add a new MCU platform, 
+ (EVE chip, APP, HAL, etc.), or add a new MCU platform, 
  leave 'B' part unchange and clear the 'C' part when 'A' part change.
  * B: significant structure change version number, 
  increase it when significant changed

@@ -49,16 +49,16 @@ typedef unsigned long  FTU32;
 #define FTRES Reader
 
 #ifdef PLUS_PRO
-#define FT800_SPI_CS (9) //VM800P, Arduino Pro
-#define FT800_SDC_CS (8)   //VM800P, Arduino Pro
+#define EVE_SPI_CS (9) //VM800P, Arduino Pro
+#define EVE_SDC_CS (8)   //VM800P, Arduino Pro
 #else
-#define FT800_SPI_CS (10)  //Arduino Uno (Sparkfun: RedBoard)
-#define FT800_SDC_CS (8)   //Sparkfun: microSD Shield
+#define EVE_SPI_CS (10)  //Arduino Uno (Sparkfun: RedBoard)
+#define EVE_SDC_CS (8)   //Sparkfun: microSD Shield
 #endif
 
-#define FT800_PD_N (4)
+#define EVE_PD_N (4)
 
-#define FT800_CAL_PARA_NUM    (6)
+#define EVE_CAL_PARA_NUM    (6)
 #define SDC_NAME_LEN     8
 #define SDC_NAME_EXT_LEN 3
 #define SDC_DBG          1

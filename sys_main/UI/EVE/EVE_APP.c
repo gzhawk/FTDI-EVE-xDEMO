@@ -1,5 +1,5 @@
 /* 
-    Applicaton, Integrated function for FT800
+    Applicaton, Integrated function for EVE 
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/Oct
@@ -68,7 +68,7 @@ STATIC appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
 
 STATIC appRet_en appCalForce (FTC8 *dataPath)
 {
-    FTU32 CData[FT800_CAL_PARA_NUM] = {0},
+    FTU32 CData[EVE_CAL_PARA_NUM] = {0},
           reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
     /* make the tag part invalid */
@@ -100,7 +100,7 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
 #else
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (Arduino)",dataPath)) {
 #endif
-        for (i = 0; i < FT800_CAL_PARA_NUM; reg+=FTU32_LEN,i++) {
+        for (i = 0; i < EVE_CAL_PARA_NUM; reg+=FTU32_LEN,i++) {
             CData[i] = HAL_Read32(reg);
         }
         /* save the CData */
@@ -138,7 +138,7 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
 
 STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
 {
-    FTU32 CData[FT800_CAL_PARA_NUM] = {0};
+    FTU32 CData[EVE_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
 #if defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
@@ -578,9 +578,9 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
     }
 
     Len = appResSize(resHDL);
-    if (chkExceed && (FT800_RAMG_SIZE < inAddr + Len)) {
+    if (chkExceed && (EVE_RAMG_SIZE < inAddr + Len)) {
         appResClose(resHDL);
-        FTPRINT("\nappFileToRamG: FT800_RAMG_SIZE < inAddr + Len");
+        FTPRINT("\nappFileToRamG: EVE_RAMG_SIZE < inAddr + Len");
         return 0;
     }
 
@@ -700,7 +700,7 @@ FTVOID appPalette(FTU32 *ps, bmpHDR_st *p)
 }
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-    if (nums > FT800_BMP_EXT_HANDLE || bmpHdl >= FT800_BMP_EXT_HANDLE) {
+    if (nums > EVE_BMP_EXT_HANDLE || bmpHdl >= EVE_BMP_EXT_HANDLE) {
         FTPRINT("\nappBmpToRamG: items exceed");
         return APP_ERR_HDL_EXC;
     }
@@ -857,11 +857,11 @@ STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
     ft9xx_sdc_init();
 #else
     /* set the GPIO pin */
-    pinMode(FT800_SPI_CS, OUTPUT);
-    digitalWrite(FT800_SPI_CS, HIGH);
+    pinMode(EVE_SPI_CS, OUTPUT);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
-    pinMode(FT800_PD_N, OUTPUT);
-    digitalWrite(FT800_PD_N, HIGH);
+    pinMode(EVE_PD_N, OUTPUT);
+    digitalWrite(EVE_PD_N, HIGH);
 
     arduino_sdcardInit();
 #endif
@@ -923,10 +923,10 @@ STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
     gpio_write(FT9XX_PD, OnOff?1:0);
     FTDELAY(PWC_DELAY);
 #else
-    digitalWrite(FT800_PD_N, OnOff?LOW:HIGH);
+    digitalWrite(EVE_PD_N, OnOff?LOW:HIGH);
     FTDELAY(PWC_DELAY);
 
-    digitalWrite(FT800_PD_N, OnOff?HIGH:LOW);
+    digitalWrite(EVE_PD_N, OnOff?HIGH:LOW);
     FTDELAY(PWC_DELAY);
     /* 
      * I was not quite understand why a read action is needed
@@ -969,7 +969,7 @@ STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
     HAL_Write16(REG_GPIOX,0x800F);
 #else
     /*
-       Bit 0 - 7 : These bits configure the direction of GPIO pins of the FT800. Bit 0 controls
+       Bit 0 - 7 : These bits configure the direction of GPIO pins of the EVE. Bit 0 controls
        the direction of GPIO0 and Bit 7 controls the direction of GPIO7. The bit value 1
        means the GPIO pin is set as an output, otherwise it means an input. After reset, only
        the GPIO7 is set to output by default.
@@ -1015,7 +1015,7 @@ STATIC FTVOID appUI_EVETchCfg ( FTVOID )
      * you may change it depends on your real system
      */
 #if !defined(LCD_WVGA)
-    HAL_Write16(REG_TOUCH_RZTHRESH,FT800_TOUCH_THRESHOLD);
+    HAL_Write16(REG_TOUCH_RZTHRESH,EVE_TOUCH_THRESHOLD);
 #endif
     HAL_Write16(REG_CYA_TOUCH,(HAL_Read16(REG_CYA_TOUCH) | 0x8000));
 #endif
@@ -1024,9 +1024,9 @@ STATIC FTVOID appUI_EVESetSPI (FTU32 type)
 {
 #if defined(DEF_81X) || defined(DEF_BT81X)
     if (type == 4) {
-        HAL_Write8(REG_SPI_WIDTH, EVE_QSPI | FT800_SPI_DUMMY);
+        HAL_Write8(REG_SPI_WIDTH, EVE_QSPI | EVE_SPI_DUMMY);
     } else if (type == 2) {
-        HAL_Write8(REG_SPI_WIDTH, EVE_DSPI | FT800_SPI_DUMMY);
+        HAL_Write8(REG_SPI_WIDTH, EVE_DSPI | EVE_SPI_DUMMY);
     } else {
         HAL_Write8(REG_SPI_WIDTH, EVE_SSPI);
     }
@@ -1182,7 +1182,7 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
        VCycle VOffset VSync0 VSync1 
        PCLK Swizzle PCLKPol Cspread Dither
      */
-    FT800_LCD lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
+    EVE_LCD lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
 #if defined(LCD_WVGA)
         /* PCLK is critical,
            sometime it may need to set to larger number (2,3)
@@ -1259,7 +1259,7 @@ STATIC FTU8 appUI_EVEVerify (FTVOID)
     FTU8 count = RETRY_COUNT;
 
     FTPRINT("\nVerify: ");
-    while ((HAL_Read8(REG_ID) != FT800_ID ||
+    while ((HAL_Read8(REG_ID) != EVE_ID ||
            HAL_Read8(REG_CPURESET)) &&
            count) {
         FTPRINT(".");

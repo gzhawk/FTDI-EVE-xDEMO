@@ -2,8 +2,8 @@
  * Copyright (C) 2013  Future Technology Devices International Ltd
  */
 
-#ifndef FT800EMU_EMULATOR_H
-#define FT800EMU_EMULATOR_H
+#ifndef FT8XXEMU_EMULATOR_H
+#define FT8XXEMU_EMULATOR_H
 
 #define FT8XXEMU_VERSION_API 10
 
@@ -199,6 +199,6 @@ FT8XXEMU_API void FT8XXEMU_touchResetXY(int idx);
 } /* extern "C" */
 #endif
 
-#endif /* #ifndef FT800EMU_EMULATOR_H */
+#endif /* #ifndef FT8XXEMU_EMULATOR_H */
 
 /* end of file */

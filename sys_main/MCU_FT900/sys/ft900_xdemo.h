@@ -47,7 +47,7 @@ typedef unsigned long  FTU64;
 
 #define FTRES FIL* 
 
-#define FT800_CAL_PARA_NUM (6)
+#define EVE_CAL_PARA_NUM (6)
 
 #define FT9XX_UART0_RX 49
 #define FT9XX_UART0_TX 48

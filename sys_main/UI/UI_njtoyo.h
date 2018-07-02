@@ -30,7 +30,7 @@ FTU8 jpeg_d[] = ROOT_PATH"njtoyo\\D00.jpg";
 #define BMPADDR          (FIFOADDR+FIFOSIZE+BUF_GAP)
 
 #define EVE_C_ADDR       (BMPADDR+4*BMPSIZE)
-#define EVE_C_MAXSIZE    (FT800_RAMG_SIZE-EVE_C_ADDR)
+#define EVE_C_MAXSIZE    (EVE_RAMG_SIZE-EVE_C_ADDR)
 
 #define FPS_OFFSET_Y     0
 #define FPS_OFFSET_X     80
@@ -205,7 +205,7 @@ STATIC FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr,
 	}
 
 	Len = appResSize(resHDL);
-	if (FT800_RAMG_SIZE < ramgAddr + Len) {
+	if (EVE_RAMG_SIZE < ramgAddr + Len) {
 		appResClose(resHDL);
 		DBGPRINT;
 		return 0;
@@ -273,8 +273,8 @@ FTU32 Code_fixed (FTVOID)
 
         HAL_CmdBufIn(BITMAP_HANDLE(i));
         HAL_CmdBufIn(CELL(0));
-        HAL_CmdBufIn(VERTEX2F(jpeg_play_list[i].pic.X*FT800_PIXEL_UNIT,
-                    jpeg_play_list[i].pic.Y*FT800_PIXEL_UNIT));
+        HAL_CmdBufIn(VERTEX2F(jpeg_play_list[i].pic.X*EVE_PIXEL_UNIT,
+                    jpeg_play_list[i].pic.Y*EVE_PIXEL_UNIT));
         HAL_CmdBufIn(TAG_MASK(0));
     }
     HAL_CmdBufIn(END());

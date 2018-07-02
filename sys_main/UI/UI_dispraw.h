@@ -27,7 +27,7 @@ FTVOID dispraw (FTU32 para)
 	
     /* only load the file once */
 	if (flag == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(0, RAM_G, &bmp_header, 1)){
 			DBGPRINT;
 			return;
@@ -44,7 +44,7 @@ FTVOID dispraw (FTU32 para)
     HAL_CmdBufIn(CELL(0));
     HAL_CmdBufIn(VERTEX2F(0,0));
 	HAL_CmdBufIn(END());
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,24,OPT_CENTERX,"show the RAW file on screen");
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,24,OPT_CENTERX,"show the RAW file on screen");
 
 	HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);

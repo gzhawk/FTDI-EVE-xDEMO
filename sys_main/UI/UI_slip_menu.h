@@ -476,7 +476,7 @@ FTU8 menu_detect (FTU32 *pMenuIndex)
 FTVOID menu_disp (FTU8 index)
 {
     FTU32 addr = main_menu[index].menuInfo.lut_src,
-          X = (main_menu[index].X)*FT800_PIXEL_UNIT;
+          X = (main_menu[index].X)*EVE_PIXEL_UNIT;
 
     HAL_CmdBufIn(BITMAP_HANDLE(MENU_HDL_START+index));
     HAL_CmdBufIn(CELL(0));
@@ -493,10 +493,10 @@ FTVOID menu_disp_scale (FTU8 index)
 
     HAL_CmdBufIn(SAVE_CONTEXT());
     CoCmd_LOADIDENTITY;
-    CoCmd_TRANSLATE(w/2*FT800_TRANSFORM_MAX,h/2*FT800_TRANSFORM_MAX);
-    CoCmd_SCALE(FT800_TRANSFORM_MAX/MENU_DENO*main_menu[index].scale,
-                FT800_TRANSFORM_MAX/MENU_DENO*main_menu[index].scale);
-    CoCmd_TRANSLATE(w/(-2)*FT800_TRANSFORM_MAX,h/(-2)*FT800_TRANSFORM_MAX);
+    CoCmd_TRANSLATE(w/2*EVE_TRANSFORM_MAX,h/2*EVE_TRANSFORM_MAX);
+    CoCmd_SCALE(EVE_TRANSFORM_MAX/MENU_DENO*main_menu[index].scale,
+                EVE_TRANSFORM_MAX/MENU_DENO*main_menu[index].scale);
+    CoCmd_TRANSLATE(w/(-2)*EVE_TRANSFORM_MAX,h/(-2)*EVE_TRANSFORM_MAX);
     CoCmd_SETMATRIX;
 
     menu_disp(index);
@@ -512,7 +512,7 @@ FTVOID menu_disp_inside (FTU8 index)
     HAL_CmdBufIn(COLOR_RGB(255,255,255));
     CoCmd_NUMBER(X,0,31,OPT_RIGHTX,index);
     HAL_CmdBufIn(COLOR_RGB(((MENU_MAIN_NUM == index)?255:0),((MENU_MAIN_NUM == index)?0:255),0));
-    CoCmd_TEXT(X,FT800_LCD_HIGH/2,((MENU_MAIN_NUM == index)?31:22),OPT_CENTER,
+    CoCmd_TEXT(X,EVE_LCD_HIGH/2,((MENU_MAIN_NUM == index)?31:22),OPT_CENTER,
                  main_menu[index].menuInfo.path);
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }

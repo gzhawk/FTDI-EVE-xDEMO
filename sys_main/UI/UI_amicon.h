@@ -76,7 +76,7 @@ halo_para_t haloPara[18] = {
 //#define BKGND_VALUE_2 (BKGND_BNUM/2)
 
 #define BKGND_BLOB_MSPEED 1
-#define BKGND_BLOB_GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,FT800_LCD_HIGH,0)
+#define BKGND_BLOB_GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,EVE_LCD_HIGH,0)
 
 #define ft_random(x)		(rand() % (x))
 #define DIR_MAX 6
@@ -375,7 +375,7 @@ STATIC FTVOID downFireBitmap()
 	FTU8 i, j;
 
 	if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(FIRE_HDL_F1, RAM_G, &FireBmpHD[0], FIRE_ICON_GROUP)){
 			DBGPRINT;
 			return;
@@ -390,7 +390,7 @@ STATIC FTVOID downRotateBitmap()
 	FTU8 i, j;
 
 	if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(FIRE_HDL_F1, RAM_G, &FireBmpHD[0], FIRE_ICON_GROUP)){
 			DBGPRINT;
 			return;
@@ -405,7 +405,7 @@ STATIC FTVOID downHaloBitmap()
 	FTU8 i, j;
 
 	if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(FIRE_HDL_F1, RAM_G, &FireBmpHD[0], FIRE_ICON_GROUP)){
 			DBGPRINT;
 			return;
@@ -420,7 +420,7 @@ STATIC FTVOID downTrembleBitmap()
 	FTU8 i, j;
 
 	if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(FIRE_HDL_F1, RAM_G, &FireBmpHD[0], FIRE_ICON_GROUP)){
 			DBGPRINT;
 			return;
@@ -561,9 +561,9 @@ STATIC FTVOID rotateBitmap()
 	            HAL_CmdBufIn(BEGIN(BITMAPS));
 				HAL_CmdBufIn(TAG(2*i+1));
 	            CoCmd_LOADIDENTITY;	      
-				CoCmd_TRANSLATE(FireBmpHD[2*i].wide/2*FT800_TRANSFORM_MAX,FireBmpHD[2*i].high/2*FT800_TRANSFORM_MAX);
-	            CoCmd_ROTATE(rangle*FT800_TRANSFORM_MAX/360);
-				CoCmd_TRANSLATE(-FireBmpHD[2*i].wide/2*FT800_TRANSFORM_MAX,-FireBmpHD[2*i].high/2*FT800_TRANSFORM_MAX);
+				CoCmd_TRANSLATE(FireBmpHD[2*i].wide/2*EVE_TRANSFORM_MAX,FireBmpHD[2*i].high/2*EVE_TRANSFORM_MAX);
+	            CoCmd_ROTATE(rangle*EVE_TRANSFORM_MAX/360);
+				CoCmd_TRANSLATE(-FireBmpHD[2*i].wide/2*EVE_TRANSFORM_MAX,-FireBmpHD[2*i].high/2*EVE_TRANSFORM_MAX);
 	            CoCmd_SETMATRIX;
 	            /* display in ICON central */
 	            HAL_CmdBufIn(VERTEX2II(Fire_Coor[2*i].x,Fire_Coor[2*i].y,2*i,0));
@@ -650,7 +650,7 @@ FTVOID fire_show (FTU32 para)
 				flag = (high<=0)?0:1;
 			} else {
 				high++;
-				flag = (high>=(FT800_LCD_HIGH-32))?1:0;
+				flag = (high>=(EVE_LCD_HIGH-32))?1:0;
 			}
 			count = 0;
 		}
@@ -661,7 +661,7 @@ FTVOID fire_show (FTU32 para)
 	
 		drawFireBitmap();
 		gIndex = 0;
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);	
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);	
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
 		HAL_BufToReg(RAM_CMD,0);
@@ -691,7 +691,7 @@ FTVOID tremble_show (FTU32 para)
 				flag = (high<=0)?0:1;
 			} else {
 				high++;
-				flag = (high>=(FT800_LCD_HIGH-32))?1:0;
+				flag = (high>=(EVE_LCD_HIGH-32))?1:0;
 			}
 			count = 0;
 		}
@@ -702,7 +702,7 @@ FTVOID tremble_show (FTU32 para)
 	
 		trembleBitmap();		
 		gIndex = 2;		
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
 		
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -732,7 +732,7 @@ FTVOID rotate_show (FTU32 para)
 				flag = (high<=0)?0:1;
 			} else {
 				high++;
-				flag = (high>=(FT800_LCD_HIGH-32))?1:0;
+				flag = (high>=(EVE_LCD_HIGH-32))?1:0;
 			}
 			count = 0;
 		}
@@ -743,7 +743,7 @@ FTVOID rotate_show (FTU32 para)
 	
 		rotateBitmap();		
 		gIndex = 1;
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
 		
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -777,7 +777,7 @@ STATIC FTVOID drawGIF(FTU32 para)
 				flag = (high<=0)?0:1;
 			} else {
 				high++;
-				flag = (high>=(FT800_LCD_HIGH-32))?1:0;
+				flag = (high>=(EVE_LCD_HIGH-32))?1:0;
 			}
 			count = 0;
 		}
@@ -797,7 +797,7 @@ STATIC FTVOID drawGIF(FTU32 para)
 	    HAL_CmdBufIn(BEGIN(BITMAPS));	
         HAL_CmdBufIn(VERTEX2II(0,0,hdl,0));
 		gIndex = 3;
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
 
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(END());
@@ -832,7 +832,7 @@ FTVOID drawHalo_show (FTU32 para)
 				flag = (high<=0)?0:1;
 			} else {
 				high++;
-				flag = (high>=(FT800_LCD_HIGH-32))?1:0;
+				flag = (high>=(EVE_LCD_HIGH-32))?1:0;
 			}
 			count = 0;
 		}
@@ -842,7 +842,7 @@ FTVOID drawHalo_show (FTU32 para)
 		BKGND_BLOB_GRAD_BKG;
 		drawHaloBitmap();
 		gIndex = 4;
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);	
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);	
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
 		HAL_BufToReg(RAM_CMD,0);

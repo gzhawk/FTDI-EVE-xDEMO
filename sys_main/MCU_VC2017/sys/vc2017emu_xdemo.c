@@ -41,7 +41,7 @@ FTVOID vc2017emu_save_cdata (FTC8 *dataPath, FTU8 *p)
 		return;
 	}
 
-	fwrite(p, 4, FT800_CAL_PARA_NUM, pF);
+	fwrite(p, 4, EVE_CAL_PARA_NUM, pF);
 	fclose(pF);
 }
 
@@ -50,7 +50,7 @@ FTVOID vc2017emu_restore_cdata (FTC8 *dataPath, FTU8 *p)
 	FILE *pF;
 	
 	pF = fopen(dataPath,"rb");
-	fread(p, 4, FT800_CAL_PARA_NUM, pF);
+	fread(p, 4, EVE_CAL_PARA_NUM, pF);
 	fclose(pF);
 }
 

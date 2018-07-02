@@ -95,16 +95,16 @@ typedef struct table_layout_ {
 #define TIME_BMP_NUM 2
 #define TIME_W 24 // limited to the font FONT_TIME_DAT WxH for demo 
 #define TIME_H 29
-#define TIME_XL (FT800_LCD_WIDTH/2-4*TIME_W)
-#define TIME_XM (FT800_LCD_WIDTH/2-TIME_W)
-#define TIME_XR (FT800_LCD_WIDTH/2+2*TIME_W)
-#define TIME_D_XL (FT800_LCD_WIDTH/2-5*TIME_W)
-#define TIME_D_XM (FT800_LCD_WIDTH/2)
-#define TIME_D_XR (FT800_LCD_WIDTH/2+3*TIME_W)
+#define TIME_XL (EVE_LCD_WIDTH/2-4*TIME_W)
+#define TIME_XM (EVE_LCD_WIDTH/2-TIME_W)
+#define TIME_XR (EVE_LCD_WIDTH/2+2*TIME_W)
+#define TIME_D_XL (EVE_LCD_WIDTH/2-5*TIME_W)
+#define TIME_D_XM (EVE_LCD_WIDTH/2)
+#define TIME_D_XR (EVE_LCD_WIDTH/2+3*TIME_W)
 
-#define TIME_YT (FT800_LCD_HIGH/2-3*TIME_H)
-#define TIME_YB (FT800_LCD_HIGH/2+2*TIME_H)
-#define TIME_TRACK_BASE (FT800_TRACK_VALUE_MAX/(TIME_H*5))
+#define TIME_YT (EVE_LCD_HIGH/2-3*TIME_H)
+#define TIME_YB (EVE_LCD_HIGH/2+2*TIME_H)
+#define TIME_TRACK_BASE (EVE_TRACK_VALUE_MAX/(TIME_H*5))
 #define TIME_TRACK_VALID (TIME_TRACK_BASE*TIME_H)
 #define TIME_TRACK_MORE (TIME_TRACK_VALID+TIME_H)
 #define TIME_TRACK_LESS (TIME_TRACK_VALID/2)
@@ -128,9 +128,9 @@ typedef struct datetime_st_ {
 #define ICON_W (90)
 #define ICON_H (90)
 
-#define ICON_X_GAP ((FT800_LCD_WIDTH-ICON_W*3)/4)
-#define ICON_Y_TGAP ((FT800_LCD_HIGH-ICON_H*2)/3-10)
-#define ICON_Y_MGAP ((FT800_LCD_HIGH-ICON_H*2)/3-12)
+#define ICON_X_GAP ((EVE_LCD_WIDTH-ICON_W*3)/4)
+#define ICON_Y_TGAP ((EVE_LCD_HIGH-ICON_H*2)/3-10)
+#define ICON_Y_MGAP ((EVE_LCD_HIGH-ICON_H*2)/3-12)
 /* n from 0 to 5 */
 #define ICON_X0(n) ((n < 3)?((n+1)*ICON_X_GAP+n*ICON_W):((n-2)*ICON_X_GAP+(n-3)*ICON_W))
 #define ICON_Y0(n) ((n < 3)?ICON_Y_TGAP:ICON_H+ICON_Y_TGAP+ICON_Y_MGAP)
@@ -148,8 +148,8 @@ typedef struct datetime_st_ {
 #define BUTN_R_GAP 20
 #define BUTN_B_GAP 10
 /* n from 0 ~ 2, sequence from right to left, at the right bottom corner */
-#define BUTN_X(n) (FT800_LCD_WIDTH-((n+1)*BUTN_W)-BUTN_M_GAP-((n)?BUTN_M_GAP:0))
-#define BUTN_Y (FT800_LCD_HIGH-BUTN_H-BUTN_B_GAP)
+#define BUTN_X(n) (EVE_LCD_WIDTH-((n+1)*BUTN_W)-BUTN_M_GAP-((n)?BUTN_M_GAP:0))
+#define BUTN_Y (EVE_LCD_HIGH-BUTN_H-BUTN_B_GAP)
 
 /* the raw font file also need to follow this address (-d parameter)
  * while using fnt_cvt tools, same address MUST not be used in same pages */
@@ -191,11 +191,11 @@ typedef enum FONT_NUM_e {
 #define BOOT_LOGO_H 120
 #define BOOT_LOGO_ZOOM  50
 #define BOOT_BMP_SIZE 72000
-#define BOOT_BMP_ADDR (FT800_RAMG_SIZE - BOOT_BMP_SIZE)
+#define BOOT_BMP_ADDR (EVE_RAMG_SIZE - BOOT_BMP_SIZE)
 
 /* manage the color here */
 #define COLOR_CLR CLEAR_COLOR_RGB(63,97,161)
-#define COLOR_GRA CoCmd_GRADIENT(0,0,0x3f61a1,0,FT800_LCD_HIGH,0x000000)
+#define COLOR_GRA CoCmd_GRADIENT(0,0,0x3f61a1,0,EVE_LCD_HIGH,0x000000)
 #define COLOR_CLR_B0 CLEAR_COLOR_RGB(0,0,0)
 #define COLOR_CLR_B1 CLEAR_COLOR_RGB(0xff,0xff,0xff)
 #define COLOR_BOT COLOR_RGB(63,97,161)
@@ -329,7 +329,7 @@ static FTVOID devp (FTU32 cashPara)
 	FTC8 butnStr[] = {1,2,0};//go back
 	FTU8 Touch = 0, tFlag = TOUCH_NO;
 
-	/* load the font resources into FT800 */
+	/* load the font resources into EVE */
 	if (0 == appFileToRamG(PATH_BUTN,FONT_BUTN_ADDR,0,(FTU8 *)&stFB,sizeof(FT_Gpu_Fonts_t))) {
 		DBGPRINT;
 		return;
@@ -361,9 +361,9 @@ static FTVOID devp (FTU32 cashPara)
 		HAL_CmdBufIn(TAG_MASK(0));
 
 		/* display the titel on each icon by using external font */
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4,FONT_DEVP_TLT,OPT_CENTER,"Menu");
-		CoCmd_NUMBER(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,FONT_DEVP_TLT,OPT_CENTER,i);
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4*3,FONT_DEVP_TLT,OPT_CENTER,"Developing...");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4,FONT_DEVP_TLT,OPT_CENTER,"Menu");
+		CoCmd_NUMBER(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,FONT_DEVP_TLT,OPT_CENTER,i);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4*3,FONT_DEVP_TLT,OPT_CENTER,"Developing...");
 
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -379,10 +379,10 @@ static FTVOID devp (FTU32 cashPara)
 }
 static FTVOID tblLines(FTU32 x0, FTU32 y0, FTU32 x1, FTU32 y1, FTU32 w)
 {
-	HAL_CmdBufIn(LINE_WIDTH(w*FT800_PIXEL_UNIT));
+	HAL_CmdBufIn(LINE_WIDTH(w*EVE_PIXEL_UNIT));
 	HAL_CmdBufIn(BEGIN(LINES)); 
-	HAL_CmdBufIn(VERTEX2F((x0)*FT800_PIXEL_UNIT,(y0)*FT800_PIXEL_UNIT)); 
-	HAL_CmdBufIn(VERTEX2F((x1)*FT800_PIXEL_UNIT,(y1)*FT800_PIXEL_UNIT)); 
+	HAL_CmdBufIn(VERTEX2F((x0)*EVE_PIXEL_UNIT,(y0)*EVE_PIXEL_UNIT)); 
+	HAL_CmdBufIn(VERTEX2F((x1)*EVE_PIXEL_UNIT,(y1)*EVE_PIXEL_UNIT)); 
 	HAL_CmdBufIn(END());
 }
 static FTVOID drawTable (table_layout_st *tblL)
@@ -450,14 +450,14 @@ static FTVOID showData (table_layout_st *tblL, table_contents_st *tblD)
 }
 static FTU32 getTrackNum (track_ctrl_st *ptrack_ctrl, FTU32 track_data, FTU32 init_num,FTU32 start_num, FTU32 max_num)
 {
-	static FTU32 base = FT800_TRACK_VALUE_MAX+1;
+	static FTU32 base = EVE_TRACK_VALUE_MAX+1;
 	FT32 offset, num = init_num;
 
 	if (track_data == 0) {
 		return init_num;	
 	}
 
-	if (base == FT800_TRACK_VALUE_MAX+1) {
+	if (base == EVE_TRACK_VALUE_MAX+1) {
 		/* record the first touch data as base data */
 		base = track_data;
 		num = init_num;
@@ -549,28 +549,28 @@ static FTVOID drawCol (datetime_st *pstDT, FTU32 timeORdate)
 	HAL_CmdBufIn(BEGIN(RECTS));
 	if (timeORdate) {
 		HAL_CmdBufIn(TAG(TAG_CLCK_LTAG));
-		HAL_CmdBufIn(VERTEX2F(TIME_XL*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
-		HAL_CmdBufIn(VERTEX2F((TIME_XL+2*TIME_W)*FT800_PIXEL_UNIT,(TIME_YT+5*TIME_H)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F(TIME_XL*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((TIME_XL+2*TIME_W)*EVE_PIXEL_UNIT,(TIME_YT+5*TIME_H)*EVE_PIXEL_UNIT));
 
 		HAL_CmdBufIn(TAG(TAG_CLCK_MTAG));
-		HAL_CmdBufIn(VERTEX2F(TIME_XM*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
-		HAL_CmdBufIn(VERTEX2F((TIME_XM+2*TIME_W)*FT800_PIXEL_UNIT,(TIME_YT+5*TIME_H)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F(TIME_XM*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((TIME_XM+2*TIME_W)*EVE_PIXEL_UNIT,(TIME_YT+5*TIME_H)*EVE_PIXEL_UNIT));
 
 		HAL_CmdBufIn(TAG(TAG_CLCK_RTAG));
-		HAL_CmdBufIn(VERTEX2F(TIME_XR*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
-		HAL_CmdBufIn(VERTEX2F((TIME_XR+2*TIME_W)*FT800_PIXEL_UNIT,(TIME_YT+5*TIME_H)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F(TIME_XR*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((TIME_XR+2*TIME_W)*EVE_PIXEL_UNIT,(TIME_YT+5*TIME_H)*EVE_PIXEL_UNIT));
 	} else {
 		HAL_CmdBufIn(TAG(TAG_DATE_LTAG));
-		HAL_CmdBufIn(VERTEX2F(TIME_D_XL*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
-		HAL_CmdBufIn(VERTEX2F((TIME_D_XL+4*TIME_W)*FT800_PIXEL_UNIT,(TIME_YT+5*TIME_H)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F(TIME_D_XL*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((TIME_D_XL+4*TIME_W)*EVE_PIXEL_UNIT,(TIME_YT+5*TIME_H)*EVE_PIXEL_UNIT));
 
 		HAL_CmdBufIn(TAG(TAG_DATE_MTAG));
-		HAL_CmdBufIn(VERTEX2F(TIME_D_XM*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
-		HAL_CmdBufIn(VERTEX2F((TIME_D_XM+2*TIME_W)*FT800_PIXEL_UNIT,(TIME_YT+5*TIME_H)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F(TIME_D_XM*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((TIME_D_XM+2*TIME_W)*EVE_PIXEL_UNIT,(TIME_YT+5*TIME_H)*EVE_PIXEL_UNIT));
 
 		HAL_CmdBufIn(TAG(TAG_DATE_RTAG));
-		HAL_CmdBufIn(VERTEX2F(TIME_D_XR*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
-		HAL_CmdBufIn(VERTEX2F((TIME_D_XR+2*TIME_W)*FT800_PIXEL_UNIT,(TIME_YT+5*TIME_H)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F(TIME_D_XR*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((TIME_D_XR+2*TIME_W)*EVE_PIXEL_UNIT,(TIME_YT+5*TIME_H)*EVE_PIXEL_UNIT));
 	}
 	HAL_CmdBufIn(TAG_MASK(0));
 
@@ -598,18 +598,18 @@ static FTVOID drawCol (datetime_st *pstDT, FTU32 timeORdate)
 		for (i = 0, k = TIME_XL; i < 3; i++, k += 3*TIME_W) {
 			for (j = 0; j < 2; j++) {
                 HAL_CmdBufIn(BITMAP_HANDLE(0));
-                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
                 HAL_CmdBufIn(BITMAP_HANDLE(1));
-                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,(TIME_YB-TIME_H/2)*FT800_PIXEL_UNIT));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*EVE_PIXEL_UNIT,(TIME_YB-TIME_H/2)*EVE_PIXEL_UNIT));
 			}
 		}
 	} else {
 		for (i = 0, k = TIME_D_XL; i < 3; i++, k += ((i==1)?5*TIME_W:3*TIME_W)) {
 			for (j = 0; j < (i?(FTU32)2:(FTU32)4); j++) {
                 HAL_CmdBufIn(BITMAP_HANDLE(0));
-                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,TIME_YT*FT800_PIXEL_UNIT));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*EVE_PIXEL_UNIT,TIME_YT*EVE_PIXEL_UNIT));
                 HAL_CmdBufIn(BITMAP_HANDLE(1));
-                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*FT800_PIXEL_UNIT,(TIME_YB-TIME_H/2)*FT800_PIXEL_UNIT));
+                HAL_CmdBufIn(VERTEX2F((k+j*TIME_W)*EVE_PIXEL_UNIT,(TIME_YB-TIME_H/2)*EVE_PIXEL_UNIT));
 			}
 		}
 	}
@@ -715,7 +715,7 @@ static FTVOID aniMoveup (FTVOID)
 {
 	FT32 X,Y;
 	/* animation for logo moving up */
-	for (Y = FT800_LCD_HIGH, X = FT800_LCD_WIDTH/2-BOOT_LOGO_W/2; Y > FT800_LCD_HIGH/2-BOOT_LOGO_H/2; Y--) {
+	for (Y = EVE_LCD_HIGH, X = EVE_LCD_WIDTH/2-BOOT_LOGO_W/2; Y > EVE_LCD_HIGH/2-BOOT_LOGO_H/2; Y--) {
 		HAL_CmdBufIn(CMD_DLSTART);
 		HAL_CmdBufIn(COLOR_CLR_B1);
 		HAL_CmdBufIn(CLEAR(1,1,1));
@@ -723,7 +723,7 @@ static FTVOID aniMoveup (FTVOID)
 		/* bitmap area setting */
 		HAL_CmdBufIn(BEGIN(BITMAPS));
         HAL_CmdBufIn(BITMAP_HANDLE(BMP_H_0));
-        HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+        HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -735,8 +735,8 @@ FTVOID aniZoomin (FTVOID)
 {
 	FT32 X,Y,step;
 	
-	X = FT800_LCD_WIDTH/2-BOOT_LOGO_W/2;
-	Y = FT800_LCD_HIGH/2-BOOT_LOGO_H/2;
+	X = EVE_LCD_WIDTH/2-BOOT_LOGO_W/2;
+	Y = EVE_LCD_HIGH/2-BOOT_LOGO_H/2;
 
 	/* animation for logo zoom in */
 	for (step = BOOT_LOGO_ZOOM; step >= 1; step--) {
@@ -747,12 +747,12 @@ FTVOID aniZoomin (FTVOID)
 		/* bitmap area setting */
 		HAL_CmdBufIn(BEGIN(BITMAPS));
 		CoCmd_LOADIDENTITY;
-		CoCmd_TRANSLATE(BOOT_LOGO_W/2*FT800_TRANSFORM_MAX,BOOT_LOGO_H/2*FT800_TRANSFORM_MAX);
-		CoCmd_SCALE(FT800_TRANSFORM_MAX/BOOT_LOGO_ZOOM*step,FT800_TRANSFORM_MAX/BOOT_LOGO_ZOOM*step);
-		CoCmd_TRANSLATE(-BOOT_LOGO_W/2*FT800_TRANSFORM_MAX,-BOOT_LOGO_H/2*FT800_TRANSFORM_MAX);
+		CoCmd_TRANSLATE(BOOT_LOGO_W/2*EVE_TRANSFORM_MAX,BOOT_LOGO_H/2*EVE_TRANSFORM_MAX);
+		CoCmd_SCALE(EVE_TRANSFORM_MAX/BOOT_LOGO_ZOOM*step,EVE_TRANSFORM_MAX/BOOT_LOGO_ZOOM*step);
+		CoCmd_TRANSLATE(-BOOT_LOGO_W/2*EVE_TRANSFORM_MAX,-BOOT_LOGO_H/2*EVE_TRANSFORM_MAX);
 		CoCmd_SETMATRIX;
         HAL_CmdBufIn(BITMAP_HANDLE(BMP_H_0));
-        HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+        HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -765,32 +765,32 @@ FTVOID aniCube (FTVOID)
 	FT32 X,Y,iX;
 	
 	/* animation for cube moving */
-	for (Y = 0, iX = 0;Y < FT800_LCD_HIGH; iX += BOOT_CUBE_W) {
-		if (iX >= FT800_LCD_WIDTH) {
+	for (Y = 0, iX = 0;Y < EVE_LCD_HIGH; iX += BOOT_CUBE_W) {
+		if (iX >= EVE_LCD_WIDTH) {
 			Y += BOOT_CUBE_H;
 			iX = 0;
 		}
-		for (X = FT800_LCD_WIDTH; X > iX; X -= BOOT_CUBE_W) {
+		for (X = EVE_LCD_WIDTH; X > iX; X -= BOOT_CUBE_W) {
 			HAL_CmdBufIn(CMD_DLSTART);
 			HAL_CmdBufIn(COLOR_CLR_B1);
 			HAL_CmdBufIn(CLEAR(1,1,1));
 
 			HAL_CmdBufIn(BEGIN(RECTS));
 			HAL_CmdBufIn(COLOR_BOT);
-			HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
-			HAL_CmdBufIn(VERTEX2F((X+BOOT_CUBE_W)*FT800_PIXEL_UNIT,(Y+BOOT_CUBE_H)*FT800_PIXEL_UNIT));
+			HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
+			HAL_CmdBufIn(VERTEX2F((X+BOOT_CUBE_W)*EVE_PIXEL_UNIT,(Y+BOOT_CUBE_H)*EVE_PIXEL_UNIT));
 
 			if (iX) {
 				HAL_CmdBufIn(BEGIN(EDGE_STRIP_L));
-				HAL_CmdBufIn(VERTEX2F(iX*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
-				HAL_CmdBufIn(VERTEX2F(iX*FT800_PIXEL_UNIT,(Y+BOOT_CUBE_H)*FT800_PIXEL_UNIT));
+				HAL_CmdBufIn(VERTEX2F(iX*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
+				HAL_CmdBufIn(VERTEX2F(iX*EVE_PIXEL_UNIT,(Y+BOOT_CUBE_H)*EVE_PIXEL_UNIT));
 				HAL_CmdBufIn(END());
 			}
 
 			if (Y) {
 				HAL_CmdBufIn(BEGIN(EDGE_STRIP_A));
-				HAL_CmdBufIn(VERTEX2F(0,Y*FT800_PIXEL_UNIT));
-				HAL_CmdBufIn(VERTEX2F(FT800_LCD_WIDTH*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+				HAL_CmdBufIn(VERTEX2F(0,Y*EVE_PIXEL_UNIT));
+				HAL_CmdBufIn(VERTEX2F(EVE_LCD_WIDTH*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 				HAL_CmdBufIn(END());
 			}
 
@@ -807,7 +807,7 @@ FTVOID aniGradient(FTVOID)
 	FT32 Y;
 
 	/* animation for background gradient */
-	for (Y = 0; Y < FT800_LCD_HIGH; Y += 10) {
+	for (Y = 0; Y < EVE_LCD_HIGH; Y += 10) {
 		HAL_CmdBufIn(CMD_DLSTART);
 		HAL_CmdBufIn(COLOR_CLR_B0);
 		HAL_CmdBufIn(CLEAR(1,1,1));
@@ -829,7 +829,7 @@ FTVOID cashBootup (FTU32 cashPara)
 	return;
 #endif
 #if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
-	/* load bitmap resources data into FT800 */
+	/* load bitmap resources data into EVE */
 	if(APP_OK != appBmpToRamG(BMP_H_0, BOOT_BMP_ADDR, bmpLogoHD, 1)) {
 		DBGPRINT;
 		return;
@@ -853,8 +853,8 @@ FTVOID cashBootup (FTU32 cashPara)
 	HAL_CmdBufIn(COLOR_CLR_B0);
 	HAL_CmdBufIn(CLEAR(1,1,1));
 
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4,24,OPT_CENTERX,"Due to limited memory in Arduino");
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4*3,24,OPT_CENTERX,"Please run me under the MSVC");
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4,24,OPT_CENTERX,"Due to limited memory in Arduino");
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4*3,24,OPT_CENTERX,"Please run me under the MSVC");
 
 	HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);
@@ -868,13 +868,13 @@ FTVOID cashMain (FTU32 cashPara)
 	FTU8 Touch = 0, tFlag = TOUCH_NO, i, Rotate = ICON_ROTATE_D;
 	FT_Gpu_Fonts_t stF;
 
-	/* load the font resources into FT800 */
+	/* load the font resources into EVE */
 	if (0 == appFileToRamG(PATH_ICON_T,FONT_MENU_1_ADDR,0,(FTU8 *)&stF,sizeof(FT_Gpu_Fonts_t))) {
 		DBGPRINT;
 		return;
 	}
 
-	/* load bitmap resources data into FT800 */
+	/* load bitmap resources data into EVE */
 	if(APP_OK != appBmpToRamG(BMP_H_0, MENU_BMP_ADDR, bmpHD, ICON_NUM)){
 		DBGPRINT;
 		return;
@@ -908,12 +908,12 @@ FTVOID cashMain (FTU32 cashPara)
 				/* rotate the touched icon */
 				HAL_CmdBufIn(TAG(TAG_CASH_REST+i));
 				CoCmd_LOADIDENTITY;
-				CoCmd_TRANSLATE(ICON_W/2*FT800_TRANSFORM_MAX,ICON_H/2*FT800_TRANSFORM_MAX);
-				CoCmd_ROTATE(Rotate*FT800_TRANSFORM_MAX/360);
-				CoCmd_TRANSLATE(-ICON_W/2*FT800_TRANSFORM_MAX,-ICON_H/2*FT800_TRANSFORM_MAX);
+				CoCmd_TRANSLATE(ICON_W/2*EVE_TRANSFORM_MAX,ICON_H/2*EVE_TRANSFORM_MAX);
+				CoCmd_ROTATE(Rotate*EVE_TRANSFORM_MAX/360);
+				CoCmd_TRANSLATE(-ICON_W/2*EVE_TRANSFORM_MAX,-ICON_H/2*EVE_TRANSFORM_MAX);
 				CoCmd_SETMATRIX;
                 HAL_CmdBufIn(BITMAP_HANDLE(i));
-                HAL_CmdBufIn(VERTEX2F(ICON_X0(i)*FT800_PIXEL_UNIT,ICON_Y0(i)*FT800_PIXEL_UNIT));
+                HAL_CmdBufIn(VERTEX2F(ICON_X0(i)*EVE_PIXEL_UNIT,ICON_Y0(i)*EVE_PIXEL_UNIT));
 				defaultMatrix();
 				HAL_CmdBufIn(COLOR_TITLE);
 				CoCmd_TEXT(ICON_T_X(i),ICON_T_Y(i), FONT_MENU, OPT_CENTERX, &iconStr[i][0]);
@@ -933,7 +933,7 @@ FTVOID cashMain (FTU32 cashPara)
 			HAL_CmdBufIn(TAG(TAG_CASH_REST+i));
 			defaultMatrix();
             HAL_CmdBufIn(BITMAP_HANDLE(i));
-            HAL_CmdBufIn(VERTEX2F(ICON_X0(i)*FT800_PIXEL_UNIT,ICON_Y0(i)*FT800_PIXEL_UNIT));
+            HAL_CmdBufIn(VERTEX2F(ICON_X0(i)*EVE_PIXEL_UNIT,ICON_Y0(i)*EVE_PIXEL_UNIT));
 			/* display the title on each icon by using external font */
 			HAL_CmdBufIn(COLOR_TITLE);
 			CoCmd_TEXT(ICON_T_X(i),ICON_T_Y(i), FONT_MENU, OPT_CENTERX, &iconStr[i][0]);
@@ -976,7 +976,7 @@ FTVOID cashVers (FTU32 cashPara)
 		tblColumnWide
 	};
 
-	/* load the font resources into FT800 */
+	/* load the font resources into EVE */
 	if (0 == appFileToRamG(PATH_BUTN,FONT_BUTN_ADDR,0,(FTU8 *)&stFB,sizeof(FT_Gpu_Fonts_t))) {
 		DBGPRINT;
 		return;
@@ -1051,13 +1051,13 @@ FTVOID cashTime (FTU32 cashPara)
 	static FTU8 Touch;
 	FTU8 okFlag = 0, cancelFlag = 0;
 
-	/* load the font resources into FT800 */
+	/* load the font resources into EVE */
 	if (0 == appFileToRamG(PATH_BUTN,FONT_BUTN_ADDR,0,(FTU8 *)&stFB,sizeof(FT_Gpu_Fonts_t))) {
 		DBGPRINT;
 		return;
 	}
 
-	/* load bitmap resources data into FT800 */
+	/* load bitmap resources data into EVE */
 	if(APP_OK != appBmpToRamG(BMP_H_0, TIME_BMP_ADDR, bmpNumHD, TIME_BMP_NUM)){
 		DBGPRINT;
 		return;
@@ -1120,15 +1120,15 @@ FTVOID cashTime (FTU32 cashPara)
 				HAL_CmdBufIn(TAG_MASK(1));
 				/* draw a clock */
 				HAL_CmdBufIn(TAG(TAG_CLCK)); 
-				CoCmd_CLOCK(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,TIME_R,0,
+				CoCmd_CLOCK(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,TIME_R,0,
 						0,0,curTime.hours*3600+curTime.minutes*60+curTime.seconds,curTime.minseconds);
 				/* draw a date */
 				HAL_CmdBufIn(TAG(TAG_DATE)); 
-				CoCmd_NUMBER(FT800_LCD_WIDTH/2-3*TIME_W+10,0,FONT_TIME_DAT,0,curTime.year);
-				CoCmd_TEXT(FT800_LCD_WIDTH/2-TIME_W+15,0,FONT_TIME_DAT,0,"/");
-				CoCmd_NUMBER(FT800_LCD_WIDTH/2,0,FONT_TIME_DAT,0,curTime.month);
-				CoCmd_TEXT(FT800_LCD_WIDTH/2+TIME_W+3,0,FONT_TIME_DAT,0,"/");
-				CoCmd_NUMBER(FT800_LCD_WIDTH/2+TIME_W+8,0,FONT_TIME_DAT,0,curTime.day);
+				CoCmd_NUMBER(EVE_LCD_WIDTH/2-3*TIME_W+10,0,FONT_TIME_DAT,0,curTime.year);
+				CoCmd_TEXT(EVE_LCD_WIDTH/2-TIME_W+15,0,FONT_TIME_DAT,0,"/");
+				CoCmd_NUMBER(EVE_LCD_WIDTH/2,0,FONT_TIME_DAT,0,curTime.month);
+				CoCmd_TEXT(EVE_LCD_WIDTH/2+TIME_W+3,0,FONT_TIME_DAT,0,"/");
+				CoCmd_NUMBER(EVE_LCD_WIDTH/2+TIME_W+8,0,FONT_TIME_DAT,0,curTime.day);
 				HAL_CmdBufIn(TAG_MASK(0));
 				break;
 		}

@@ -70,7 +70,7 @@
 #define PAGE_FULL             ((uint8_t)0x80)
 
 /* Variables' number */
-#define NB_OF_VAR             ((uint8_t)(4+6*4)/2)/* (CALD_TAG_LEN(4) + FT800_CAL_PARA_NUM(6)*FTU32_LEN(4))/2*/
+#define NB_OF_VAR             ((uint8_t)(4+6*4)/2)/* (CALD_TAG_LEN(4) + EVE_CAL_PARA_NUM(6)*FTU32_LEN(4))/2*/
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/

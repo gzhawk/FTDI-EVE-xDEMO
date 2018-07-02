@@ -5,7 +5,7 @@
 	2. follow the instruction to generate the raw or rawh file
 	   here, I would like to use raw file
 	   http://www.ftdichip.com/Support/Documents/AppNotes/AN_277_FT800_Custom_Font_Implement.pdf
-	3. after you got the raw file, follow the code below to see how it works in FT800
+	3. after you got the raw file, follow the code below to see how it works in EVE
     Author: Hawk
 	Email : hawk.gao@ftdichip.com
 	Date  : 2014/Sep
@@ -45,7 +45,7 @@ FTVOID font_main (FTU32 para)
 
 	static FT_Gpu_Fonts_t stFB1,stFB2;
 
-	/* load the font resources into FT800 */
+	/* load the font resources into EVE */
 	if (init) {
 		if (0 == appFileToRamG(PATH_LINE1,LINE1_ADDR,0,(FTU8 *)&stFB1,sizeof(FT_Gpu_Fonts_t))) {
 			DBGPRINT;
@@ -66,10 +66,10 @@ FTVOID font_main (FTU32 para)
 	CoCmd_SETFONT(FONT_2, LINE2_ADDR, &stFB2);
 
 	HAL_CmdBufIn(LINE1_COLOR);
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4-FONT_2_H,FONT_1,OPT_CENTERX,&screen_title[0][0]);
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4-FONT_2_H,FONT_1,OPT_CENTERX,&screen_title[0][0]);
 	HAL_CmdBufIn(LINE2_COLOR);
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2-FONT_2_H/2,FONT_2,OPT_CENTER,&screen_title[1][0]);
-	CoCmd_KEY(FT800_LCD_WIDTH/2-FONT_2_W/2,FT800_LCD_HIGH/2+FONT_2_H/2,FONT_2_W,FONT_2_H,FONT_2,OPT_CENTER,&screen_title[2][0]);
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2-FONT_2_H/2,FONT_2,OPT_CENTER,&screen_title[1][0]);
+	CoCmd_KEY(EVE_LCD_WIDTH/2-FONT_2_W/2,EVE_LCD_HIGH/2+FONT_2_H/2,FONT_2_W,FONT_2_H,FONT_2,OPT_CENTER,&screen_title[2][0]);
 
 	HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);

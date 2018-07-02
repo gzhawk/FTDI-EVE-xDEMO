@@ -715,9 +715,9 @@ typedef struct FT_Gpu_Fonts
     /* Width of each character font from 0 to 127 */
     FTU8	FontWidth[FT_GPU_NUMCHARPERFONT];
     /* Bitmap format of font wrt bitmap formats 
-     * supported by FT800 - L1, L4, L8 */
+     * supported by EVE - L1, L4, L8 */
     FTU32	FontBitmapFormat;
-    /* Font line stride in FT800 ROM */
+    /* Font line stride in EVE ROM */
     FTU32	FontLineStride;
     /* Font width in pixels */
     FTU32	FontWidthInPixels;

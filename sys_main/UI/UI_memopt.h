@@ -73,29 +73,29 @@ FTVOID demo_memopt (FTU32 para)
     switch (i) {
         case 1:
 	        HAL_CmdBufIn(COLOR_RGB(0xFF,0,0));
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2, 25, OPT_CENTERY, "MEMSET ERR");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2, 25, OPT_CENTERY, "MEMSET ERR");
             break;
         case 2:
 	        HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2-FNT_H, 25, OPT_CENTERY, "MEMSET OK");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2-FNT_H, 25, OPT_CENTERY, "MEMSET OK");
 	        HAL_CmdBufIn(COLOR_RGB(0xFF,0,0));
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2, 25, OPT_CENTERY, "MEMZERO ERR");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2, 25, OPT_CENTERY, "MEMZERO ERR");
             break;
         case 3:
 	        HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2-2*FNT_H, 25, OPT_CENTERY, "MEMSET OK");
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2-FNT_H, 25, OPT_CENTERY, "MEMZERO OK");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2-2*FNT_H, 25, OPT_CENTERY, "MEMSET OK");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2-FNT_H, 25, OPT_CENTERY, "MEMZERO OK");
 	        HAL_CmdBufIn(COLOR_RGB(0xFF,0,0));
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2, 25, OPT_CENTERY, "MEMCPY ERR");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2, 25, OPT_CENTERY, "MEMCPY ERR");
             break;
         default:
 	        HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2-2*FNT_H, 25, OPT_CENTERY, "MEMSET OK");
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2-FNT_H, 25, OPT_CENTERY, "MEMZERO OK");
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2, 25, OPT_CENTERY, "MEMCPY OK");
-            CoCmd_TEXT(0, FT800_LCD_HIGH/2+FNT_H, 25, OPT_CENTERY, "CRC: ");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2-2*FNT_H, 25, OPT_CENTERY, "MEMSET OK");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2-FNT_H, 25, OPT_CENTERY, "MEMZERO OK");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2, 25, OPT_CENTERY, "MEMCPY OK");
+            CoCmd_TEXT(0, EVE_LCD_HIGH/2+FNT_H, 25, OPT_CENTERY, "CRC: ");
             CoCmd_SETBASE(16);
-            CoCmd_NUMBER(250, FT800_LCD_HIGH/2+FNT_H, 25, OPT_CENTERY|OPT_RIGHTX|8, i);
+            CoCmd_NUMBER(250, EVE_LCD_HIGH/2+FNT_H, 25, OPT_CENTERY|OPT_RIGHTX|8, i);
             break;
     }
 

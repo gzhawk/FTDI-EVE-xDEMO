@@ -284,7 +284,7 @@ void stm32f4_save_cdata (unsigned short* p)
 {
 	unsigned short i,j;
 
-	for (i = 0, j = 0; i < FT800_CAL_PARA_NUM; i++) {
+	for (i = 0, j = 0; i < EVE_CAL_PARA_NUM; i++) {
 		j = i*4;
 		EE_WriteVariable((CALD_TAG_ADDR+j/2),p[j/2]);
 		EE_WriteVariable((CALD_TAG_ADDR+j/2+1),p[j/2+1]);
@@ -294,7 +294,7 @@ void stm32f4_restore_cdata (unsigned short* p)
 {
 	unsigned char i;
 
-	for (i = 0;i < FT800_CAL_PARA_NUM;i+=2) {
+	for (i = 0;i < EVE_CAL_PARA_NUM;i+=2) {
 		EE_ReadVariable((unsigned short)(CALD_TAG_ADDR+CALD_TAG_LEN+i*2), (unsigned short *)(p+i*2));
 		EE_ReadVariable((unsigned short)(CALD_TAG_ADDR+CALD_TAG_LEN+i*2+1), (unsigned short *)(p+i*2+1));
 	}

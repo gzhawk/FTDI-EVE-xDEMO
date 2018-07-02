@@ -45,7 +45,7 @@ typedef unsigned long  FTU64;
 
 #define FTRES FILE*
 
-#define FT800_CAL_PARA_NUM    (6)
+#define EVE_CAL_PARA_NUM    (6)
 
 #define SPI_CLK_12M 12000000
 #define SPI_CLK_15M 15000000

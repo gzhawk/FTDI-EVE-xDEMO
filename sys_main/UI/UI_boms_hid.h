@@ -116,14 +116,14 @@ FTVOID test_boms (FTU32 para)
 #define TEST_FONT    25
 #define TEST_LOW_X   50
 #define TEST_HIGH_X  450
-#define TEST_STATUS_X (FT800_LCD_WIDTH/2)
-#define TEST_STATUS_Y (FT800_LCD_HIGH/2)
+#define TEST_STATUS_X (EVE_LCD_WIDTH/2)
+#define TEST_STATUS_Y (EVE_LCD_HIGH/2)
 #define TEST_TXT_GAP 200
 #define TEST_KEY_W   40
 #define TEST_KEY_H   40
-#define TEST_DSK_Y   (FT800_LCD_HIGH*2/3)
+#define TEST_DSK_Y   (EVE_LCD_HIGH*2/3)
 #define TEST_PAK_Y   TEST_DSK_Y
-#define TEST_ACT_Y   (FT800_LCD_HIGH-TEST_KEY_H)
+#define TEST_ACT_Y   (EVE_LCD_HIGH-TEST_KEY_H)
     static FTU8 pressed = 0, inited = 0;
 
     if (!inited) {
@@ -142,15 +142,15 @@ FTVOID test_boms (FTU32 para)
     HAL_CmdBufIn(COLOR_RGB(0,74,111));
 
     if (rate_data.read) {
-        CoCmd_TEXT(TEST_LOW_X, FT800_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "Low (MB/s):");
-        CoCmd_TEXT(TEST_HIGH_X, FT800_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "High (MB/s):");
+        CoCmd_TEXT(TEST_LOW_X, EVE_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "Low (MB/s):");
+        CoCmd_TEXT(TEST_HIGH_X, EVE_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "High (MB/s):");
     } else {
-        CoCmd_TEXT(TEST_LOW_X, FT800_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "Low (KB/s):");
-        CoCmd_TEXT(TEST_HIGH_X, FT800_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "High (KB/s):");
+        CoCmd_TEXT(TEST_LOW_X, EVE_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "Low (KB/s):");
+        CoCmd_TEXT(TEST_HIGH_X, EVE_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, "High (KB/s):");
     }
 
-    CoCmd_NUMBER(TEST_LOW_X+TEST_TXT_GAP, FT800_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, rate_data.low);
-    CoCmd_NUMBER(TEST_HIGH_X+TEST_TXT_GAP, FT800_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, rate_data.high);
+    CoCmd_NUMBER(TEST_LOW_X+TEST_TXT_GAP, EVE_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, rate_data.low);
+    CoCmd_NUMBER(TEST_HIGH_X+TEST_TXT_GAP, EVE_LCD_HIGH/3, TEST_FONT, OPT_CENTERY, rate_data.high);
    
     CoCmd_TEXT(TEST_LOW_X, TEST_DSK_Y, TEST_FONT, 0, "Disk");
     CoCmd_TEXT(TEST_HIGH_X, TEST_DSK_Y, TEST_FONT, 0, "PackSize");
@@ -163,13 +163,13 @@ FTVOID test_boms (FTU32 para)
         CoCmd_NUMBER(TEST_HIGH_X, TEST_DSK_Y+TEST_KEY_H, TEST_FONT, 0, rate_data.size);
 
         if (rate_data.read) {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_FONT, 0, "Read");
+            CoCmd_TEXT(EVE_LCD_WIDTH/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_FONT, 0, "Read");
         } else {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_FONT, 0, "Write");
+            CoCmd_TEXT(EVE_LCD_WIDTH/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_FONT, 0, "Write");
         }
 
         HAL_CmdBufIn(COLOR_RGB(255,0,0));
-        CoCmd_KEY((FT800_LCD_WIDTH)/2, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "S");
+        CoCmd_KEY((EVE_LCD_WIDTH)/2, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "S");
     } else {
         HAL_CmdBufIn(COLOR_RGB(255,255,255));
         CoCmd_KEY(TEST_LOW_X, TEST_DSK_Y+TEST_KEY_H, TEST_KEY_W, TEST_KEY_H, TEST_FONT, pressed, "<");
@@ -179,9 +179,9 @@ FTVOID test_boms (FTU32 para)
         CoCmd_KEY(TEST_HIGH_X+TEST_KEY_W*3, TEST_DSK_Y+TEST_KEY_H, TEST_KEY_W, TEST_KEY_H, TEST_FONT, pressed, "}");
         
         if (rate_data.read) {
-            CoCmd_KEY((FT800_LCD_WIDTH)/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "R");
+            CoCmd_KEY((EVE_LCD_WIDTH)/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "R");
         } else {
-            CoCmd_KEY((FT800_LCD_WIDTH)/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "W");
+            CoCmd_KEY((EVE_LCD_WIDTH)/2-TEST_KEY_W*3, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "W");
         }
 
         HAL_CmdBufIn(COLOR_RGB(0,74,111));
@@ -189,7 +189,7 @@ FTVOID test_boms (FTU32 para)
         CoCmd_NUMBER(TEST_HIGH_X+TEST_KEY_W, TEST_DSK_Y+TEST_KEY_H, TEST_FONT, 0, rate_data.size);
 
         HAL_CmdBufIn(COLOR_RGB(0,255,0));
-        CoCmd_KEY((FT800_LCD_WIDTH)/2, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "G");
+        CoCmd_KEY((EVE_LCD_WIDTH)/2, TEST_ACT_Y, TEST_KEY_W*3, TEST_KEY_H, TEST_FONT, pressed, "G");
     }
 
 
@@ -326,10 +326,10 @@ FTVOID simple_keyboard_ui (FTU32 ui_index)
 #define SIM_KB_KEY_W 50
 #define SIM_KB_KEY_H 50
 #define SIM_KB_GAP   50
-#define SIM_KB_L1_Y  (FT800_LCD_HIGH/2)
-#define SIM_KB_L2_Y  (FT800_LCD_HIGH/2+SIM_KB_KEY_H)
-#define SIM_KB_L3_Y  (FT800_LCD_HIGH/2+2*SIM_KB_KEY_H)
-#define SIM_KB_L4_Y  (FT800_LCD_HIGH/2+3*SIM_KB_KEY_H)
+#define SIM_KB_L1_Y  (EVE_LCD_HIGH/2)
+#define SIM_KB_L2_Y  (EVE_LCD_HIGH/2+SIM_KB_KEY_H)
+#define SIM_KB_L3_Y  (EVE_LCD_HIGH/2+2*SIM_KB_KEY_H)
+#define SIM_KB_L4_Y  (EVE_LCD_HIGH/2+3*SIM_KB_KEY_H)
     static FTU8 pressed = 0, mode = KB_MODE_NON_CAP, inited = 0;
 
     /* 
@@ -389,18 +389,18 @@ FTVOID simple_keyboard_ui (FTU32 ui_index)
 
     HAL_CmdBufIn(COLOR_RGB(0,74,111));
     if (ui_index == UI_KB2PC) {
-        CoCmd_TEXT(FT800_LCD_WIDTH/2, FT800_LCD_HIGH/5, SIM_KB_FONT, OPT_CENTER, "Open a TXT file on PC, press the key to check");
+        CoCmd_TEXT(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/5, SIM_KB_FONT, OPT_CENTER, "Open a TXT file on PC, press the key to check");
         if (mode == KB_MODE_NON_CAP || mode == KB_MODE_IS_CAP) {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2, FT800_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Shift[^] Backspace[-] NumSym[*] Space[_] Enter[>]");
+            CoCmd_TEXT(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Shift[^] Backspace[-] NumSym[*] Space[_] Enter[>]");
         } else {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2, FT800_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Backspace[B] Char[C] Space[S] Enter[E]");
+            CoCmd_TEXT(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Backspace[B] Char[C] Space[S] Enter[E]");
         }
     } else {
-        CoCmd_TEXT(FT800_LCD_WIDTH/2, FT800_LCD_HIGH/5, SIM_KB_FONT, OPT_CENTER, "Press the key to write into test file in SD card");
+        CoCmd_TEXT(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/5, SIM_KB_FONT, OPT_CENTER, "Press the key to write into test file in SD card");
         if (mode == KB_MODE_NON_CAP || mode == KB_MODE_IS_CAP) {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2, FT800_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Shift[^] NumSym[*] Space[_]");
+            CoCmd_TEXT(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Shift[^] NumSym[*] Space[_]");
         } else {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2, FT800_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Char[C] Space[S]");
+            CoCmd_TEXT(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/3, SIM_KB_FONT, OPT_CENTER, "Char[C] Space[S]");
         }
     }
 

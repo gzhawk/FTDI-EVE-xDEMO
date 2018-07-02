@@ -287,23 +287,23 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     //HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
     //HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
 	HAL_CmdBufIn(CALL(call_start+6));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     //HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
 	HAL_CmdBufIn(CALL(call_start+4));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     //HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
 	HAL_CmdBufIn(CALL(call_start+2));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     /* while using previous stencil function need to add this */
 	//HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
@@ -366,9 +366,9 @@ FTVOID draw_needle (FTU32 spd, spd_n_st *sp_ndl, FTU16 *pX, FTU16 *pY)
 
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
-    CoCmd_TRANSLATE(offset*FT800_TRANSFORM_MAX, 0);
-	CoCmd_ROTATE(angle*FT800_TRANSFORM_MAX/360);
-    CoCmd_SCALE(FT800_TRANSFORM_MAX,scale*FT800_TRANSFORM_MAX/100);
+    CoCmd_TRANSLATE(offset*EVE_TRANSFORM_MAX, 0);
+	CoCmd_ROTATE(angle*EVE_TRANSFORM_MAX/360);
+    CoCmd_SCALE(EVE_TRANSFORM_MAX,scale*EVE_TRANSFORM_MAX/100);
 	CoCmd_SETMATRIX;
 	/* speed needle */
 	dispPal8(X,Y,bmp_header[I_NDL].lut_src,I_NDL,0);
@@ -481,9 +481,9 @@ FTU32 ally_fixed_background (FTVOID)
     /* background: vertical mirror cut1 */
     HAL_CmdBufIn(SAVE_CONTEXT());
     CoCmd_LOADIDENTITY;	      
-    CoCmd_TRANSLATE(800/4*FT800_TRANSFORM_MAX,0);
-    CoCmd_SCALE(-1*FT800_TRANSFORM_MAX,1*FT800_TRANSFORM_MAX);
-    CoCmd_TRANSLATE(-800/4*FT800_TRANSFORM_MAX,0);
+    CoCmd_TRANSLATE(800/4*EVE_TRANSFORM_MAX,0);
+    CoCmd_SCALE(-1*EVE_TRANSFORM_MAX,1*EVE_TRANSFORM_MAX);
+    CoCmd_TRANSLATE(-800/4*EVE_TRANSFORM_MAX,0);
     CoCmd_SETMATRIX;
     dispPal8(CUTED_M_X,0,bmp_header[I_CUT1].lut_src, I_CUT1, 0);
     HAL_CmdBufIn(RESTORE_CONTEXT());
@@ -493,9 +493,9 @@ FTU32 ally_fixed_background (FTVOID)
     /* background: vertical mirror cut2 */
     HAL_CmdBufIn(SAVE_CONTEXT());
     CoCmd_LOADIDENTITY;
-    CoCmd_TRANSLATE(800/4*FT800_TRANSFORM_MAX,0);
-    CoCmd_SCALE(-1*FT800_TRANSFORM_MAX,1*FT800_TRANSFORM_MAX);
-    CoCmd_TRANSLATE(-800/4*FT800_TRANSFORM_MAX,0);
+    CoCmd_TRANSLATE(800/4*EVE_TRANSFORM_MAX,0);
+    CoCmd_SCALE(-1*EVE_TRANSFORM_MAX,1*EVE_TRANSFORM_MAX);
+    CoCmd_TRANSLATE(-800/4*EVE_TRANSFORM_MAX,0);
     CoCmd_SETMATRIX;
     dispPal8(CUTED_M_X,bmp_header[I_CUT1].high,bmp_header[I_CUT2].lut_src, I_CUT2, 0);
     HAL_CmdBufIn(RESTORE_CONTEXT());
@@ -522,8 +522,8 @@ FTVOID ally_realtime_background (FTU32 speed)
     FTU16 x,y;
 
     /* shadow left edge strip */
-    HAL_CmdBufIn(VERTEX2F(getHX(speed,shadow_edge)*FT800_PIXEL_UNIT,SHADOW_Y*FT800_PIXEL_UNIT));
-    HAL_CmdBufIn(VERTEX2F(getLX(speed,shadow_edge)*FT800_PIXEL_UNIT,(SHADOW_Y+100)*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(getHX(speed,shadow_edge)*EVE_PIXEL_UNIT,SHADOW_Y*EVE_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(getLX(speed,shadow_edge)*EVE_PIXEL_UNIT,(SHADOW_Y+100)*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(STENCIL_FUNC(GEQUAL,5,255));
@@ -543,16 +543,16 @@ FTVOID ally_realtime_background (FTU32 speed)
     HAL_CmdBufIn(BITMAP_HANDLE(I_NUM_S));
 
     HAL_CmdBufIn(CELL(speed/100));
-    HAL_CmdBufIn(VERTEX2F((x-bmp_header[I_NUM_S].wide)*FT800_PIXEL_UNIT,
-                          y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F((x-bmp_header[I_NUM_S].wide)*EVE_PIXEL_UNIT,
+                          y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(CELL((speed/10)%10));
-    HAL_CmdBufIn(VERTEX2F(x*FT800_PIXEL_UNIT,
-                          y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(x*EVE_PIXEL_UNIT,
+                          y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(CELL(speed%10));
-    HAL_CmdBufIn(VERTEX2F((x+bmp_header[I_NUM_S].wide)*FT800_PIXEL_UNIT,
-                          y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F((x+bmp_header[I_NUM_S].wide)*EVE_PIXEL_UNIT,
+                          y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(DISPLAY());
 }
@@ -613,7 +613,7 @@ FTVOID ally_rotate (FTU32 para)
 
 	/* run it once */
 	if (!len_fDL1) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(0, RAM_G, bmp_header, PIC_NUM)){
 			DBGPRINT;
 			return;
