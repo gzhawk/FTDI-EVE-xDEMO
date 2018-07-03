@@ -27,7 +27,7 @@
  */
 #define CLK_DELAY 200
 
-FTU8 EVE_ID = 0;
+FTU8 READ_ID = 0;
 
 FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = "Error occur / Stop display";
 
@@ -791,10 +791,10 @@ FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 
 STATIC FTVOID appUI_GetEVEID (FTVOID)
 {
-    EVE_ID = HAL_Read8(EVE_ID_REG);
+    READ_ID = HAL_Read8(EVE_ID_REG);
 #if defined(DBG_PRINT)
     FTPRINT("\nChip: ");
-    switch (EVE_ID) {
+    switch (READ_ID) {
         case 0x10:
             FTPRINT("FT810");
             break;
@@ -1052,7 +1052,7 @@ STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
         HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
         HAL_CmdBufIn(CLEAR(1,1,1));
 
-        switch (EVE_ID) {
+        switch (READ_ID) {
             case 0x10:
                 CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT810");
@@ -1440,7 +1440,7 @@ FTVOID UI_END (FTVOID)
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
     HAL_CmdBufIn(CLEAR(1,1,1));
     CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,24,
-               OPT_CENTER,dbg_str_buf);
+               OPT_CENTER,(FTC8 *)dbg_str_buf);
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);

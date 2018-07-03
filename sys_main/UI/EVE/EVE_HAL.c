@@ -786,7 +786,8 @@ FTU8 COUNT_ARGS(FTC8 * str)
 	FTU8 count = 0;
 	FTC8 *tmp = str;
 
-	while (tmp = strstr(tmp, "%"))
+    tmp = strstr(tmp, "%");
+	while (tmp)
 	{
 		if (*(tmp + 1) == '%') {
 			tmp += 2;
@@ -802,7 +803,6 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...)
 {
 	va_list args;
 	FTU8 i, num=0;
-	FTU8 len = (FTU8)strlen(s);
 	va_start(args, s);
 	
 #if defined(DEF_BT81X)

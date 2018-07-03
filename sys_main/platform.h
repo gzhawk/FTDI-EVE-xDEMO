@@ -186,7 +186,11 @@
     defined(UI_ALLY_LCDTST) || \
     defined(UI_DRAGICON) || \
     defined(UI_TOUCH)
+#if 1 // enable the BT81X define here when needed
+#define DEF_BT81X 
+#else
 #define DEF_81X
+#endif
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
