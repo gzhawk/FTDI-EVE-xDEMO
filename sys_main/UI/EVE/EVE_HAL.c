@@ -104,6 +104,10 @@ STATIC FTVOID wrStart ( FTU32 addr )
 }
 FTVOID HAL_CoReset (FTVOID)
 {
+#if defined(DEF_BT81X)
+	FTU16 p_addr = HAL_Read16(PATCH_ADDR);
+#endif	
+
     /*
        Bit 2 - 0 :
        Bit 0 for coprocessor engine,
@@ -112,22 +116,37 @@ FTVOID HAL_CoReset (FTVOID)
        Write 1 to reset the corresponding engine.
        Write 0 to go back normal working status.
      */
+
+	/* Set REG_CPURESET to 1, to hold the coprocessor in the reset condition */
     HAL_Write8(REG_CPURESET, 1);
     while (!HAL_Read8(REG_CPURESET));
+
+    /* Set REG_CMD_READ and REG_CMD_WRITE to zero */
     HAL_Write32(REG_CMD_READ,0);
     HAL_Write32(REG_CMD_WRITE,0);
+	HAL_Write32(REG_CMD_DL, 0);
+    
     mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = REG_FLAG_CLN;
     mcuCMDindex = 0; 
+        
+    /* j1 will set the pclk to 0 for that error case */
+	HAL_Write32(REG_PCLK, 2);
+
+	/* Set REG_CPURESET to 0, to restart the coprocessor */
     HAL_Write8(REG_CPURESET, 0);
     while (HAL_Read8(REG_CPURESET));
+
+#if defined(DEF_BT81X)
+    HAL_Write16(PATCH_ADDR, p_addr);
+#endif
 }
 STATIC FTU32 cmdWait (FTVOID)
 {
     while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ)) {
         if (0xFFF == HAL_Read32(REG_CMD_READ)) {
             FTPRINT("\nco-processor error, reset...");
-            HAL_CoReset();
-            FTPRINT("done");
+            UI_END();
+            FTPRINT("\ndone");
             return 0;
         }
     }
@@ -786,7 +805,7 @@ FTU8 COUNT_ARGS(FTC8 * str)
 	FTU8 count = 0;
 	FTC8 *tmp = str;
 
-    tmp = strstr(tmp, "%");
+	tmp = strstr(tmp, "%");
 	while (tmp)
 	{
 		if (*(tmp + 1) == '%') {
@@ -796,6 +815,7 @@ FTU8 COUNT_ARGS(FTC8 * str)
 			count++;
 			tmp++;
 		}
+		tmp = strstr(tmp, "%");
 	}
 	return count;
 }
@@ -898,12 +918,17 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum)
 }
 FTVOID HAL_CmdExeNow(FTU32 * pCL, FTU32 l)
 {
-    FTU32 i = l, *p = pCL;
+    FTU32 i = 0;
+    
+    /* make sure command buffer clean */
+    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
 
-    while (i--) {
-	    HAL_CmdToReg(*p);
-        p++;
+    while (i < l) {
+	    HAL_CmdToReg(pCL[i]);
+        i++;
     }
+
+    /* make sure command successful executed */
     HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
 }
 
