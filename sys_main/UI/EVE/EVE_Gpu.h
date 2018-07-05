@@ -731,18 +731,17 @@ typedef struct FT_Gpu_Fonts
 /* BT81X inclusion - extended font table for unicode support */
 typedef struct Gpu_FontsExt_t
 {
-	uint32_t Signature;
-	uint32_t Size;
-	uint32_t Format;
-	uint32_t Swizzle;
-	uint32_t LayoutWidth;
-	uint32_t LayoutHeight;
-	uint32_t PixelWidth;
-	uint32_t pixelHeight;
-	uint32_t StartOfGraphicData;
-	uint32_t NumberOfCharacters;
-	uint32_t OffsetGlyphData;
-	//uint32_t OffsetWidthData;//to be OffsetWidthData=Starting adress+StartOfGraphicData*4.
+	FTU32 Signature;
+	FTU32 Size;
+	FTU32 Format;
+	FTU32 Swizzle;
+	FTU32 LayoutWidth;
+	FTU32 LayoutHeight;
+	FTU32 PixelWidth;
+	FTU32 pixelHeight;
+	FTU32 StartOfGraphicData;
+	FTU32 NumberOfCharacters;
+	FTU32 OffsetGlyphData;
 }Gpu_FontsExt_t;
 
 #endif /* #ifndef _FT_GPU_H_ */
