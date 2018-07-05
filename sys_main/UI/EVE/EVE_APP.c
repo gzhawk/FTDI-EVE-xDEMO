@@ -32,10 +32,10 @@ FTU8 READ_ID = 0;
 FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = "Error occur / Stop display";
 
 typedef struct wrFuncPara_ {
-    FTRES res;
-    FTU32 Src;
-    FTU32 Des;
-    FTU32 len;
+    FTRES res; // operation source point
+    FTU32 Src; // operation starting point
+    FTU32 Des; // operation destination point
+    FTU32 len; // operation length
 }wrFuncPara;
 
 wrFuncPara fPara = {0};
@@ -315,6 +315,26 @@ FTVOID resWrBuf (FTU32 para)
 
 #endif
 }
+FTVOID resWrFlash (FTU32 para)
+{
+    /* all Flash action must be 256 aligned
+       the address should be handled
+       before entry this routine*/
+    wrFuncPara *wfp = (wrFuncPara *) para;
+    FTU32 x = wfp->len%256;
+    
+    if (x) {
+        x = 256 - x;
+    }
+    /* make sure command buffer clean */
+    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
+    
+    /* then start sending the command */
+    HAL_CmdToReg(CMD_FLASHWRITE);
+    HAL_CmdToReg(wfp->Des);
+    HAL_CmdToReg(wfp->len+x);
+    resWrEveCmd((FTU32)wfp);
+}
 /* 
  * call back routine for multi-platform
  * read data from Src (MCU, EVE, Flash, SD Card) to Des (EVE-CMD, EVE-DLP, EVE-RAM_G)
@@ -566,6 +586,25 @@ FTVOID appResClose (FTU32 resHDL)
 
 #endif
 }
+
+FTU8 appFileExist (FTC8 *path) 
+{
+    FTU32 resHDL;
+
+    resHDL = appResOpen((FTU8 *)path);
+    if (resHDL == 0) {
+        FTPRINT("\nappFileExist: file open error");
+        return 0;
+    }
+
+    if (!appResSize(resHDL)) {
+        appResClose(resHDL);
+        FTPRINT("\nappFileExist: file size 0");
+        return 0;
+    }
+
+    return 1;
+}
 /* the chkExceed flag provid the flexibility while using puzzle overlap function */
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen)
 {
@@ -713,6 +752,29 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 
     return APP_OK;
 }
+FTU32 appEveCRC(FTU32 eve_addr, FTU32 len)
+{
+    FTU32 addr = HAL_Read32(REG_CMD_WRITE), cmd[4];
+    /* the result would be saved in co-processor's command buffer
+       so need to mark the current offset down
+       then do the read out at result offset
+       to tell the result*/
+    cmd[0] = CMD_MEMCRC;
+    cmd[1] = eve_addr;
+    cmd[2] = len;
+    cmd[3] = 0;
+    HAL_CmdExeNow(cmd, 4);
+    
+    return HAL_Read32(RAM_CMD+addr+4*3);
+}
+FTVOID appEveZERO(FTU32 eve_addr, FTU32 len)
+{
+    FTU32 cmd[3];
+    cmd[0] = CMD_MEMZERO;
+    cmd[1] = eve_addr;
+	cmd[2] = len;
+    HAL_CmdExeNow(cmd, 3);
+}
 FTU8 appFlashSetFull(FTVOID)
 {
     FTU32 addr, a[2];
@@ -755,6 +817,133 @@ FTU8 appFlashSetFull(FTVOID)
             FTPRINT("\nFlash: unknown failure");
             return 1; 
     }
+}
+FTU8 appFlashToEVE(FTU32 f_addr, FTU32 e_addr, FTU32 len)
+{
+    FTU32 cmd[4];
+    
+    if (f_addr % 64 || e_addr % 4 || len % 4) {
+        FTPRINT("\nappFlashToEVE: input error");
+        return 1;
+    }
+
+    cmd[0] = CMD_FLASHREAD;
+    cmd[1] = e_addr;
+    cmd[2] = f_addr;
+    cmd[3] = len;
+    HAL_CmdExeNow(cmd, 4);
+
+    return 0;
+}
+FTVOID appFlashErase(FTVOID)
+{
+    FTU32 cmd = CMD_FLASHERASE;
+
+    HAL_CmdExeNow(&cmd, 1);
+}
+FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
+{
+#define CHECK_NUM   3 //head, middle, tail
+#define CHECK_LEN   256
+#define CHECK_EVE_TMP  (EVE_RAMG_SIZE - CHECK_LEN)
+    FTU8 buf[CHECK_LEN] = {0};
+    FTU32 Len, block, resHDL, point, count, crc;
+
+    resHDL = appResOpen(golden_file);
+    if (resHDL == 0) {
+        FTPRINT("\nappFlashVerify: file open error");
+        return 0;
+    }
+    
+    if (f_addr%64) {
+        FTPRINT("\nappFlashVerify: flash addr error");
+        appResClose(resHDL);
+        return 0;
+    }
+
+    Len = appResSize(resHDL);
+    /* if too small, don't have to pick check point
+       just check the first CHECK_LEN*/
+    if (Len <= CHECK_NUM*CHECK_LEN) {
+        count = 1;
+        block = (Len < CHECK_LEN)?(Len - Len%4):Len;
+    } else {
+        count = 3;
+        block = CHECK_LEN;
+    }
+    point = 0;
+    
+    while (count) {
+        if (appResToDes(resHDL,(FTU32)buf,point,block,resWrBuf) != block) {
+            FTPRINT("\nappFlashVerify: file read error");
+            appResClose(resHDL);
+            return 0;
+        }
+        /* if there is a way to calulate the crc32
+           in MCU the same way as EVE (zlib) does
+           it would be even better than sending data to eve
+           then do the crc32, but I don't found any
+           convenience way to do so...
+        */
+        HAL_Write8Src(CHECK_EVE_TMP, buf, block);
+        crc = appEveCRC(CHECK_EVE_TMP, block);
+
+		appEveZERO(CHECK_EVE_TMP, block);
+		if (appFlashToEVE(f_addr+point, CHECK_EVE_TMP, block)) {
+			FTPRINT("\nappFlashVerify: fail to write to eve");
+			return 0;
+		}
+        if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
+            FTPRINT("\nappFlashVerify: crc not match");
+            appResClose(resHDL);
+            return 0;
+        }
+
+		count--;
+
+        if (count == 2) {
+            /* check the middle of the body */
+            point = (Len - CHECK_LEN)/2 - ((Len - CHECK_LEN)/2)%64;
+        } else if (count == 1) {
+            /* check the tail of the body */
+            point = (Len - CHECK_LEN) - (Len - CHECK_LEN)%64;
+        }
+    }
+
+    appResClose(resHDL);
+
+    return Len;
+}
+
+FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
+{
+    FTU32 resHDL, Len;
+
+    resHDL = appResOpen(f_file);
+    if (resHDL == 0) {
+        FTPRINT("\nappFlashProg: file open error");
+        return 0;
+    }
+
+    Len = appResSize(resHDL);
+    
+    if (f_addr%256) {
+        /* the length of flash would be handled inside resWrFlash */
+        FTPRINT("\nappFlashProg: file addr error");
+        appResClose(resHDL);
+        return 0;
+    }
+
+    if (appResToDes(resHDL,f_addr,0,Len,resWrFlash) != Len) {
+        FTPRINT("\nappFlashProg: file program error");
+        appResClose(resHDL);
+        return 0;
+    }
+    
+    /* return the actual length
+       because if the original file length not 256 byte align
+       it would pad some extra bytes at the tail*/
+    return ((wrFuncPara *)resHDL)->len;
 }
 /*
  * You may do this bitmap related display list setup here
@@ -1329,31 +1518,6 @@ STATIC appRet_en appUI_WaitCal (FTVOID)
     return APP_OK; 
 }
 
-#if defined(DEF_BT81X)
-FTVOID appUI_CoProFaultRecovery (FTVOID)
-{
-	FTU16 p_addr = HAL_Read16(PATCH_ADDR);
-	
-	/* Set REG_CPURESET to 1, to hold the coprocessor in the reset condition */
-    HAL_Write32(REG_CPURESET, 1);
-	
-    /* Set REG_CMD_READ and REG_CMD_WRITE to zero */
-	HAL_Write32(REG_CMD_READ, 0);
-	HAL_Write32(REG_CMD_WRITE, 0);
-	HAL_Write32(REG_CMD_DL, 0);
-    
-    /* j1 will set the pclk to 0 for that error case */
-	HAL_Write32(REG_PCLK, 2);
-	
-	/* Set REG_CPURESET to 0, to restart the coprocessor */
-	HAL_Write32(REG_CPURESET, 0);
-	FTDELAY(100);
-	
-    HAL_Write16(PATCH_ADDR, p_addr);
-
-    /* you may set the flash to full mode, I'm not doing this step here */
-}
-#endif
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline)
 {
     sprintf((char *)dbg_str_buf,"%s:%d",p_fname,(int)fline);
@@ -1429,12 +1593,10 @@ FTVOID UI_END (FTVOID)
      */
 	if (reg_rd)	{
 		HAL_Read8Buff(RAM_ERR_REPORT, dbg_str_buf, EVE_DBG_BUF_LEN);
-
-        /* make co-processor recovery from the fault
-           for later information display */
-        appUI_CoProFaultRecovery();
 	}
 #endif
+    HAL_CoReset();
+
     HAL_CmdBufIn(CMD_DLSTART);
     // give a RED background to highlight the error
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
@@ -1446,5 +1608,5 @@ FTVOID UI_END (FTVOID)
     HAL_BufToReg(RAM_CMD,0);
     
     FTPRINT("\nEVE ended");
-	FTDELAY(3000);
+	FTDELAY(5000);
 }

@@ -77,8 +77,10 @@ typedef enum appRet_ {
 typedef FTVOID (* AppFunc) (FTU32);
 
 FTVOID resWrBuf (FTU32 para);
+FTVOID resWrFlash (FTU32 para);
 FTVOID resWrEve (FTU32 para);
 FTVOID resWrEveCmd (FTU32 para);
+FTU8 appFileExist (FTC8 *path);
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen);
 appRet_en appWaitCal (FTVOID);
 FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
@@ -90,9 +92,14 @@ FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeF
 FTVOID appResClose (FTU32 resHDL);
 FTU32 appGetLinestride(bmpHDR_st bmpHD);
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
+FTU32 appEveCRC(FTU32 eve_addr, FTU32 len);
+FTVOID appEveZERO(FTU32 eve_addr, FTU32 len);
 #if defined(DEF_BT81X)
-FTVOID appUI_CoProFaultRecovery (FTVOID);
 FTU8 appFlashSetFull(FTVOID);
+FTVOID appFlashErase(FTVOID);
+FTU8 appFlashToEVE(FTU32 flash_addr, FTU32 eve_addr, FTU32 len);
+FTU32 appFlashVerify(FTU8 *golden_file, FTU32 flash_addr);
+FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr);
 #endif
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
 FTVOID arduino_simugpio(FTU8 flag);

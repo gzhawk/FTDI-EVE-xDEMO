@@ -42,6 +42,7 @@
 #define UI_DIAL
 #define UI_FV_INVENSYS
 #define UI_FLASH_ANIM
+#define UI_FLASH_PROG
 /* UI for customer: demonstration */
 #define UI_CJ
 #define UI_STELIGENT
@@ -99,7 +100,8 @@
 #define DEF_DISPLAY
 #endif
 
-#if defined(UI_FLASH_ANIM)
+#if defined(UI_FLASH_ANIM) || \
+    defined(UI_FLASH_PROG)
 #define DEF_BT81X
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
