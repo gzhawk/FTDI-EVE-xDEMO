@@ -48,7 +48,6 @@ FTVOID flash_anim(FTU32 para)
 	HAL_CmdBufIn(SAVE_CONTEXT());
 	HAL_CmdBufIn(COLOR_RGB(0, 0, 255));
 	CoCmd_TEXT(0, 0, 24, OPT_FORMAT, "Frame 1: %d", c1);
-	HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
 	CoCmd_TEXT(EVE_LCD_WIDTH - 150, 0, 24, OPT_FORMAT, "Frame 2: %d", c2);
 	HAL_CmdBufIn(RESTORE_CONTEXT());
 
