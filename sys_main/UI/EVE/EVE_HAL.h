@@ -242,11 +242,11 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
 
 #define CoCmd_SETBITMAP(s, f, w, h) HAL_CmdBufIn(CMD_SETBITMAP); \
                                     HAL_CmdBufIn(s); \
-                                    HAL_CmdBufIn(((FT32)(w)<<16)|(f & 0xFFFF)); \
+                                    HAL_CmdBufIn(((FT32)(w)<<16)|((f) & 0xFFFF)); \
                                     HAL_CmdBufIn(h)
 
 #define CoCmd_ANIMFRAME(x, y, o, f) HAL_CmdBufIn(CMD_ANIMFRAME); \
-                                    HAL_CmdBufIn(((FT32)(y)<<16)|(x & 0xFFFF)); \
+                                    HAL_CmdBufIn(((FT32)(y)<<16)|((x) & 0xFFFF)); \
                                     HAL_CmdBufIn(o); \
                                     HAL_CmdBufIn(f)
 
