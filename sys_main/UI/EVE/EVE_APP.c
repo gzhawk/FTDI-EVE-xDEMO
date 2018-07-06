@@ -867,6 +867,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     point = 0;
     
     while (count) {
+        /* read a piece of file to a block */
         if (appResToDes(resHDL,(FTU32)buf,point,block,resWrBuf) != block) {
             FTPRINT("\nappFlashVerify: file read error");
             appResClose(resHDL);
@@ -877,16 +878,21 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
            it would be even better than sending data to eve
            then do the crc32, but I don't found any
            convenience way to do so...
+
+           send that piece of file to EVE for CRC
         */
         HAL_Write8Src(CHECK_EVE_TMP, buf, block);
         crc = appEveCRC(CHECK_EVE_TMP, block);
-
+        /* clear the temp space in EVE */
 		appEveZERO(CHECK_EVE_TMP, block);
+
+        /* read a piece of flash to EVE */
 		if (appFlashToEVE(f_addr+point, CHECK_EVE_TMP, block)) {
 			FTPRINT("\nappFlashVerify: fail to write to eve");
 			return 0;
 		}
 
+        /* do CRC in EVE and compare the CRC with file piece*/
         if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
             FTPRINT("\nappFlashVerify: crc not match");
             appResClose(resHDL);
@@ -906,7 +912,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
 
     appResClose(resHDL);
 
-    return Len;
+    return 1;
 }
 
 FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
