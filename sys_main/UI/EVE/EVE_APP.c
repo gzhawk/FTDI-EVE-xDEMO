@@ -317,22 +317,15 @@ FTVOID resWrBuf (FTU32 para)
 }
 FTVOID resWrFlash (FTU32 para)
 {
-    /* all Flash action must be 256 aligned
-       the address should be handled
-       before entry this routine*/
     wrFuncPara *wfp = (wrFuncPara *) para;
-    FTU32 x = wfp->len%256;
-    
-    if (x) {
-        x = 256 - x;
-    }
+
     /* make sure command buffer clean */
     HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
     
     /* then start sending the command */
     HAL_CmdToReg(CMD_FLASHWRITE);
     HAL_CmdToReg(wfp->Des);
-    HAL_CmdToReg(wfp->len+x);
+    HAL_CmdToReg(wfp->len);
     resWrEveCmd((FTU32)wfp);
 }
 /* 
@@ -893,6 +886,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
 			FTPRINT("\nappFlashVerify: fail to write to eve");
 			return 0;
 		}
+
         if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
             FTPRINT("\nappFlashVerify: crc not match");
             appResClose(resHDL);
@@ -902,10 +896,10 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
 		count--;
 
         if (count == 2) {
-            /* check the middle of the body */
+            /* check the middle of the body, skip the none 64 align part */
             point = (Len - CHECK_LEN)/2 - ((Len - CHECK_LEN)/2)%64;
         } else if (count == 1) {
-            /* check the tail of the body */
+            /* check the tail of the body, skip the none 64 align part */
             point = (Len - CHECK_LEN) - (Len - CHECK_LEN)%64;
         }
     }
@@ -924,26 +918,25 @@ FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
         FTPRINT("\nappFlashProg: file open error");
         return 0;
     }
-
+    
+    /* if the original file length not 256 byte align
+       it would pad some extra bytes at the tail*/
     Len = appResSize(resHDL);
+    Len += Len%256?(256 - Len%256):0;
     
     if (f_addr%256) {
-        /* the length of flash would be handled inside resWrFlash */
         FTPRINT("\nappFlashProg: file addr error");
         appResClose(resHDL);
         return 0;
     }
 
-    if (appResToDes(resHDL,f_addr,0,Len,resWrFlash) != Len) {
+    if (appResToDes(resHDL,f_addr, 0, Len, resWrFlash) != Len) {
         FTPRINT("\nappFlashProg: file program error");
         appResClose(resHDL);
         return 0;
     }
     
-    /* return the actual length
-       because if the original file length not 256 byte align
-       it would pad some extra bytes at the tail*/
-    return ((wrFuncPara *)resHDL)->len;
+    return Len;
 }
 /*
  * You may do this bitmap related display list setup here
