@@ -32,7 +32,7 @@ typedef uint32_t argb8888;
 #include "bt8xxemu_Emulator.h"
 extern BT8XXEMU_Emulator *gEmulator;
 
-#define BTFLASH_DATA_FILE   L"..\\..\\res\\bt81X.flash"
+#define BTFLASH_DATA_FILE   L"..\\..\\res\\flash\\bt81X.flash"
 #define BTFLASH_DEVICE_TYPE L"mx25lemu"
 #define BTFLASH_SIZE        (16 * 1024 * 1024)
 #define USED_CMD_BUF
