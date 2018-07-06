@@ -18,7 +18,7 @@
 #define FLASH_ANIM_1_COUNT 188
 #define FLASH_ANIM_2_COUNT 180
 
-#define FLASH_ANIM_GAP     100
+#define FLASH_ANIM_GAP     200
 
 FTVOID flash_anim(FTU32 para)
 {
