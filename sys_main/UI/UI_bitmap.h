@@ -52,78 +52,85 @@
 
 #endif
 
+#define HDL_START 0
 #define FNT_WIDE  30
-
-#if defined(DEF_BT81X)
-#define BMP_NUM   5
-#else
-#define BMP_NUM   4
-#endif
+#define FNT_NUM   24
+#define FNT_OPT   0
 
 #if defined(DEF_81X) || defined(DEF_BT81X)
-#define PAL_NUM   3
+#if defined(DEF_BT81X)
+#define IMAGE_NUM   (8)
 #else
-#define PAL_NUM   1
+#define IMAGE_NUM   (7)
+#endif
+#else
+#define IMAGE_NUM   (5)
 #endif
 
-#define RAW_NUM   (BMP_NUM+PAL_NUM)
-#define HDL_START 0
-bmpHDR_st bmp_header[RAW_NUM] = {
+bmpHDR_st bmp_header[IMAGE_NUM] = {
     {DISPBP_ARGB1555,   0,                     0,ARGB1555,    0,0,128,128},
     {DISPBP_ARGB4,      0,                     0,ARGB4,       0,0,128,128},
-    {DISPBP_RGB332,     0,                     0,RGB332,      0,0,128,128},
     {DISPBP_RGB565,     0,                     0,RGB565,      0,0,128,128},
+    {DISPBP_RGB332,     0,                     0,RGB332,      0,0,128,128},
+#if defined(DEF_81X) || defined(DEF_BT81X)
 #if defined(DEF_BT81X)
     {DISPBP_ASTC4X4,    0,                     0,COMPRESSED_RGBA_ASTC_4x4_KHR,    0,0,128,128},
 #endif
-#if defined(DEF_81X) || defined(DEF_BT81X)
-    {DISPBP_PALETTE4444,DISPBP_PALETTE4444_LUT,0,PALETTED4444,0,0,128,128},
     {DISPBP_PALETTE8,   DISPBP_PALETTE8_LUT,   0,PALETTED8,   0,0,128,128},
+    {DISPBP_PALETTE4444,DISPBP_PALETTE4444_LUT,0,PALETTED4444,0,0,128,128},
     {DISPBP_PALETTE565, DISPBP_PALETTE565_LUT, 0,PALETTED565, 0,0,128,128},
 #else
-    {DISPBP_PALETTE,    DISPBP_PALETTE_LUT,    0,PALETTED,    0,0,128,128}
+    {DISPBP_PALETTE,    DISPBP_PALETTE_LUT,    0,PALETTED,    0,0,128,128},
 #endif
 };
 
-FTVOID dispTEXT (FTU32 format, FTU32 X)
+FTVOID dispTEXT (FTU32 format, FTU32 X, FTU32 Y)
 {
     switch (format) {
         case RGB565:
-            CoCmd_TEXT(X,0,24,OPT_CENTERX,"RGB565");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"RGB565");
             break;
         case RGB332:
-            CoCmd_TEXT(X,0,24,OPT_CENTERX,"RGB332");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"RGB332");
             break;
         case ARGB4:
-            CoCmd_TEXT(X,0,24,OPT_CENTERX,"ARGB4");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"ARGB4");
             break;
         case ARGB1555:
-            CoCmd_TEXT(X,0,24,OPT_CENTERX,"ARGB1555");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"ARGB1555");
             break;
 #if defined(DEF_BT81X)
         case COMPRESSED_RGBA_ASTC_4x4_KHR:
-            CoCmd_TEXT(X,0,24,OPT_CENTERX,"ASTC 4x4");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"ASTC4x4");
             break;
 #endif
 #if defined(DEF_81X) || defined(DEF_BT81X)
         case PALETTED8:
-            CoCmd_TEXT(X,(EVE_LCD_HIGH-FNT_WIDE),24,OPT_CENTERX,"PALETTED8");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"PAL8");
             break;
         case PALETTED565:
-            CoCmd_TEXT(X,(EVE_LCD_HIGH-FNT_WIDE),24,OPT_CENTERX,"PALETTED565");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"PAL565");
             break;
         case PALETTED4444:
-            CoCmd_TEXT(X,(EVE_LCD_HIGH-FNT_WIDE),24,OPT_CENTERX,"PALETTED4444");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"PAL4444");
             break;
 #else                
         case PALETTED:
-            CoCmd_TEXT(X,(EVE_LCD_HIGH-FNT_WIDE),24,OPT_CENTERX,"PALETTED");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"PALETTED");
             break;
 #endif
         default:
-            CoCmd_TEXT(X,(EVE_LCD_HIGH-FNT_WIDE),24,OPT_CENTERX,"Unknown");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"UNKNOWN");
             break;
     }
+}
+
+FTVOID dispTitle(FTU32 index, FTU32 X, FTU32 Y)
+{
+    HAL_CmdBufIn(SAVE_CONTEXT());
+    HAL_CmdBufIn(COLOR_RGB(0,0,255));
+    dispTEXT(bmp_header[index].format, X, Y);
+    HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
 #if defined(DEF_81X) || defined(DEF_BT81X)
@@ -157,15 +164,27 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
 }
 #endif
 
+FTVOID dispImage(FTU32 index, FTU32 X, FTU32 Y)
+{
+#if defined(DEF_81X) || defined(DEF_BT81X)
+    if (PALETTED8 == bmp_header[index].format) {
+        dispPal8(X,Y,bmp_header[index].lut_src, index, 0);
+    } else {
+        HAL_CmdBufIn(PALETTE_SOURCE(bmp_header[index].lut_src));
+    }
+#endif
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
+}
+
 FTVOID disp_bitmap (FTU32 para)
 {
 	static FTU8 flag = 0;
-    FTU32 i,j;
+    FTU32 i,j,X,Y;
 
 	/* only load the file once */
 	if (flag == 0) {
 		/* load bitmap resources data into EVE */
-		if(APP_OK != appBmpToRamG(HDL_START, RAM_G, bmp_header, RAW_NUM)){
+		if(APP_OK != appBmpToRamG(HDL_START, RAM_G, bmp_header, IMAGE_NUM)){
 			DBGPRINT;
 			return;
 		}
@@ -178,37 +197,24 @@ FTVOID disp_bitmap (FTU32 para)
 	
     HAL_CmdBufIn(BEGIN(BITMAPS));
    
-    for (i = 0; i < RAW_NUM; i++) {
+    for (i = 0, j = (IMAGE_NUM%2)?(IMAGE_NUM/2+1):(IMAGE_NUM/2); 
+         i < IMAGE_NUM; i++) {
         HAL_CmdBufIn(BITMAP_HANDLE(i));
         HAL_CmdBufIn(CELL(0));
 
-        /* bitmap display location */
-        if (i < BMP_NUM) {
-            j = (EVE_LCD_WIDTH/(BMP_NUM+1))*(i+1);
-            HAL_CmdBufIn(VERTEX2F((j-bmp_header[i].wide/2)*EVE_PIXEL_UNIT,
-                                    FNT_WIDE*EVE_PIXEL_UNIT));
+        if (i < j) {
+            X = EVE_LCD_WIDTH/(j + 1)*(i + 1) - bmp_header[i].wide/2;
+            Y = 0;
+            dispTitle(i,X,Y);
+            Y = FNT_WIDE;
+            dispImage(i,X,Y);
         } else {
-            j = (EVE_LCD_WIDTH/(PAL_NUM+1))*(i-BMP_NUM+1);
-#if defined(DEF_81X) || defined(DEF_BT81X)
-            if (PALETTED8 == bmp_header[i].format) {
-                dispPal8((j-bmp_header[i].wide/2), 
-                         (EVE_LCD_HIGH-bmp_header[i].high-FNT_WIDE), 
-                         bmp_header[i].lut_src, i, 0);
-            } else {
-                HAL_CmdBufIn(PALETTE_SOURCE(bmp_header[i].lut_src));
-                HAL_CmdBufIn(VERTEX2F((j-bmp_header[i].wide/2)*EVE_PIXEL_UNIT,
-                                    (EVE_LCD_HIGH-bmp_header[i].high-FNT_WIDE)*EVE_PIXEL_UNIT));
-            }
-#else
-            HAL_CmdBufIn(VERTEX2F((j-bmp_header[i].wide/2)*EVE_PIXEL_UNIT,
-                                    (EVE_LCD_HIGH-bmp_header[i].high-FNT_WIDE)*EVE_PIXEL_UNIT));
-#endif
+            X = EVE_LCD_WIDTH/(IMAGE_NUM - j + 1)*(i - j + 1) - bmp_header[i].wide/2;
+            Y = 2*FNT_WIDE+bmp_header[i].high;
+            dispImage(i,X,Y);
+            Y += bmp_header[i].high;
+            dispTitle(i,X,Y);
         }
-        /* format title display */
-        HAL_CmdBufIn(SAVE_CONTEXT());
-        HAL_CmdBufIn(COLOR_RGB(0,0,255));
-        dispTEXT(bmp_header[i].format, j);
-        HAL_CmdBufIn(RESTORE_CONTEXT());
     }
 
     HAL_CmdBufIn(END());
