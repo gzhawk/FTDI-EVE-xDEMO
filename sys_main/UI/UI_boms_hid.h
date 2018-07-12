@@ -8,7 +8,7 @@
 #define RET_W    80
 #define RET_H    40
 
-#if defined(MSVC2012EMU)
+#if defined(MSVC2012EMU) || defined(MSVC2017EMU)
 
 test_rate_t rate_data = {0};
 #define DISK_LIST_LEN 3

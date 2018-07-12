@@ -5,7 +5,7 @@
 	Date  : 2015/May
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 #define DISPRAW_PATH ROOT_PATH"dispraw\\test.raw"
 #else
 #define DISPRAW_PATH ROOT_PATH"test.raw"

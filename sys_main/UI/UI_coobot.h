@@ -126,7 +126,7 @@ typedef struct coobot_st {
 #define FILLING_K7_9(x) ((x)>='7'?((x)<='9'?(x):0):0)
 #define FILLING_K0_M(x) ((x)!='0'?((x)!='-'?0:(x)):(x))
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define PATH_ICON_1 ROOT_PATH"coobot\\logo.raw"
 #define PATH_ICON_2 ROOT_PATH"coobot\\logo.raw"
 #define PATH_ICON_3 ROOT_PATH"coobot\\logo.raw"

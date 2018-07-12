@@ -65,7 +65,7 @@ jpeg_play_st jpeg_play_list[4] = {
 #define TAG_START  (10)
 FTU8 frame_rate[4] = {0};
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define FILE_INDEX 18
 #elif defined(FT9XXEV)
 #define FILE_INDEX 8

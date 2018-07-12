@@ -5,7 +5,7 @@
 	Date  : 2014/Jan
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define PATH_SCN_C0 ROOT_PATH"dxt1\\s1_c0.raw"
 #define PATH_SCN_C1 ROOT_PATH"dxt1\\s1_c1.raw"
 #define PATH_SCN_B0 ROOT_PATH"dxt1\\s1_b0.raw"
@@ -17,7 +17,7 @@
 #define PATH_SCN_B1 ROOT_PATH"s1_b1.raw"
 #endif
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define DXT1_PATH_LEN   (30)
 #define DXT1_PATH_INDEX_RUN (16)
 #else
@@ -222,7 +222,7 @@ FTVOID playdxt1 (FTU32 para)
 			/* wait for releasing */
 		}
 
-#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU)
+#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(MSVC2017EMU) 
 		dxt1Display(path->path_c0[DXT1_PATH_INDEX_RUN], hdl, addr, 0);
 #endif
 

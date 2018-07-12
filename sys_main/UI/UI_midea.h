@@ -5,7 +5,7 @@
 	Date  : 2013/Dec
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define PATH_M_C0 ROOT_PATH"midea\\m0_c0.raw"
 #define PATH_M_C1 ROOT_PATH"midea\\m0_c1.raw"
 #define PATH_M_B0 ROOT_PATH"midea\\m0_b0.raw"
@@ -24,7 +24,7 @@
 #endif
 
 #define DXT1_BLOCK_NUMS (4)
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define DXT1_PATH_LEN   (30)
 #define DXT1_PATH_INDEX_M (17)
 #define BITMAP_STATUS_INDEX (23)
@@ -208,7 +208,7 @@ FTVOID playmidea (FTU32 para)
 
 		if (touch) {
 			if (tmp[BITMAP_STATUS_INDEX] != '5') {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 				if (BITMAP_SPEED == count++) {
 					tmp[BITMAP_STATUS_INDEX]++;
 					count = 0;

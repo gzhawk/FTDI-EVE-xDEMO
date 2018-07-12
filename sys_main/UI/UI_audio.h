@@ -227,7 +227,7 @@ FTVOID playaudio (FTU32 cashPara)
  */
 #if 0
 	audio_hd_t wav_hd = {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
 		(FTU8 *)ROOT_PATH"aud\\Chopin.wav",
 #else
 		(FTU8 *)ROOT_PATH"Chopin.wav",

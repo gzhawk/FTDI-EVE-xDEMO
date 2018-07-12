@@ -33,7 +33,7 @@ enum ICON_HDL_ {
 
 #if defined(FT9XXEV)
 #define DISP_PATH_LEN   (30)
-#else /*defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)*/
+#else /*defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) */
 #define DISP_PATH_LEN   (50)
 #endif
 

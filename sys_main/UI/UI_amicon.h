@@ -44,7 +44,7 @@ halo_para_t haloPara[18] = {
 //FTU8 count=0;
 //FTU8 longtouchTag=0;
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
 #define PATH_LEN 50
 #define PATH_AM_ICON ROOT_PATH"ami\\g\\gd0"
 #define PATH_FIRE_F1 ROOT_PATH"ami\\fire\\f1.raw"

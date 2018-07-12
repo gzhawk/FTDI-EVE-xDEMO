@@ -88,7 +88,7 @@ struct {
 
 FTU8 gIndex = 0;
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 #define PATH_BKGND_8ICON ROOT_PATH"bkgnd\\8icon.raw"
 #define PATH_BKGND_STAR ROOT_PATH"bkgnd\\star.raw"
 #define PATH_BKGND_BALL ROOT_PATH"bkgnd\\balloon.raw"

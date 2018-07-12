@@ -5,7 +5,7 @@
 	Date  : 2014/Jan
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define PATH_V1_C0 ROOT_PATH"fvideo\\h00_c0.raw"
 #define PATH_V1_C1 ROOT_PATH"fvideo\\h00_c1.raw"
 #define PATH_V1_B0 ROOT_PATH"fvideo\\h00_b0.raw"
@@ -33,7 +33,7 @@
 #define PATH_V3_B1 ROOT_PATH"m00_b1.raw"
 #endif
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define DXT1_PATH_LEN   (30)
 #define DXT1_PATH_INDEX (19)
 #else
@@ -237,7 +237,7 @@ FTVOID playfv (FTU32 para)
 			return;
 		}
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 		dxt1Display(hdl, addr, 0);
 #else
 		dxt1Display(hdl, addr, 1);
