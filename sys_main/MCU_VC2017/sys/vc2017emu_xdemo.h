@@ -86,7 +86,13 @@ extern BT8XXEMU_Emulator *gEmulator;
 
 #define FTRANDOM(M) (rand()%(M))
 
+#if defined(DEF_BT81X)
 #define EVEMODE BT8XXEMU_EmulatorBT815
+#elif defined(DEF_81X)
+#define EVEMODE BT8XXEMU_EmulatorFT810
+#else
+#define EVEMODE BT8XXEMU_EmulatorFT800
+#endif
 
 #define FTRES FILE*
 
