@@ -144,7 +144,7 @@ STATIC FTU32 cmdWait (FTVOID)
 {
     while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ)) {
         if (0xFFF == HAL_Read32(REG_CMD_READ)) {
-            FTPRINT("\nco-processor error, reset.");
+            FTPRINT("\nco-processor error!");
             UI_END();
             return 0;
         }
