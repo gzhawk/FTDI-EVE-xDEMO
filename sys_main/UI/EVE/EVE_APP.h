@@ -38,6 +38,8 @@
 #define EVE_FONT_INTERNAL   (16)
 
 #define ZLIB_LEN              (0xFFFFFFFF)
+#define ZFLH_LEN              (0xFFFFFFFE)
+#define FLH_LEN               (0xFFFFFFFC)
 #if defined(DEF_BT81X)
 #define EVE_DBG_BUF_LEN       (128)
 #else
@@ -77,7 +79,6 @@ typedef enum appRet_ {
 typedef FTVOID (* AppFunc) (FTU32);
 
 FTVOID resWrBuf (FTU32 para);
-FTVOID resWrFlash (FTU32 para);
 FTVOID resWrEve (FTU32 para);
 FTVOID resWrEveCmd (FTU32 para);
 FTU8 appFileExist (FTC8 *path);
@@ -94,12 +95,16 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD);
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
 FTU32 appEveCRC(FTU32 eve_addr, FTU32 len);
 FTVOID appEveZERO(FTU32 eve_addr, FTU32 len);
+FTU8 appFlashPath (FTC8 *path, FTU32 *len);
 #if defined(DEF_BT81X)
+FTVOID resWrFlash (FTU32 para);
 FTU8 appFlashSetFull(FTVOID);
 FTVOID appFlashErase(FTVOID);
 FTU8 appFlashToEVE(FTU32 flash_addr, FTU32 eve_addr, FTU32 len);
 FTU32 appFlashVerify(FTU8 *golden_file, FTU32 flash_addr);
 FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr);
+FTU32 appFlashAddr(FTC8 *path);
+FTVOID appFlashUnzip(FTC8 *path, FTU32 src);
 #endif
 #if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
 FTVOID arduino_simugpio(FTU8 flag);

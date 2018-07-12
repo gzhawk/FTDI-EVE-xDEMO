@@ -315,19 +315,7 @@ FTVOID resWrBuf (FTU32 para)
 
 #endif
 }
-FTVOID resWrFlash (FTU32 para)
-{
-    wrFuncPara *wfp = (wrFuncPara *) para;
 
-    /* make sure command buffer clean */
-    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
-    
-    /* then start sending the command */
-    HAL_CmdToReg(CMD_FLASHWRITE);
-    HAL_CmdToReg(wfp->Des);
-    HAL_CmdToReg(wfp->len);
-    resWrEveCmd((FTU32)wfp);
-}
 /* 
  * call back routine for multi-platform
  * read data from Src (MCU, EVE, Flash, SD Card) to Des (EVE-CMD, EVE-DLP, EVE-RAM_G)
@@ -598,34 +586,55 @@ FTU8 appFileExist (FTC8 *path)
 
     return 1;
 }
+FTU32 appGetNumFromStr(FTU8 *str)
+{
+    FTU32 tmp = 0, i = 0;
+
+    while (str[i]) {
+        if (str[i] >= '0' && str[i] <= '9') {
+            tmp *= 10;
+            tmp += (FTU32)(str[i] - '0');
+        } else {
+            return 0;
+        }
+        if (++i >= 10) {
+            return 0;
+        }
+    }
+
+    return tmp;
+}
 /* the chkExceed flag provid the flexibility while using puzzle overlap function */
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen)
 {
     FTU32 Len, resHDL;
 
-    resHDL = appResOpen((FTU8 *)path);
-    if (resHDL == 0) {
-        FTPRINT("\nappFileToRamG: file open error");
-        return 0;
-    }
+    if (!appFlashPath(path, &Len)) {
+        
+        resHDL = appResOpen((FTU8 *)path);
+        if (resHDL == 0) {
+            FTPRINT("\nappFileToRamG: file open error");
+            return 0;
+        }
 
-    Len = appResSize(resHDL);
-    if (chkExceed && (EVE_RAMG_SIZE < inAddr + Len)) {
+        Len = appResSize(resHDL);
+        if (chkExceed && (EVE_RAMG_SIZE < inAddr + Len)) {
+            appResClose(resHDL);
+            FTPRINT("\nappFileToRamG: EVE_RAMG_SIZE < inAddr + Len");
+            return 0;
+        }
+
+        Len = appResToDes(resHDL,inAddr,0,Len,resIsZlib);
+
+        if (outAddr) {
+            appResToDes(resHDL,(FTU32)outAddr,0,outLen,resWrBuf);
+        }
+
         appResClose(resHDL);
-        FTPRINT("\nappFileToRamG: EVE_RAMG_SIZE < inAddr + Len");
-        return 0;
     }
-
-    Len = appResToDes(resHDL,inAddr,0,Len,resIsZlib);
-
-    if (outAddr) {
-        appResToDes(resHDL,(FTU32)outAddr,0,outLen,resWrBuf);
-    }
-
-    appResClose(resHDL);
-
     return Len;
 }
+
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
     FTU32 i, src, l;
@@ -645,7 +654,21 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
              */
             if (ZLIB_LEN == pbmpHD[i].len) {
                 pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
+            } 
+#if defined(DEF_BT81X)            
+            else if (FLH_LEN == pbmpHD[i].len) {
+                /* 
+                reuse the len_lut for the flash address in setbitmap command use
+                when using flash to display raw (only for ASTC)
+                no RAM is needed, EVE render directly from Flash
+                */
+                pbmpHD[i].len_lut = appFlashAddr(pbmpHD[i].path);
+                pbmpHD[i].len = 0;
+            } else if (ZFLH_LEN == pbmpHD[i].len) {
+                appFlashUnzip(pbmpHD[i].path, src);
+                pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
             }
+#endif
         } else {
             FTPRINT("\nappLoadBmp: Len 0");
             return APP_ERR_LEN;
@@ -707,7 +730,13 @@ FTU8 appUseSetBitmp(FTU32 s, bmpHDR_st *p)
      * option in size, you may use size seperatly
      * when you wish to set other option such as BILINEAR
      */
-    CoCmd_SETBITMAP(s,p->format,p->wide,p->high);
+    if (p->len) {
+        CoCmd_SETBITMAP(s,p->format,p->wide,p->high);
+    } else {
+        /* when len is zero, it means ASTC format in flash
+           use the len_lut to pass the flash address*/
+        CoCmd_SETBITMAP(0x800000 | (p->len_lut) / 32,p->format,p->wide,p->high);
+    }
     return 1;
 #else
     return 0;
@@ -768,10 +797,72 @@ FTVOID appEveZERO(FTU32 eve_addr, FTU32 len)
 	cmd[2] = len;
     HAL_CmdExeNow(cmd, 3);
 }
+FTU8 appFlashPath (FTC8 *path, FTU32 *len)
+{
+#if defined(DEF_BT81X)
+    FTU8 tmp[] = "ZFLASH:";
+
+    if (!memcmp(path, tmp, 7)) {
+        appFlashSetFull();
+        *len = ZFLH_LEN;
+        return 1;
+    }
+    
+    if (!memcmp(path, &tmp[1], 6)) {
+        appFlashSetFull();
+        *len = FLH_LEN;
+        return 1;
+    }
+#endif
+    return 0;
+}
+#if defined(DEF_BT81X)
+FTVOID resWrFlash (FTU32 para)
+{
+    wrFuncPara *wfp = (wrFuncPara *) para;
+
+    /* make sure command buffer clean */
+    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
+    
+    /* then start sending the command */
+    HAL_CmdToReg(CMD_FLASHWRITE);
+    HAL_CmdToReg(wfp->Des);
+    HAL_CmdToReg(wfp->len);
+    resWrEveCmd((FTU32)wfp);
+}
+FTU32 appFlashAddr(FTC8 *path)
+{
+    FTU8 *p = (FTU8 *)path;
+
+    /* either 'ZFLASH:' or 'FLASH:', others all wrong */
+    if (p[6] == ':') {
+        return appGetNumFromStr(&p[7]);
+    } else if (p[5] == ':') {
+        return appGetNumFromStr(&p[6]);
+    }
+
+    return 0;
+}
+FTVOID appFlashUnzip(FTC8 *path, FTU32 src)
+{
+    FTU32 cmd[5] = {0};
+
+    cmd[0] = CMD_FLASHSOURCE;
+    cmd[1] = appFlashAddr(path);
+    cmd[2] = CMD_INFLATE2;
+    cmd[3] = src;
+    cmd[4] = OPT_FLASH;
+    HAL_CmdExeNow(cmd,5);
+}
 FTU8 appFlashSetFull(FTVOID)
 {
     FTU32 addr, a[2];
 
+    if(FLASH_STATUS_FULL == HAL_Read32(REG_FLASH_STATUS)) {
+        FTPRINT("\nFlash: already in full mode");
+        return 0;
+    }
+    
     a[0] = CMD_FLASHDETACH;
     HAL_CmdExeNow(a, 1);
     
@@ -944,6 +1035,7 @@ FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
     
     return Len;
 }
+#endif
 /*
  * You may do this bitmap related display list setup here
  * or do it in your own routine
