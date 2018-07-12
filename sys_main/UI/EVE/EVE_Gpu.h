@@ -458,6 +458,7 @@
 #define FLASH_ADDR_HEAD      8388608UL
 #else
 #define ROM_FONT_ADDR        1048572UL
+#define RAM_G                0UL
 #define RAM_PAL              1056768UL
 #define RAM_CMD              1081344UL
 #define RAM_DL               1048576UL
