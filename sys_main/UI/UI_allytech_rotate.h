@@ -666,7 +666,7 @@ FTVOID ally_rotate (FTU32 para)
     if (!call_start) {
         /* what CALL needs is instruction offset
            one instruction 4 bytes*/
-        call_start = offset/FTU32_LEN;
+        call_start = offset/4;
 	    appGP.appIndex = 1;
         return;
 	}
