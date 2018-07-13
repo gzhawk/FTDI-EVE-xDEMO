@@ -1,11 +1,11 @@
 /* 
-    Sample to play a video in FT800 way
+    Sample to play a video in EVE way
     Author: Hawk
 	Email : hawk.gao@ftdichip.com
 	Date  : 2014/Jan
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define PATH_V1_C0 ROOT_PATH"fvideo\\h00_c0.raw"
 #define PATH_V1_C1 ROOT_PATH"fvideo\\h00_c1.raw"
 #define PATH_V1_B0 ROOT_PATH"fvideo\\h00_b0.raw"
@@ -33,7 +33,7 @@
 #define PATH_V3_B1 ROOT_PATH"m00_b1.raw"
 #endif
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define DXT1_PATH_LEN   (30)
 #define DXT1_PATH_INDEX (19)
 #else
@@ -122,7 +122,7 @@ STATIC FTVOID dxt1FormatInfo (FTU8 startHdl, FTU16 X, FTU16 Y)
 	HAL_CmdBufIn(COLOR_MASK(1,1,1,0));
 
 	CoCmd_LOADIDENTITY;
-	CoCmd_SCALE(4*FT800_TRANSFORM_MAX, 4*FT800_TRANSFORM_MAX);
+	CoCmd_SCALE(4*EVE_TRANSFORM_MAX, 4*EVE_TRANSFORM_MAX);
 	CoCmd_SETMATRIX;
 
 	HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA,ZERO));
@@ -207,13 +207,13 @@ STATIC FTVOID dxt1Display (FTU32 hdl, FTU32 addr, FTU8 t)
 
 	HAL_CmdBufIn(COLOR_RGB(0xFF,0,0));
 	if (t) {
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4,DXT1_TLT_FONT,OPT_CENTERX,"Due to limited memory in Arduino");
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,DXT1_TLT_FONT,OPT_CENTERX,"Frame exchange become really slow");
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4*3,DXT1_TLT_FONT,OPT_CENTERX,"Better play me on MSVC");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4,DXT1_TLT_FONT,OPT_CENTERX,"Due to limited memory in Arduino");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,DXT1_TLT_FONT,OPT_CENTERX,"Frame exchange become really slow");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4*3,DXT1_TLT_FONT,OPT_CENTERX,"Better play me on MSVC");
 	} else {
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4,DXT1_TLT_FONT,OPT_CENTERX,"Due to my frame capture tools limitation");
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,DXT1_TLT_FONT,OPT_CENTERX,"Frame border looks not good");
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4*3,DXT1_TLT_FONT,OPT_CENTERX,"Not FT800's fault! But Frame itself!");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4,DXT1_TLT_FONT,OPT_CENTERX,"Due to my frame capture tools limitation");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,DXT1_TLT_FONT,OPT_CENTERX,"Frame border looks not good");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4*3,DXT1_TLT_FONT,OPT_CENTERX,"Not EVE's fault! But Frame itself!");
 	}
 
 	HAL_CmdBufIn(DISPLAY());
@@ -237,7 +237,7 @@ FTVOID playfv (FTU32 para)
 			return;
 		}
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 		dxt1Display(hdl, addr, 0);
 #else
 		dxt1Display(hdl, addr, 1);

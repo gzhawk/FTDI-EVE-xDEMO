@@ -1,5 +1,5 @@
 /* 
-    Hardware Abstract Layer for FT800 
+    Hardware Abstract Layer for EVE 
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/Oct
@@ -32,14 +32,14 @@ STATIC FTVOID rdStart ( FTU32 addr )
     SPI_Write(ftHandle,tmp,SPI_RXCMD_LEN,&send,
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FT8XXEMU_cs(1);
     FT8XXEMU_transfer((FTU8)(addr >> 16));
     FT8XXEMU_transfer((FTU8)(addr >> 8));
     FT8XXEMU_transfer((FTU8)addr);
     FT8XXEMU_transfer(0);
 #elif defined(STM32F4)
-    FT800_CS_LOW;
+    EVE_CS_LOW;
     STM32_SPISend((FTU8)(addr >> 16));
     STM32_SPISend((FTU8)(addr >> 8));
     STM32_SPISend((FTU8)addr);
@@ -54,7 +54,7 @@ STATIC FTVOID rdStart ( FTU32 addr )
     FT9XX_CS_LOW;
     spi_writen(SPIM,tmp,FT9XX_SPI_RXLEN);
 #else
-    digitalWrite(FT800_SPI_CS, LOW);
+    digitalWrite(EVE_SPI_CS, LOW);
     SPI.transfer((FTU8)(addr >> 16));
     SPI.transfer(highByte(addr));
     SPI.transfer(lowByte(addr));
@@ -76,13 +76,13 @@ STATIC FTVOID wrStart ( FTU32 addr )
     SPI_Write(ftHandle,tmp,SPI_TXCMD_LEN,&send,
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FT8XXEMU_cs(1);
     FT8XXEMU_transfer((FTU8)(addr >> 16) | 0x80);
     FT8XXEMU_transfer((FTU8)(addr >> 8));
     FT8XXEMU_transfer((FTU8)addr);
 #elif defined(STM32F4)
-    FT800_CS_LOW;
+    EVE_CS_LOW;
     STM32_SPISend((FTU8)(0x80 | (addr >> 16)));
     STM32_SPISend((FTU8)(addr >> 8));
     STM32_SPISend((FTU8)addr);
@@ -96,7 +96,7 @@ STATIC FTVOID wrStart ( FTU32 addr )
     FT9XX_CS_LOW;
     spi_writen(SPIM,tmp,FT9XX_SPI_TXLEN);
 #else
-    digitalWrite(FT800_SPI_CS, LOW);
+    digitalWrite(EVE_SPI_CS, LOW);
     SPI.transfer(0x80 | (addr >> 16));
     SPI.transfer(highByte(addr));
     SPI.transfer(lowByte(addr));
@@ -104,6 +104,10 @@ STATIC FTVOID wrStart ( FTU32 addr )
 }
 FTVOID HAL_CoReset (FTVOID)
 {
+#if defined(DEF_BT81X)
+	FTU16 p_addr = HAL_Read16(PATCH_ADDR);
+#endif	
+
     /*
        Bit 2 - 0 :
        Bit 0 for coprocessor engine,
@@ -112,22 +116,36 @@ FTVOID HAL_CoReset (FTVOID)
        Write 1 to reset the corresponding engine.
        Write 0 to go back normal working status.
      */
+
+	/* Set REG_CPURESET to 1, to hold the coprocessor in the reset condition */
     HAL_Write8(REG_CPURESET, 1);
     while (!HAL_Read8(REG_CPURESET));
+
+    /* Set REG_CMD_READ and REG_CMD_WRITE to zero */
     HAL_Write32(REG_CMD_READ,0);
     HAL_Write32(REG_CMD_WRITE,0);
+	HAL_Write32(REG_CMD_DL, 0);
+    
     mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = REG_FLAG_CLN;
     mcuCMDindex = 0; 
+        
+    /* j1 will set the pclk to 0 for that error case */
+	HAL_Write32(REG_PCLK, 2);
+
+	/* Set REG_CPURESET to 0, to restart the coprocessor */
     HAL_Write8(REG_CPURESET, 0);
     while (HAL_Read8(REG_CPURESET));
+
+#if defined(DEF_BT81X)
+    HAL_Write16(PATCH_ADDR, p_addr);
+#endif
 }
 STATIC FTU32 cmdWait (FTVOID)
 {
     while (HAL_Read32(REG_CMD_WRITE) != HAL_Read32(REG_CMD_READ)) {
         if (0xFFF == HAL_Read32(REG_CMD_READ)) {
-            FTPRINT("\nco-processor error, reset...");
-            HAL_CoReset();
-            FTPRINT("done");
+            FTPRINT("\nco-processor error!");
+            UI_END();
             return 0;
         }
     }
@@ -157,7 +175,7 @@ FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrStart(addr);
     FT8XXEMU_transfer(data);
     FT8XXEMU_cs(0);
@@ -166,8 +184,8 @@ FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
 
     STM32_SPISend(data);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     wrStart(addr);
 
@@ -179,7 +197,7 @@ FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
 
     SPI.transfer(data);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
@@ -191,7 +209,7 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
     SPI_Write(ftHandle,src,len,&i,
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     for (i = 0; i < len; i++) {
         FT8XXEMU_transfer(src[i]);
     }
@@ -201,8 +219,8 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
         STM32_SPISend(src[i]);
     }
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     i = len; /* just to remove compile warning */
     spi_writen(SPIM,src,i);
@@ -213,7 +231,7 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
         SPI.transfer(src[i]);
     }
 
-    digitalWrite(FT800_SPI_CS, HIGH);	
+    digitalWrite(EVE_SPI_CS, HIGH);	
 #endif
 }
 FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
@@ -232,7 +250,7 @@ FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrStart(addr);
 
     FT8XXEMU_transfer((FTU8)data&0xFF);
@@ -245,8 +263,8 @@ FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
     STM32_SPISend((FTU8)data&0xFF);
     STM32_SPISend((FTU8)(data>>8)&0xFF);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     wrStart(addr);
 
@@ -259,7 +277,7 @@ FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
     SPI.transfer((FTU8)data&0xFF);
     SPI.transfer((FTU8)(data>>8)&0xFF);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
@@ -280,7 +298,7 @@ FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrStart(addr);
 
     FT8XXEMU_transfer((FTU8)data&0xFF);
@@ -297,8 +315,8 @@ FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
     STM32_SPISend((FTU8)(data>>16)&0xFF);
     STM32_SPISend((FTU8)(data>>24)&0xFF);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     wrStart(addr);
 
@@ -313,7 +331,7 @@ FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
     SPI.transfer((FTU8)(data>>16)&0xFF);
     SPI.transfer((FTU8)(data>>24)&0xFF);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 
@@ -329,10 +347,10 @@ FTVOID HAL_Cfg ( FTU8 cfg )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FT8XXEMU_transfer(cfg);
 #elif defined(STM32F4)
-    FT800_CS_LOW;
+    EVE_CS_LOW;
 
     STM32_SPISend(cfg);
 
@@ -340,8 +358,8 @@ FTVOID HAL_Cfg ( FTU8 cfg )
 
     STM32_SPISend(0);
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 #elif defined(FT9XXEV)
     FTU8 tmp[FT9XX_SPI_TXLEN] = {0};
     tmp[0] = cfg;
@@ -352,11 +370,11 @@ FTVOID HAL_Cfg ( FTU8 cfg )
     spi_writen(SPIM,tmp,FT9XX_SPI_TXLEN);
     FT9XX_CS_HIGH;
 #else
-    digitalWrite(FT800_SPI_CS, LOW);
+    digitalWrite(EVE_SPI_CS, LOW);
     SPI.transfer(cfg);
     SPI.transfer(0);
     SPI.transfer(0);
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 #endif
 }
 
@@ -374,7 +392,7 @@ FTU8 HAL_Read8 ( FTU32 addr )
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 
     return tmp[0];
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU8 tmp;
 
     rdStart(addr);
@@ -390,7 +408,7 @@ FTU8 HAL_Read8 ( FTU32 addr )
     rdStart(addr);
     tmp = STM32_SPISend(0);
 
-    FT800_CS_HIGH;
+    EVE_CS_HIGH;
 
     return tmp;
 #elif defined(FT9XXEV)
@@ -406,12 +424,75 @@ FTU8 HAL_Read8 ( FTU32 addr )
 
     tmp = SPI.transfer(0);
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
     return tmp;
 #endif
 }
+FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len )
+{
+#ifdef MSVC2010EXPRESS
+    FTU32 recv;
 
+    rdStart(addr);
+
+    SPI_Read(ftHandle,buff,len,&recv,
+            SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
+            SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
+
+    return recv;
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
+    FTU32 tmp = len;
+    FTU8 *p = buff;
+
+    rdStart(addr);
+
+    while (tmp--) {
+        *p = FT8XXEMU_transfer(0);
+        p++;
+    }
+
+    FT8XXEMU_cs(0);
+
+    return len;
+#elif defined(STM32F4)
+    FTU32 tmp = len;
+    FTU8 *p = buff;
+
+    rdStart(addr);
+
+    while (tmp--) {
+        *p = STM32_SPISend(0);
+        p++;
+    }
+
+    EVE_CS_HIGH;
+
+    return len;
+#elif defined(FT9XXEV)
+    rdStart(addr);
+
+    spi_readn(SPIM,buff,spi_dummy+len);
+    
+    FT9XX_CS_HIGH;
+    
+    return len;
+#else
+    FTU32 tmp = len;
+    FTU8 *p = buff;
+
+    rdStart(addr);
+
+    while (tmp--) {
+        *p = SPI.transfer(0);
+        p++;
+    }
+
+    digitalWrite(EVE_SPI_CS, HIGH);
+
+    return len;
+#endif
+}
 FTU16 HAL_Read16 ( FTU32 addr )
 {
 #ifdef MSVC2010EXPRESS
@@ -425,7 +506,7 @@ FTU16 HAL_Read16 ( FTU32 addr )
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 
     return (tmp[0]|(tmp[1]<<8));
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU16 tmp = 0;
 
     rdStart(addr);
@@ -445,8 +526,8 @@ FTU16 HAL_Read16 ( FTU32 addr )
     tmp = (FTU16)STM32_SPISend(0);
     tmp |= (FTU16)STM32_SPISend(0) << 8;
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 
     return tmp;
 #elif defined(FT9XXEV)
@@ -466,7 +547,7 @@ FTU16 HAL_Read16 ( FTU32 addr )
     tmp = (FTU16)SPI.transfer(0);
     tmp |= (FTU16)SPI.transfer(0) << 8;
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
     return tmp;
 #endif
@@ -485,7 +566,7 @@ FTU32 HAL_Read32 ( FTU32 addr )
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 
     return (tmp[0]|(tmp[1]<<8)|(tmp[2]<<16)|(tmp[3]<<24));
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU32 tmp = 0;
 
     rdStart(addr);
@@ -509,8 +590,8 @@ FTU32 HAL_Read32 ( FTU32 addr )
     tmp |= (FTU32)STM32_SPISend(0) << 16;
     tmp |= (FTU32)STM32_SPISend(0) << 24;
 
-    while( SPI_GetFlagStatus(FT800_SPI, SPI_I2S_FLAG_BSY));
-    FT800_CS_HIGH;
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
 
     return tmp;
 #elif defined(FT9XXEV)
@@ -534,7 +615,7 @@ FTU32 HAL_Read32 ( FTU32 addr )
     tmp |= (FTU32)SPI.transfer(0) << 16;
     tmp |= (FTU32)SPI.transfer(0) << 24;
 
-    digitalWrite(FT800_SPI_CS, HIGH);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
     return tmp;
 #endif
@@ -631,7 +712,9 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
             FTPRINT("\nmcu cmd buf: mcuCMDBufSize <= mcuCMDindex");
             return;
         }
-        /* set the cmd tag */
+        /* mcuCMDBuf would be used both DLP and CMD for the buffering
+           set the CMD tag, to indicate CMD is using
+           when tag not match, previous command may using DLP*/
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_CMD;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_CMD) {
@@ -716,7 +799,45 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
 
     return;
 }
+FTU8 COUNT_ARGS(FTC8 * str)
+{
+	FTU8 count = 0;
+	FTC8 *tmp = str;
 
+	tmp = strstr(tmp, "%");
+	while (tmp)
+	{
+		if (*(tmp + 1) == '%') {
+			tmp += 2;
+		}
+		else {
+			count++;
+			tmp++;
+		}
+		tmp = strstr(tmp, "%");
+	}
+	return count;
+}
+FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...)
+{
+	va_list args;
+	FTU8 i, num=0;
+	va_start(args, s);
+	
+#if defined(DEF_BT81X)
+    //Only check % characters if option OPT_FORMAT is set 
+	num = (opt & OPT_FORMAT) ? (COUNT_ARGS(s)) : (0); 
+#endif
+	HAL_CmdBufIn(CMD_TEXT);
+	HAL_CmdBufIn((((FTU32)y << 16) | (x & 0xffff)));
+	HAL_CmdBufIn((((FTU32)opt << 16) | (font & 0xffff)));
+	HAL_CmdBufInStr(s);
+	for (i = 0; i < num; i++)
+	{
+	    HAL_CmdBufIn((FTU32)va_arg(args, FTU32));
+	}
+	va_end(args);
+}
 FTVOID HAL_DlpBufIn (FTU32 Dlp)
 {
     if (mcuCMDBuf) {
@@ -724,7 +845,9 @@ FTVOID HAL_DlpBufIn (FTU32 Dlp)
             FTPRINT("\nmcu dlp buf: EVE_DLP_SIZE <= index");
             return;
         }
-        /* set the dlp tag */
+        /* mcuCMDBuf would be used both DLP and CMD for the buffering
+           set the DLP tag, to indicate DLP is using
+           when tag not match, previous command may using CMD*/
         if (REG_FLAG_CLN == mcuCMDBuf[mcuCMDBufSize/FTU32_LEN]) {
             mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] = RAM_DL;
         } else if (mcuCMDBuf[mcuCMDBufSize/FTU32_LEN] != RAM_DL) {
@@ -792,5 +915,19 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum)
         mcuCMDindex = 0;
     }
 }
+FTVOID HAL_CmdExeNow(FTU32 * pCL, FTU32 l)
+{
+    FTU32 i = 0;
+    
+    /* make sure command buffer clean */
+    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
 
+    while (i < l) {
+	    HAL_CmdToReg(pCL[i]);
+        i++;
+    }
+
+    /* make sure command successful executed */
+    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
+}
 

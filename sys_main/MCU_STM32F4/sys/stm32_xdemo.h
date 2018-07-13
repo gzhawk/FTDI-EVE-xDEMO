@@ -50,14 +50,14 @@ typedef uint32_t     FTU32;
 
 #define FTRES FTU32
 
-#define FT800_CAL_PARA_NUM    (6)
+#define EVE_CAL_PARA_NUM    (6)
 
-#define FT800_SPI SPI1
-#define FT800_SPI_RCC RCC_AHB1Periph_GPIOD
-#define FT800_SPI_GPIO GPIOD
-#define FT800_SPI_CS GPIO_Pin_15
-#define FT800_CS_HIGH (FT800_SPI_GPIO->BSRRL |= FT800_SPI_CS)
-#define FT800_CS_LOW (FT800_SPI_GPIO->BSRRH |= FT800_SPI_CS)
+#define EVE_SPI SPI1
+#define EVE_SPI_RCC RCC_AHB1Periph_GPIOD
+#define EVE_SPI_GPIO GPIOD
+#define EVE_SPI_CS GPIO_Pin_15
+#define EVE_CS_HIGH (EVE_SPI_GPIO->BSRRL |= EVE_SPI_CS)
+#define EVE_CS_LOW (EVE_SPI_GPIO->BSRRH |= EVE_SPI_CS)
 
 #define APPS_SYS stm32_apps_sys_dummy
 

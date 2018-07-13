@@ -7,7 +7,7 @@
 */
 
 #define PATH_LEN 50
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define ANIMATION_NUM 10
 #define ANIMATION_TUB_TAG 7 /* tag number of tube */
 #else
@@ -27,7 +27,7 @@ typedef struct bitmap_ {
 	FTU32 high;
 } bitmap_st;
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define PUZZLE_PATH ROOT_PATH"puzzle\\"
 #else
 #define PUZZLE_PATH 
@@ -38,7 +38,7 @@ bitmap_st brgd_bitmap[] = {
 	{PUZZLE_PATH"0_0.raw",     0,0,144,52}, 
 	{PUZZLE_PATH"189_0.raw",   189,0,4,52},
 	{PUZZLE_PATH"238_0.raw",   238,0,17,52},
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 	/* Due to limited resource of Arduino (2K RAM in total, SD card module use too much RAM)
 	 * we remove some parts of this unchange resources
 	 * it may looks bad, please bear it...
@@ -70,7 +70,7 @@ bitmap_st ani_bitmap[ANIMATION_NUM] = {
 	{PUZZLE_PATH"sound00.raw",  423,0,45,52}, 
 
 	/* if tube position change, ANIMATION_TUB_TAG need to be changed */
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 	/* remove this animation effect in Arduino platform
 	 * since it's too diffical to make the effect run smooth
 	 * in such tiny RAM (2K RAM in total, SD card module use too much RAM)*/
@@ -86,7 +86,7 @@ appRet_en loadBitmap (FTVOID)
 {
 	FTU8 i;
 	FTU32 addr = 0;
-	/* load unchanged bitmap resources data into FT800 */
+	/* load unchanged bitmap resources data into EVE */
 	for (i = 0, addr = RAM_G; brgd_bitmap[i].path[0];
 		addr += brgd_bitmap[i].wide*brgd_bitmap[i].high*2, i++) {
 		if (0 == appFileToRamG((FTC8 *)brgd_bitmap[i].path,addr,0,0,0)) {
@@ -97,10 +97,10 @@ appRet_en loadBitmap (FTVOID)
 		HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, brgd_bitmap[i].wide*2, brgd_bitmap[i].high));
 		HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, brgd_bitmap[i].wide, brgd_bitmap[i].high));
 		HAL_CmdBufIn(BEGIN(BITMAPS));
- 		HAL_CmdBufIn(VERTEX2F(brgd_bitmap[i].x*FT800_PIXEL_UNIT,brgd_bitmap[i].y*FT800_PIXEL_UNIT));
+ 		HAL_CmdBufIn(VERTEX2F(brgd_bitmap[i].x*EVE_PIXEL_UNIT,brgd_bitmap[i].y*EVE_PIXEL_UNIT));
 		HAL_CmdBufIn(END());
 	}
-	/* load changed bitmap resources data into FT800 */
+	/* load changed bitmap resources data into EVE */
 	HAL_CmdBufIn(TAG_MASK(1));
 	for (i = 0; i < ANIMATION_NUM;
 		addr += ani_bitmap[i].wide*ani_bitmap[i].high*2, i++) {
@@ -113,7 +113,7 @@ appRet_en loadBitmap (FTVOID)
 		HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, ani_bitmap[i].wide, ani_bitmap[i].high));
 		HAL_CmdBufIn(BEGIN(BITMAPS));
 		HAL_CmdBufIn(TAG(i+1));
- 		HAL_CmdBufIn(VERTEX2F(ani_bitmap[i].x*FT800_PIXEL_UNIT,ani_bitmap[i].y*FT800_PIXEL_UNIT));
+ 		HAL_CmdBufIn(VERTEX2F(ani_bitmap[i].x*EVE_PIXEL_UNIT,ani_bitmap[i].y*EVE_PIXEL_UNIT));
 		HAL_CmdBufIn(END());
 		ani_addr[i] = addr;
 	}
@@ -184,16 +184,16 @@ FTVOID playpuzzle (FTU32 para)
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
 	HAL_CmdBufIn(CLEAR(1,1,1));
 
-	/* load bitmap resources data into FT800 */
+	/* load bitmap resources data into EVE */
 	if(APP_OK != loadBitmap()){
 		DBGPRINT;
 		return;
 	}
 
-#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU)
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4,24,OPT_CENTERX,"Due to limited memory in Arduino");
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,24,OPT_CENTERX,"We remove some parts of the background");
-	CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/4*3,24,OPT_CENTERX,"Better play me on MSVC");
+#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(MSVC2017EMU) 
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4,24,OPT_CENTERX,"Due to limited memory in Arduino");
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,24,OPT_CENTERX,"We remove some parts of the background");
+	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4*3,24,OPT_CENTERX,"Better play me on MSVC");
 #endif
 
 	HAL_CmdBufIn(DISPLAY());
@@ -244,7 +244,7 @@ FTVOID playpuzzle (FTU32 para)
 			changename(&ani_bitmap[Tag-1],Tag,getposition((FTC8 *)ani_bitmap[Tag-1].path),&ani_index);
 			/* flash the cutted animation peices to it's proper location */
 			/* Arduino: as limitation of the platform (Arduino Pro) I have on hand
-			 * appFileToRamG is read the file in SD Card, and copy data to FT800 block by block each time
+			 * appFileToRamG is read the file in SD Card, and copy data to EVE block by block each time
 			 * the speed and the performance is really slow, for your system
 			 * please copy the proper file into your RAM then flash the animation */
 			if (0 == appFileToRamG((FTC8 *)ani_bitmap[Tag-1].path,ani_addr[Tag-1],0,0,0)) {

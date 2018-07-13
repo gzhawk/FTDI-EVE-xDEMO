@@ -391,7 +391,7 @@ FTVOID ft9xx_save_cdata (FIL *f_hdl, FTC8 *dataPath, FTU8 *p)
     FTPRINT("\nwrite tag to file...");
     ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)tag,4,&i));
     FTPRINT("\nwrite c data to file...");
-    ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)p,FT800_CAL_PARA_NUM*4,&i));
+    ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)p,EVE_CAL_PARA_NUM*4,&i));
 
 	f_close(f_hdl);
 }
@@ -403,7 +403,7 @@ FTVOID ft9xx_restore_cdata (FIL *f_hdl, FTC8 *dPath, FTVOID *p)
     FTPRINT("\nrestore c data from file...");
 	f_open(f_hdl, (const TCHAR*)dPath, FA_READ);
     f_lseek(f_hdl, CALD_TAG_LEN);
-    ft9xx_fatfs_dbg_info(f_read(f_hdl, p,FT800_CAL_PARA_NUM*4,&i));
+    ft9xx_fatfs_dbg_info(f_read(f_hdl, p,EVE_CAL_PARA_NUM*4,&i));
 	f_close(f_hdl);
 }
 

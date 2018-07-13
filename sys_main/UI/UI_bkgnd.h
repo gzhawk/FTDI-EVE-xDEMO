@@ -36,7 +36,7 @@ typedef enum direct_ {
 #define BKGND_BLOB_HI_2 BKGND_BNUM
 #define BKGND_BLOB_MSPEED 1
 #define BKGND_BLOB_CLR_BRD CLEAR_COLOR_RGB(203,222,182)
-#define BKGND_BLOB_GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,FT800_LCD_HIGH,0)
+#define BKGND_BLOB_GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,EVE_LCD_HIGH,0)
 
 typedef enum icon_grp {
 	BKGND_ICON_HDL_8ICON = 0,
@@ -51,10 +51,10 @@ typedef enum icon_grp {
 #define BKGND_ICON_FISH_SUBNUM 4
 #define BKGND_ICON_CAR_SUBNUM 4
 #define BKGND_ICON_CLR_BRD CLEAR_COLOR_RGB(103,122,182)
-#define BKGND_ICON_GRAD_BKG CoCmd_GRADIENT(0,0,0x677AB6,0,FT800_LCD_HIGH,0)
+#define BKGND_ICON_GRAD_BKG CoCmd_GRADIENT(0,0,0x677AB6,0,EVE_LCD_HIGH,0)
 
 #define BKGND_SPK_CLR_BRD CLEAR_COLOR_RGB(199,251,40)
-#define BKGND_SPK_GRAD_BKG CoCmd_GRADIENT(0,0,0xC7FB28,0,FT800_LCD_HIGH,0)
+#define BKGND_SPK_GRAD_BKG CoCmd_GRADIENT(0,0,0xC7FB28,0,EVE_LCD_HIGH,0)
 #define BKGND_SPK_MSPEED 100
 #define BKGND_SPK_COLR    COLOR_RGB(101,190,186)
 #define BKGND_SPK_SIZE_MIN    60
@@ -88,7 +88,7 @@ struct {
 
 FTU8 gIndex = 0;
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 #define PATH_BKGND_8ICON ROOT_PATH"bkgnd\\8icon.raw"
 #define PATH_BKGND_STAR ROOT_PATH"bkgnd\\star.raw"
 #define PATH_BKGND_BALL ROOT_PATH"bkgnd\\balloon.raw"
@@ -188,28 +188,28 @@ STATIC FTVOID initCoors(FTU8 init, direct_e d, coor_st *p, FTU8 stlen)
 		switch (d) {
 			case L2R:
 				p[k].x = 0;
-				p[k].y = FT800_PIXEL_UNIT*FT800_LCD_HIGH/2;
+				p[k].y = EVE_PIXEL_UNIT*EVE_LCD_HIGH/2;
 				break;
 			case R2L:
-				p[k].x = FT800_PIXEL_UNIT*FT800_LCD_WIDTH;
-				p[k].y = FT800_PIXEL_UNIT*FT800_LCD_HIGH/2;
+				p[k].x = EVE_PIXEL_UNIT*EVE_LCD_WIDTH;
+				p[k].y = EVE_PIXEL_UNIT*EVE_LCD_HIGH/2;
 				break;
 			case B2T:
-				p[k].x = FT800_PIXEL_UNIT*FT800_LCD_WIDTH/2;
-				p[k].y = FT800_PIXEL_UNIT*FT800_LCD_HIGH;
+				p[k].x = EVE_PIXEL_UNIT*EVE_LCD_WIDTH/2;
+				p[k].y = EVE_PIXEL_UNIT*EVE_LCD_HIGH;
 				break;
 			case T2B:
-				p[k].x = FT800_PIXEL_UNIT*FT800_LCD_WIDTH/2;
+				p[k].x = EVE_PIXEL_UNIT*EVE_LCD_WIDTH/2;
 				p[k].y = 0;
 				break;
 			default:
-				p[k].x = FTRANDOM(FT800_PIXEL_UNIT*FT800_LCD_WIDTH);
-				p[k].y = FTRANDOM(FT800_PIXEL_UNIT*FT800_LCD_HIGH);
+				p[k].x = FTRANDOM(EVE_PIXEL_UNIT*EVE_LCD_WIDTH);
+				p[k].y = FTRANDOM(EVE_PIXEL_UNIT*EVE_LCD_HIGH);
 				break;
 		}
 #else
-		p[k].x = FTRANDOM(FT800_PIXEL_UNIT*FT800_LCD_WIDTH);
-		p[k].y = FTRANDOM(FT800_PIXEL_UNIT*FT800_LCD_HIGH);
+		p[k].x = FTRANDOM(EVE_PIXEL_UNIT*EVE_LCD_WIDTH);
+		p[k].y = FTRANDOM(EVE_PIXEL_UNIT*EVE_LCD_HIGH);
 #endif
 		p[k].xOffset = 0;
 		p[k].yOffset = 0;
@@ -311,9 +311,9 @@ STATIC FTVOID animFizz (FTU8 init, FTU32 speed)
 
 	if (count++ == 0) {
 		for (i = 0; i< BKGND_FIZZ_NUM; i++) {
-			fz[i].s = FTRANDOM(BKGND_FIZZ_SIZE_MAX)*FT800_PIXEL_UNIT;
-			fz[i].x = FTRANDOM(FT800_LCD_WIDTH)*FT800_PIXEL_UNIT;
-			fz[i].y = FTRANDOM(FT800_LCD_HIGH)*FT800_PIXEL_UNIT;
+			fz[i].s = FTRANDOM(BKGND_FIZZ_SIZE_MAX)*EVE_PIXEL_UNIT;
+			fz[i].x = FTRANDOM(EVE_LCD_WIDTH)*EVE_PIXEL_UNIT;
+			fz[i].y = FTRANDOM(EVE_LCD_HIGH)*EVE_PIXEL_UNIT;
 			fz[i].r = FTRANDOM(0xFF);
 			fz[i].g = FTRANDOM(0xFF);
 			fz[i].b = FTRANDOM(0xFF);
@@ -350,7 +350,7 @@ FTVOID background_blobs (FTU32 para)
 				flag = (high<=0)?0:1;
 			} else {
 				high++;
-				flag = (high>=(FT800_LCD_HIGH-32))?1:0;
+				flag = (high>=(EVE_LCD_HIGH-32))?1:0;
 			}
 			count = 0;
 		}
@@ -363,7 +363,7 @@ FTVOID background_blobs (FTU32 para)
 
 		drawBlob();
 		
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
 		
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -391,7 +391,7 @@ FTVOID background_bitmap (FTU32 para)
 	static FTU8 ifLoaded = 0;
 
 	if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(BKGND_ICON_HDL_8ICON, RAM_G, &bmpHD[0], BKGND_ICON_GROUP)){
 			DBGPRINT;
 			return;
@@ -407,7 +407,7 @@ FTVOID background_bitmap (FTU32 para)
 				flag = (high<=0)?0:1;
 			} else {
 				high++;
-				flag = (high>=(FT800_LCD_HIGH-32))?1:0;
+				flag = (high>=(EVE_LCD_HIGH-32))?1:0;
 			}
 			count = 0;
 		}
@@ -445,7 +445,7 @@ FTVOID background_bitmap (FTU32 para)
 		if (ctrl_a[gIndex].d == R2L) {
 			HAL_CmdBufIn(COLOR_RGB(0,0,0));
 		}
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,high,BKGND_TLT_FONT,OPT_CENTERX,(FT8 *)ctrl_a[gIndex].tlt);
 		
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -468,7 +468,7 @@ FTVOID background_bitmap (FTU32 para)
 
 FTVOID background_spk (FTU32 para)
 {
-	FTU16 wide = FT800_LCD_WIDTH/2, flag = 0, count = 0;
+	FTU16 wide = EVE_LCD_WIDTH/2, flag = 0, count = 0;
 	FTU8 init = 1;
 
 	while (0 == TOUCHED) {
@@ -479,7 +479,7 @@ FTVOID background_spk (FTU32 para)
 				flag = (wide<=BKGND_SPK_HALF_TLT_LEN)?0:1;
 			} else {
 				wide++;
-				flag = (wide>=(FT800_LCD_WIDTH-BKGND_SPK_HALF_TLT_LEN))?1:0;
+				flag = (wide>=(EVE_LCD_WIDTH-BKGND_SPK_HALF_TLT_LEN))?1:0;
 			}
 			count = 0;
 		}
@@ -490,7 +490,7 @@ FTVOID background_spk (FTU32 para)
 
 		animSpark(init, DIR_MAX, Coor, BKGND_BNUM);
 	
-		CoCmd_TEXT(wide,FT800_LCD_HIGH/2,BKGND_TLT_FONT,OPT_CENTERX,"Blow Bubble");
+		CoCmd_TEXT(wide,EVE_LCD_HIGH/2,BKGND_TLT_FONT,OPT_CENTERX,"Blow Bubble");
 		
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
@@ -514,7 +514,7 @@ FTVOID background_spk (FTU32 para)
 
 FTVOID background_fizz (FTU32 para)
 {
-	FTU16 wide = FT800_LCD_WIDTH/2, flag = 0, count = 0;
+	FTU16 wide = EVE_LCD_WIDTH/2, flag = 0, count = 0;
 	FTU8 init = 1;
 
 	while (0 == TOUCHED) {
@@ -525,7 +525,7 @@ FTVOID background_fizz (FTU32 para)
 				flag = (wide<=BKGND_FIZZ_HALF_TLT_LEN)?0:1;
 			} else {
 				wide++;
-				flag = (wide>=(FT800_LCD_WIDTH-BKGND_FIZZ_HALF_TLT_LEN))?1:0;
+				flag = (wide>=(EVE_LCD_WIDTH-BKGND_FIZZ_HALF_TLT_LEN))?1:0;
 			}
 			count = 0;
 		}
@@ -535,7 +535,7 @@ FTVOID background_fizz (FTU32 para)
 
 		animFizz(init, BKGND_FIZZ_MSPEED);
 	
-		CoCmd_TEXT(wide,FT800_LCD_HIGH/2,BKGND_TLT_FONT,OPT_CENTERX,"Fizz");
+		CoCmd_TEXT(wide,EVE_LCD_HIGH/2,BKGND_TLT_FONT,OPT_CENTERX,"Fizz");
 		
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);

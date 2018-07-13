@@ -5,7 +5,7 @@
 	Date  : 2015/July
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
 #define PATH_DISP ROOT_PATH"littleswan\\X1.jpg"
 #define P_LEN 30
 #define P_INX 22
@@ -15,7 +15,7 @@
 #define P_INX 1
 #endif
 #define FIFOSIZE        204800UL//(200*1024)/* make sure this size larger than all JPG file size */
-#define FIFOADDR        843776UL//(FT800_RAMG_SIZE - FIFOSIZE)
+#define FIFOADDR        843776UL//(EVE_RAMG_SIZE - FIFOSIZE)
 #define FIFOGAP         102400UL//(100*1024)/* make sure this size larger than single JPG file size */
 #define P_BEN '1'
 
@@ -72,10 +72,10 @@ STATIC FTVOID Display (FTU32 hdl, FTU32 addr, FTU32 X, FTU32 Y)
 
 	HAL_CmdBufIn(BITMAP_HANDLE(0));
 	HAL_CmdBufIn(BITMAP_SOURCE(addr));
-	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, (FT800_LCD_WIDTH * 2), FT800_LCD_HIGH));
-	HAL_CmdBufIn(BITMAP_LAYOUT_H((FT800_LCD_WIDTH * 2) >> 10, FT800_LCD_HIGH >> 9)); 
-	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, FT800_LCD_WIDTH, FT800_LCD_HIGH));
-	HAL_CmdBufIn(BITMAP_SIZE_H(FT800_LCD_WIDTH>>9, FT800_LCD_HIGH>>9));
+	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, (EVE_LCD_WIDTH * 2), EVE_LCD_HIGH));
+	HAL_CmdBufIn(BITMAP_LAYOUT_H((EVE_LCD_WIDTH * 2) >> 10, EVE_LCD_HIGH >> 9)); 
+	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, EVE_LCD_WIDTH, EVE_LCD_HIGH));
+	HAL_CmdBufIn(BITMAP_SIZE_H(EVE_LCD_WIDTH>>9, EVE_LCD_HIGH>>9));
 	HAL_CmdBufIn(BEGIN(BITMAPS));
 	HAL_CmdBufIn(VERTEX2F(0,0));
 	HAL_CmdBufIn(END());
@@ -83,7 +83,7 @@ STATIC FTVOID Display (FTU32 hdl, FTU32 addr, FTU32 X, FTU32 Y)
 	if (hdl != 0) {
 		HAL_CmdBufIn(COLOR_RGB(0xFF,0,0));
 		CoCmd_ROMFONT(hdl, 34);
-		CoCmd_TEXT(FT800_LCD_WIDTH/2, FT800_LCD_HIGH/2, hdl, OPT_CENTER, "--END--");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/2, hdl, OPT_CENTER, "--END--");
 	}
 
 	if (X != 0 && Y != 0) {
@@ -129,7 +129,7 @@ FTU32 fileload (FTU8 * p_file, FTU32 mfifo_addr)
 FTVOID jpgdisp (FTU32 para)
 {
 	FTU32 len, XY, mfifo_addr = FIFOADDR;
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
 	FTU32 lenX, lenY;
 #endif
     static FTU8 inited = 0;
@@ -142,7 +142,7 @@ FTVOID jpgdisp (FTU32 para)
             return;
         }
         /*Arduino*/
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
         /* X2.jpg */
         p_tmp[P_INX]++;
         lenX = len;
@@ -170,20 +170,20 @@ FTVOID jpgdisp (FTU32 para)
 
         if (FIFOADDR == mfifo_addr) {
             mfifo_addr += FIFOGAP;
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
             len = lenY;
 #endif
             /* do the IO control */
             appGP.appPara = 0;
         } else {
             mfifo_addr = FIFOADDR;
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
             len = lenX;
 #endif
             /* do the IO control */
             appGP.appPara = 1;
         }
-#if defined(STM32F4) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(STM32F4) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
         p_tmp[P_INX]++;
         len = fileload(p_tmp, mfifo_addr);
         if (len == 0) {

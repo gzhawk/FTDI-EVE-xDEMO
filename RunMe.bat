@@ -20,14 +20,20 @@ echo.
 echo 5: it's a PC based platform (MS VC2012) sample/demo codes, 
 echo which you don't need hardware (cable/CCModule/BasicModule, 
 echo etc.), it can emulate a LCD window which show the final effect 
-echo of running result by FT800.
+echo of running result by EVE.
 echo.
-echo 6: quit
+echo 6: it's a PC based platform (MS VC2017) sample/demo codes, 
+echo which you don't need hardware (cable/CCModule/BasicModule, 
+echo etc.), it can emulate a LCD window which show the final effect 
+echo of running result by EVE.
+echo.
+echo 7: quit
 echo.
 
-choice /C:123456
+choice /C:1234567
 
-if errorlevel 6 goto SkipRunme
+if errorlevel 7 goto SkipRunme
+if errorlevel 6 goto VC2017
 if errorlevel 5 goto VC2012
 if errorlevel 4 goto VC2010
 if errorlevel 3 goto STM32
@@ -116,6 +122,10 @@ goto SkipRunme
 
 :VC2012
 call sys_main\MCU_VC2012\vc2012.vcxproj
+goto SkipRunme
+
+:VC2017
+call sys_main\MCU_VC2017\vc2017.vcxproj
 goto SkipRunme
 
 :SkipRunme

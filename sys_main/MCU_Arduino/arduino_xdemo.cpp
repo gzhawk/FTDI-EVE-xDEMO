@@ -50,12 +50,12 @@ FTVOID dos83(FTU8 dst[SDC_NAME_LEN+SDC_NAME_EXT_LEN], FT8 *ps)
 
 FTVOID arduino_sdcardInit (FTVOID)
 {
-	pinMode(FT800_SDC_CS, OUTPUT);
-	digitalWrite(FT800_SDC_CS, HIGH);
+	pinMode(EVE_SDC_CS, OUTPUT);
+	digitalWrite(EVE_SDC_CS, HIGH);
 
 	FTDELAY(100);
 
-	while(SD.begin(FT800_SDC_CS) == 0)
+	while(SD.begin(EVE_SDC_CS) == 0)
 	{
 		FTPRINT("\r\n");
 		FTPRINT("No SD Card be found!");
@@ -91,7 +91,7 @@ FTVOID arduino_save_cdata (FTU8 *p)
 {
 	FTU16 i, j;
 
-	for (i = 0, j = 0; i < FT800_CAL_PARA_NUM; i++) {
+	for (i = 0, j = 0; i < EVE_CAL_PARA_NUM; i++) {
 		j = i*4;
 		EEPROM.write((CALD_TAG_ADDR+CALD_TAG_LEN)+j,p[j]);
 		EEPROM.write((CALD_TAG_ADDR+CALD_TAG_LEN)+j+1,p[j+1]);
@@ -104,7 +104,7 @@ FTVOID arduino_restore_cdata (FTU8 *p)
 {
 	FTU16 i;
 
-	for (i = 0;i < FT800_CAL_PARA_NUM;i++) {
+	for (i = 0;i < EVE_CAL_PARA_NUM;i++) {
 		p[i*4] = EEPROM.read((CALD_TAG_ADDR+CALD_TAG_LEN)+i*4);
 		p[i*4+1] = EEPROM.read((CALD_TAG_ADDR+CALD_TAG_LEN)+i*4+1);
 		p[i*4+2] = EEPROM.read((CALD_TAG_ADDR+CALD_TAG_LEN)+i*4+2);

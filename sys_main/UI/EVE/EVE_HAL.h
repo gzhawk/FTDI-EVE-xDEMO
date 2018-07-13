@@ -1,12 +1,12 @@
 /* 
-    Hardware Abstract Layer for FT800 
+    Hardware Abstract Layer for EVE 
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/May
  */
 
-#ifndef _FT800_HAL_H_
-#define _FT800_HAL_H_
+#ifndef _EVE_HAL_H_
+#define _EVE_HAL_H_
 
 #define WVGA_WIDTH  800
 #define WVGA_HIGH   480
@@ -21,47 +21,47 @@
 #define HVGA_HIGH   480
 
 #if defined(LCD_WVGA)
-#define FT800_LCD_WIDTH WVGA_WIDTH
-#define FT800_LCD_HIGH  WVGA_HIGH
+#define EVE_LCD_WIDTH WVGA_WIDTH
+#define EVE_LCD_HIGH  WVGA_HIGH
 #elif defined(LCD_QVGA)
-#define FT800_LCD_WIDTH QVGA_WIDTH
-#define FT800_LCD_HIGH  QVGA_HIGH
+#define EVE_LCD_WIDTH QVGA_WIDTH
+#define EVE_LCD_HIGH  QVGA_HIGH
 #elif defined(LCD_HVGA)
-#define FT800_LCD_WIDTH HVGA_WIDTH
-#define FT800_LCD_HIGH  HVGA_HIGH
+#define EVE_LCD_WIDTH HVGA_WIDTH
+#define EVE_LCD_HIGH  HVGA_HIGH
 #else
-#define FT800_LCD_WIDTH WQVGA_WIDTH
-#define FT800_LCD_HIGH  WQVGA_HIGH
+#define EVE_LCD_WIDTH WQVGA_WIDTH
+#define EVE_LCD_HIGH  WQVGA_HIGH
 #endif
 
 #define EVE_ID_REG            (0xC0001)
-#define FT800_ID              (0x7C)
-#define FT800_CMD_WAIT_MAX    50
-#define FT800_DLP_WAIT_MAX    100
-#define FT800_TOUCH_THRESHOLD 1800
-#define FT800_PIXEL_UNIT      (16)
+#define EVE_ID              (0x7C)
+#define EVE_CMD_WAIT_MAX    50
+#define EVE_DLP_WAIT_MAX    100
+#define EVE_TOUCH_THRESHOLD 1800
+#define EVE_PIXEL_UNIT      (16)
 
 #define EVE_DLP_SIZE          (8*1024)
 #define REG_FLAG_CLN          (0xFFFFFFFF)
-#define FT800_TRACK_VALUE_MAX (0xFFFF)
-#define FT800_TRANSFORM_MAX   (0x10000)
+#define EVE_TRACK_VALUE_MAX (0xFFFF)
+#define EVE_TRANSFORM_MAX   (0x10000)
 #define FTU32_LEN             4
 #define FTU16_LEN             2
 #define FTU8_LEN              1
 
-#define FT800_SPI_DUMMY       (0x04)
+#define EVE_SPI_DUMMY       (0x04)
 
 typedef enum {
     EVE_SSPI = 0,
     EVE_DSPI,
     EVE_QSPI
 }EVE_SPI_NUM;
-typedef enum FT800_CMD_EXE_st {
+typedef enum EVE_CMD_EXE_st {
     CMD_BUF_START = 0,
     CMD_BUF,
     CMD_BUF_END
-} FT800_CMD_EXE;
-typedef struct FT800_LCD_st {
+} EVE_CMD_EXE;
+typedef struct EVE_LCD_st {
     FT16 Width;
     FT16 Height;
     FT16 HCycle;
@@ -77,7 +77,7 @@ typedef struct FT800_LCD_st {
     FT8 PCLKPol;
     FT16 Cspread;
     FT16 Dither;	
-} FT800_LCD;
+} EVE_LCD;
 
 #define CoCmd_TRACK(x, y, w, h, t)  HAL_CmdBufIn(CMD_TRACK); \
                                     HAL_CmdBufIn((FT32)(y)<<16|(FT32)(x)); \
@@ -92,10 +92,7 @@ typedef struct FT800_LCD_st {
                                     HAL_CmdBufIn((FTU32)(o)<<16|(FTU32)(f)); \
                                     HAL_CmdBufIn((FT32)n)
 
-#define CoCmd_TEXT(x, y, f, o, p)   HAL_CmdBufIn(CMD_TEXT); \
-                                    HAL_CmdBufIn((FT32)(y)<<16|(FT32)(x)); \
-                                    HAL_CmdBufIn((FTU32)(o)<<16|(FTU32)(f)); \
-                                    HAL_CmdBufInStr((FTC8 *)(p))
+FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
 
 #define CoCmd_SLIDER(x, y, w, h, o, v, r)	HAL_CmdBufIn(CMD_SLIDER); \
                                     HAL_CmdBufIn((FT32)(y)<<16|(FT32)(x)); \
@@ -190,7 +187,7 @@ typedef struct FT800_LCD_st {
 
 #define TOUCHED                     (!(HAL_Read16(REG_CTOUCH_TOUCH0_XY)&0x8000))
 
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
 #define CoCmd_SETFONT(f, s, pf)     HAL_CmdBufIn(BITMAP_HANDLE((FTU32)(f))); \
                                     HAL_CmdBufIn(BITMAP_SOURCE(((FT_Gpu_Fonts_t *)(pf))->PointerToFontGraphicsData)); \
                                     HAL_CmdBufIn(BITMAP_LAYOUT(((FT_Gpu_Fonts_t *)(pf))->FontBitmapFormat, \
@@ -239,13 +236,25 @@ typedef struct FT800_LCD_st {
                                     HAL_CmdBufIn(addr); \
                                     HAL_CmdBufIn(nums)
 
-#if defined(DEF_81X)
+#if defined(DEF_81X) || defined(DEF_BT81X)
 #define CoCmd_SETROTATE(r)          HAL_CmdBufIn(CMD_SETROTATE); \
                                     HAL_CmdBufIn(r)
+
+#define CoCmd_SETBITMAP(s, f, w, h) HAL_CmdBufIn(CMD_SETBITMAP); \
+                                    HAL_CmdBufIn(s); \
+                                    HAL_CmdBufIn(((FT32)(w)<<16)|((f) & 0xFFFF)); \
+                                    HAL_CmdBufIn(h)
+
+#define CoCmd_ANIMFRAME(x, y, o, f) HAL_CmdBufIn(CMD_ANIMFRAME); \
+                                    HAL_CmdBufIn(((FT32)(y)<<16)|((x) & 0xFFFF)); \
+                                    HAL_CmdBufIn(o); \
+                                    HAL_CmdBufIn(f)
+
 #endif
 
 FTVOID HAL_Cfg ( FTU8 cfg );
 FTU8 HAL_Read8 ( FTU32 addr );
+FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len );
 FTU16 HAL_Read16 ( FTU32 addr );
 FTU32 HAL_Read32 ( FTU32 addr );
 FTVOID HAL_Write8 ( FTU32 addr, FTU8 data );
@@ -264,5 +273,6 @@ FTVOID HAL_BufToReg (FTU32 reg, FTU32 padNum);
 FTVOID HAL_CmdToReg (FTU32 Cmd);
 FTVOID HAL_McuCmdBufInit (FTVOID);
 FTU32 HAL_CmdBufSize (FTVOID);
+FTVOID HAL_CmdExeNow(FTU32 * pCL, FTU32 l);
 #endif
 

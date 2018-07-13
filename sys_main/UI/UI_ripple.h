@@ -8,13 +8,13 @@
 #define PATH_DISP ROOT_PATH"ripple\\X1.jpg"
 
 #define FIFOSIZE        (100*1024)/* make sure this size larger than all JPG file size */
-#define FIFOADDR        (FT800_RAMG_SIZE - FIFOSIZE)
-#define WAV_BUF_LEN     (FT800_LCD_WIDTH*FT800_LCD_HIGH+FT800_LCD_WIDTH)
+#define FIFOADDR        (EVE_RAMG_SIZE - FIFOSIZE)
+#define WAV_BUF_LEN     (EVE_LCD_WIDTH*EVE_LCD_HIGH+EVE_LCD_WIDTH)
 
 /* 1pixel=RGB565=5+6+5=16=2bytes=FTU16 */
 FTU8 wav_buf1[WAV_BUF_LEN] = {0};
 FTU8 wav_buf2[WAV_BUF_LEN] = {0};
-FTU8 img_buf[FT800_LCD_WIDTH*FT800_LCD_HIGH*2] = {0};
+FTU8 img_buf[EVE_LCD_WIDTH*EVE_LCD_HIGH*2] = {0};
 
 STATIC FTU32 mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU32 file_len)
 {
@@ -56,10 +56,10 @@ STATIC FTVOID Display (FTU32 addr)
 
 	HAL_CmdBufIn(BITMAP_HANDLE(0));
 	HAL_CmdBufIn(BITMAP_SOURCE(addr));
-	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, (FT800_LCD_WIDTH * 2), FT800_LCD_HIGH));
-	HAL_CmdBufIn(BITMAP_LAYOUT_H((FT800_LCD_WIDTH * 2) >> 10, FT800_LCD_HIGH >> 9)); 
-	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, FT800_LCD_WIDTH, FT800_LCD_HIGH));
-	HAL_CmdBufIn(BITMAP_SIZE_H(FT800_LCD_WIDTH>>9, FT800_LCD_HIGH>>9));
+	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, (EVE_LCD_WIDTH * 2), EVE_LCD_HIGH));
+	HAL_CmdBufIn(BITMAP_LAYOUT_H((EVE_LCD_WIDTH * 2) >> 10, EVE_LCD_HIGH >> 9)); 
+	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, EVE_LCD_WIDTH, EVE_LCD_HIGH));
+	HAL_CmdBufIn(BITMAP_SIZE_H(EVE_LCD_WIDTH>>9, EVE_LCD_HIGH>>9));
 	HAL_CmdBufIn(BEGIN(BITMAPS));
 	HAL_CmdBufIn(VERTEX2F(0,0));
 	HAL_CmdBufIn(END());
@@ -98,9 +98,9 @@ FTVOID waveCalculate (FTU8 **pWav1, FTU8 **pWav2)
 	FTU32 x;
 	FTU8 *p,*p1=*pWav1,*p2=*pWav2;
 	
-	for (x = FT800_LCD_WIDTH; x < FT800_LCD_HIGH*(FT800_LCD_WIDTH-1); x++) {
-		p2[x] = ((p1[x-FT800_LCD_WIDTH]+
-				  p1[x+FT800_LCD_WIDTH]+
+	for (x = EVE_LCD_WIDTH; x < EVE_LCD_HIGH*(EVE_LCD_WIDTH-1); x++) {
+		p2[x] = ((p1[x-EVE_LCD_WIDTH]+
+				  p1[x+EVE_LCD_WIDTH]+
 				  p1[x-1]+
 				  p1[x+1])/2 - p2[x]);
 		p2[x] -= p2[x]>>3;
@@ -119,31 +119,31 @@ FTVOID pixelRender (FTU32 addr, FTU8 *pnextWav)
 	static FTU8 flag = 1;
 
 	if (flag) {
-		for (x = 0; x < FT800_LCD_WIDTH*FT800_LCD_HIGH*2; x++) {
+		for (x = 0; x < EVE_LCD_WIDTH*EVE_LCD_HIGH*2; x++) {
 			img_buf[x] = HAL_Read8(addr+x);
 		}
 		flag = 0;
 	}
 
-	for (y = 0; y < (FT800_LCD_HIGH); y++) {
-		for (x = 0; x < FT800_LCD_WIDTH; x++) {
+	for (y = 0; y < (EVE_LCD_HIGH); y++) {
+		for (x = 0; x < EVE_LCD_WIDTH; x++) {
 			tmp = RENDER_SEED - pnextWav[i];
-			a = (x-FT800_LCD_WIDTH/2)*tmp/RENDER_SEED +FT800_LCD_WIDTH/2;
-			b = (y-FT800_LCD_HIGH/2)*tmp/RENDER_SEED +FT800_LCD_HIGH/2;
+			a = (x-EVE_LCD_WIDTH/2)*tmp/RENDER_SEED +EVE_LCD_WIDTH/2;
+			b = (y-EVE_LCD_HIGH/2)*tmp/RENDER_SEED +EVE_LCD_HIGH/2;
 		
-			if (a >= FT800_LCD_WIDTH) {
-				a = FT800_LCD_WIDTH - 1;
+			if (a >= EVE_LCD_WIDTH) {
+				a = EVE_LCD_WIDTH - 1;
 			} else if (a < 0) {
 				a = 0;
 			}
 
-			if (b >= FT800_LCD_HIGH) {
-				b = FT800_LCD_HIGH - 1;
+			if (b >= EVE_LCD_HIGH) {
+				b = EVE_LCD_HIGH - 1;
 			} else if (b < 0) {
 				b = 0;
 			}
 
-			a += b*FT800_LCD_WIDTH;
+			a += b*EVE_LCD_WIDTH;
 			HAL_Write8(addr+i*2, img_buf[a*2]);
 			HAL_Write8(addr+i*2+1, img_buf[a*2+1]);
 			i++;
@@ -155,9 +155,9 @@ FTVOID disturb (FTU8* pcurrWav, FT32 X, FT32 Y, FTU32 size, FTU32 weight)
 {
 	FT32 x,y;
 
-	if ((X >= FT800_LCD_WIDTH - size) ||
+	if ((X >= EVE_LCD_WIDTH - size) ||
 		(X < size) ||
-		(Y >= FT800_LCD_HIGH - size) ||
+		(Y >= EVE_LCD_HIGH - size) ||
 		(Y < size)) {
 		return;
 	}
@@ -165,7 +165,7 @@ FTVOID disturb (FTU8* pcurrWav, FT32 X, FT32 Y, FTU32 size, FTU32 weight)
 	for (x = X - size; x < X + size; x++) {
 		for (y = Y - size; y < Y + size; y++) {
 			if ((x-X)*(x-X) + (y-Y)*(y-Y) < size*size) {
-				pcurrWav[FT800_LCD_WIDTH*y+x] += weight;
+				pcurrWav[EVE_LCD_WIDTH*y+x] += weight;
 			}
 		}
 	}

@@ -8,7 +8,7 @@
 /* make sure FIFOSIZE larger than JPG file size
    and less than (1024-LCD_WIDTH*LCD_HIGH*2/1024) */
 #define FIFOSIZE        (16*1024) /* the MAX file size + 1024 for safty buffer */
-#define FIFOADDR        (FT800_RAMG_SIZE - FIFOSIZE)
+#define FIFOADDR        (EVE_RAMG_SIZE - FIFOSIZE)
 #define PALINXSIZE      (376*1024)
 #define PALLUTADDR_a    (FIFOADDR - 1024)
 #define PALINXADDR_a    (PALLUTADDR_a - PALINXSIZE)
@@ -95,7 +95,7 @@ STATIC FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoS
 	}
 
 	Len = appResSize(resHDL);
-	if (FT800_RAMG_SIZE < ramgAddr + Len) {
+	if (EVE_RAMG_SIZE < ramgAddr + Len) {
 		appResClose(resHDL);
 		DBGPRINT;
 		return 0;
@@ -132,7 +132,7 @@ STATIC FTVOID DisplayJPG (FTU32 hdl, FTU32 addr)
     }
 
     HAL_CmdBufIn(BEGIN(BITMAPS));
-	HAL_CmdBufIn(VERTEX2F(LOGO_X*FT800_PIXEL_UNIT,LOGO_Y*FT800_PIXEL_UNIT));
+	HAL_CmdBufIn(VERTEX2F(LOGO_X*EVE_PIXEL_UNIT,LOGO_Y*EVE_PIXEL_UNIT));
 	HAL_CmdBufIn(END());
 
 	HAL_CmdBufIn(DISPLAY());

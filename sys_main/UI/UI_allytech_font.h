@@ -44,26 +44,26 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
     HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }
@@ -74,12 +74,12 @@ FTVOID ally_font_main (FTU32 para)
     static FTU16 angle = 0;
 
 	if (!init) {
-	    /* load the bitmap resources into FT800 */
+	    /* load the bitmap resources into EVE */
 		if(APP_OK != appBmpToRamG(0, BMP_ADDR, bmp_header, PIC_NUM)){
 			DBGPRINT;
 			return;
 		}
-	    /* load the font resources into FT800 */
+	    /* load the font resources into EVE */
 		if (0 == appFileToRamG(FONT_PATH,FONT_ADDR,0,(FTU8 *)&stFontBlock,
                                sizeof(FT_Gpu_Fonts_t))) {
 			DBGPRINT;
@@ -99,12 +99,12 @@ FTVOID ally_font_main (FTU32 para)
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(BITMAP_HANDLE(I_ARGB4));
     HAL_CmdBufIn(CELL(0));
-    HAL_CmdBufIn(VERTEX2F(0*FT800_PIXEL_UNIT,0*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(0*EVE_PIXEL_UNIT,0*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(BITMAP_HANDLE(I_ARGB5));
     HAL_CmdBufIn(CELL(0));
     h = bmp_header[I_ARGB4].high;
-    HAL_CmdBufIn(VERTEX2F(0*FT800_PIXEL_UNIT,h*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(0*EVE_PIXEL_UNIT,h*EVE_PIXEL_UNIT));
 
     // bitmap rotate 
     x = 400;
@@ -117,34 +117,34 @@ FTVOID ally_font_main (FTU32 para)
     HAL_CmdBufIn(LINE_WIDTH(1));
     HAL_CmdBufIn(BEGIN(RECTS));
     /* indicate the expended bitmap area */
-    HAL_CmdBufIn(VERTEX2F((x-2*bmp_header[I_CS].high)*FT800_PIXEL_UNIT,
-                          (y)*FT800_PIXEL_UNIT));    
-    HAL_CmdBufIn(VERTEX2F((x+2*bmp_header[I_CS].high)*FT800_PIXEL_UNIT,
-                          (y+2*bmp_header[I_CS].high)*FT800_PIXEL_UNIT));    
+    HAL_CmdBufIn(VERTEX2F((x-2*bmp_header[I_CS].high)*EVE_PIXEL_UNIT,
+                          (y)*EVE_PIXEL_UNIT));    
+    HAL_CmdBufIn(VERTEX2F((x+2*bmp_header[I_CS].high)*EVE_PIXEL_UNIT,
+                          (y+2*bmp_header[I_CS].high)*EVE_PIXEL_UNIT));    
 
     HAL_CmdBufIn(COLOR_RGB(200,200,200));
     /* indicate the original bitmap area */
-    HAL_CmdBufIn(VERTEX2F(x*FT800_PIXEL_UNIT,
-                          y*FT800_PIXEL_UNIT));    
-    HAL_CmdBufIn(VERTEX2F((x+bmp_header[I_CS].wide)*FT800_PIXEL_UNIT,
-                          (y+bmp_header[I_CS].high)*FT800_PIXEL_UNIT));    
+    HAL_CmdBufIn(VERTEX2F(x*EVE_PIXEL_UNIT,
+                          y*EVE_PIXEL_UNIT));    
+    HAL_CmdBufIn(VERTEX2F((x+bmp_header[I_CS].wide)*EVE_PIXEL_UNIT,
+                          (y+bmp_header[I_CS].high)*EVE_PIXEL_UNIT));    
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(BITMAP_HANDLE(I_CS));
     HAL_CmdBufIn(CELL(0));
     /* original bitmap */
-    HAL_CmdBufIn(VERTEX2F(x*FT800_PIXEL_UNIT,
-                          y*FT800_PIXEL_UNIT));    
+    HAL_CmdBufIn(VERTEX2F(x*EVE_PIXEL_UNIT,
+                          y*EVE_PIXEL_UNIT));    
     /* rotate NEAREST bitmap */
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
-    CoCmd_TRANSLATE((bmp_header[I_CS].high)*FT800_TRANSFORM_MAX, 
-                    (bmp_header[I_CS].high)*FT800_TRANSFORM_MAX);
-	CoCmd_ROTATE(angle*FT800_TRANSFORM_MAX/360);
-    CoCmd_TRANSLATE((-25)*FT800_TRANSFORM_MAX, 
-                    (-16)*FT800_TRANSFORM_MAX);
+    CoCmd_TRANSLATE((bmp_header[I_CS].high)*EVE_TRANSFORM_MAX, 
+                    (bmp_header[I_CS].high)*EVE_TRANSFORM_MAX);
+	CoCmd_ROTATE(angle*EVE_TRANSFORM_MAX/360);
+    CoCmd_TRANSLATE((-25)*EVE_TRANSFORM_MAX, 
+                    (-16)*EVE_TRANSFORM_MAX);
 	CoCmd_SETMATRIX;
-    HAL_CmdBufIn(VERTEX2F(x*FT800_PIXEL_UNIT,
-                          y*FT800_PIXEL_UNIT));    
+    HAL_CmdBufIn(VERTEX2F(x*EVE_PIXEL_UNIT,
+                          y*EVE_PIXEL_UNIT));    
     HAL_CmdBufIn(RESTORE_CONTEXT());
     /* expend the bitmap area */
     HAL_CmdBufIn(BITMAP_HANDLE(I_CS));
@@ -153,14 +153,14 @@ FTVOID ally_font_main (FTU32 para)
     /* rotate BILINEAR bitmap */
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
-    CoCmd_TRANSLATE((bmp_header[I_CS].high)*FT800_TRANSFORM_MAX, 
-                    (bmp_header[I_CS].high)*FT800_TRANSFORM_MAX);
-	CoCmd_ROTATE(angle*FT800_TRANSFORM_MAX/360);
-    CoCmd_TRANSLATE((-25)*FT800_TRANSFORM_MAX, 
-                    (-16)*FT800_TRANSFORM_MAX);
+    CoCmd_TRANSLATE((bmp_header[I_CS].high)*EVE_TRANSFORM_MAX, 
+                    (bmp_header[I_CS].high)*EVE_TRANSFORM_MAX);
+	CoCmd_ROTATE(angle*EVE_TRANSFORM_MAX/360);
+    CoCmd_TRANSLATE((-25)*EVE_TRANSFORM_MAX, 
+                    (-16)*EVE_TRANSFORM_MAX);
 	CoCmd_SETMATRIX;
-    HAL_CmdBufIn(VERTEX2F((x-2*bmp_header[I_CS].high)*FT800_PIXEL_UNIT,
-                          (y)*FT800_PIXEL_UNIT));    
+    HAL_CmdBufIn(VERTEX2F((x-2*bmp_header[I_CS].high)*EVE_PIXEL_UNIT,
+                          (y)*EVE_PIXEL_UNIT));    
     HAL_CmdBufIn(RESTORE_CONTEXT());
     HAL_CmdBufIn(COLOR_RGB(255,255,255));
     

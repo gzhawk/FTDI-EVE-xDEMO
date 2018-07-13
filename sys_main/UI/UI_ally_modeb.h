@@ -105,26 +105,26 @@ FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
     HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
 
     HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
     HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
     HAL_CmdBufIn(BITMAP_HANDLE(hdl));
     HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*FT800_PIXEL_UNIT,Y*FT800_PIXEL_UNIT));
+    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
@@ -136,7 +136,7 @@ FTVOID ally_modeb (FTU32 para)
 
     /* only load the file once */
     if (flag == 0) {
-        /* load bitmap resources data into FT800 */
+        /* load bitmap resources data into EVE */
         if(APP_OK != appBmpToRamG(HDL_START, RAM_G, bmp_header, RAW_NUM)){
             DBGPRINT;
             return;
@@ -165,10 +165,10 @@ FTVOID ally_modeb (FTU32 para)
     /* display rotated needle */
     HAL_CmdBufIn(SAVE_CONTEXT());
     CoCmd_LOADIDENTITY;
-    CoCmd_TRANSLATE((bmp_header[0].high)*FT800_TRANSFORM_MAX, 
-            (bmp_header[0].high)*FT800_TRANSFORM_MAX);
-    CoCmd_ROTATE(i*FT800_TRANSFORM_MAX/360);
-    CoCmd_TRANSLATE((-1)*(bmp_header[0].wide/2)*FT800_TRANSFORM_MAX,0);
+    CoCmd_TRANSLATE((bmp_header[0].high)*EVE_TRANSFORM_MAX, 
+            (bmp_header[0].high)*EVE_TRANSFORM_MAX);
+    CoCmd_ROTATE(i*EVE_TRANSFORM_MAX/360);
+    CoCmd_TRANSLATE((-1)*(bmp_header[0].wide/2)*EVE_TRANSFORM_MAX,0);
     CoCmd_SETMATRIX;
 
     getXYfrmCenter(i,&Nx,&Ny);

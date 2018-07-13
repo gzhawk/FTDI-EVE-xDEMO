@@ -1,5 +1,5 @@
 /* 
-    Applicaton, Integrated function for FT800
+    Applicaton, Integrated function for EVE 
     Author: Hawk
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/Oct
@@ -27,20 +27,20 @@
  */
 #define CLK_DELAY 200
 
-FTU8 EVE_ID = 0;
+FTU8 READ_ID = 0;
 
 FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = "Error occur / Stop display";
 
 typedef struct wrFuncPara_ {
-    FTRES res;
-    FTU32 Src;
-    FTU32 Des;
-    FTU32 len;
+    FTRES res; // operation source point
+    FTU32 Src; // operation starting point
+    FTU32 Des; // operation destination point
+    FTU32 len; // operation length
 }wrFuncPara;
 
 wrFuncPara fPara = {0};
 
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)
+#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)
 FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
 #endif
 
@@ -55,8 +55,8 @@ STATIC appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
     HAL_CmdBufIn(CLEAR(1,1,1));
     HAL_CmdBufIn(COLOR_RGB(255,255,255));
 
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,font,OPT_CENTER,str1);
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/3*2,font,OPT_CENTER,
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,font,OPT_CENTER,str1);
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/3*2,font,OPT_CENTER,
                (str2 == NULL)?"NULL":str2);
     HAL_CmdBufIn(CMD_CALIBRATE);
     HAL_CmdBufIn(0);
@@ -68,7 +68,7 @@ STATIC appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
 
 STATIC appRet_en appCalForce (FTC8 *dataPath)
 {
-    FTU32 CData[FT800_CAL_PARA_NUM] = {0},
+    FTU32 CData[EVE_CAL_PARA_NUM] = {0},
           reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
     /* make the tag part invalid */
@@ -76,6 +76,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
     stm32f4_invaild_tag();
 #elif defined(MSVC2012EMU)
     vc2012emu_invaild_tag(dataPath);
+#elif defined(MSVC2017EMU)
+    vc2017emu_invaild_tag(dataPath);
 #elif defined(MSVC2010EXPRESS)
     vc2010_invaild_tag(dataPath);
 #elif defined(FT9XXEV)
@@ -89,6 +91,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (STM32F4)",dataPath)) {
 #elif defined(MSVC2012EMU)
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2012Emu)",dataPath)) {
+#elif defined(MSVC2017EMU)
+    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2017Emu)",dataPath)) {
 #elif defined(MSVC2010EXPRESS)
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2010)",dataPath)) {
 #elif defined(FT9XXEV)
@@ -96,7 +100,7 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
 #else
     if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (Arduino)",dataPath)) {
 #endif
-        for (i = 0; i < FT800_CAL_PARA_NUM; reg+=FTU32_LEN,i++) {
+        for (i = 0; i < EVE_CAL_PARA_NUM; reg+=FTU32_LEN,i++) {
             CData[i] = HAL_Read32(reg);
         }
         /* save the CData */
@@ -104,6 +108,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
         stm32f4_save_cdata((FTU16 *)CData);
 #elif defined(MSVC2012EMU)
         vc2012emu_save_cdata(dataPath, (FTU8 *)CData);
+#elif defined(MSVC2017EMU)
+        vc2017emu_save_cdata(dataPath, (FTU8 *)CData);
 #elif defined(MSVC2010EXPRESS)
         vc2010_save_cdata(dataPath, (FTU8 *)CData);
 #elif defined(FT9XXEV)
@@ -117,6 +123,8 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
         stm32f4_vaild_tag();
 #elif defined(MSVC2012EMU)
         vc2012emu_vaild_tag();
+#elif defined(MSVC2017EMU)
+        vc2017emu_vaild_tag();
 #elif defined(MSVC2010EXPRESS)
         vc2010_vaild_tag();
 #elif defined(FT9XXEV)
@@ -130,10 +138,10 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
 
 STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
 {
-    FTU32 CData[FT800_CAL_PARA_NUM] = {0};
+    FTU32 CData[EVE_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
-#if defined(MSVC2012EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
+#if defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
     if (force || (dPath == NULL)) {
 #else
         if (force) {
@@ -145,6 +153,8 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
     if (!stm32f4_is_tag_vaild()) {
 #elif defined(MSVC2012EMU)
     if (!vc2012emu_is_tag_vaild(dPath)) {
+#elif defined(MSVC2017EMU)
+    if (!vc2017emu_is_tag_vaild(dPath)) {
 #elif defined(MSVC2010EXPRESS)
     if (!vc2010_is_tag_vaild(dPath)) {
 #elif defined(FT9XXEV)
@@ -159,6 +169,8 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
     stm32f4_restore_cdata((FTU16 *)CData);
 #elif defined(MSVC2012EMU)
     vc2012emu_restore_cdata(dPath, (FTU8 *)CData);
+#elif defined(MSVC2017EMU)
+    vc2017emu_restore_cdata(dPath, (FTU8 *)CData);
 #elif defined(MSVC2010EXPRESS)
     vc2010_restore_cdata(dPath, (FTU8 *)CData);
 #elif defined(FT9XXEV)
@@ -192,7 +204,7 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
         case L8:
         case ARGB2:
         case RGB332:
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
         case PALETTED8:
         case PALETTED565:
         case PALETTED4444:
@@ -201,6 +213,50 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
 #endif 
             linestride = bmpHD.wide;
             break;
+#if defined(DEF_BT81X)
+        case COMPRESSED_RGBA_ASTC_10x10_KHR:
+            linestride = bmpHD.wide*128/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_10x5_KHR:
+            linestride = bmpHD.wide*213/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_10x6_KHR:
+            linestride = bmpHD.wide*200/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_10x8_KHR:
+            linestride = bmpHD.wide*160/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_12x10_KHR:
+            linestride = bmpHD.wide*107/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_12x12_KHR:
+            linestride = bmpHD.wide*89/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_4x4_KHR:
+            linestride = bmpHD.wide;
+            break;
+        case COMPRESSED_RGBA_ASTC_5x4_KHR:
+            linestride = bmpHD.wide*640/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_5x5_KHR:
+            linestride = bmpHD.wide*512/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_6x5_KHR:
+            linestride = bmpHD.wide*427/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_6x6_KHR:
+            linestride = bmpHD.wide*356/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_8x5_KHR:
+            linestride = bmpHD.wide*320/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_8x6_KHR:
+            linestride = bmpHD.wide*267/800;
+            break;
+        case COMPRESSED_RGBA_ASTC_8x8_KHR:
+            linestride = bmpHD.wide*256/800;
+            break;
+#endif
         case ARGB4:
         case RGB565:
         case ARGB1555:
@@ -220,7 +276,7 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
 FTVOID resWrBuf (FTU32 para)
 {
     wrFuncPara *wfp = (wrFuncPara *) para;
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     fseek(wfp->res,wfp->Src,SEEK_SET);
     if (wfp->len > 0) {
         fread((FTVOID *)wfp->Des,1,wfp->len,wfp->res);
@@ -259,6 +315,7 @@ FTVOID resWrBuf (FTU32 para)
 
 #endif
 }
+
 /* 
  * call back routine for multi-platform
  * read data from Src (MCU, EVE, Flash, SD Card) to Des (EVE-CMD, EVE-DLP, EVE-RAM_G)
@@ -279,7 +336,7 @@ STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
         block = MCU_BLOCK_SIZE;
     }
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     p = (FTU8 *)malloc(block);
     if (p == 0) {
         FTPRINT("\neve mem: no memory");
@@ -304,7 +361,7 @@ STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
 
     for (i = 0; i < file_len; i += l) {
         l = ((file_len - i) > block)?block:(file_len - i);
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)        
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
         fread(p,1,l,wfp->res);
 #elif defined(FT9XXEV)
         /* 
@@ -324,7 +381,7 @@ STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
         }
     }
     wfp->len = file_len;
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     free(p);
 #endif
 }
@@ -343,7 +400,7 @@ FTVOID resIsZlib(FTU32 para)
     FTU8 header[2] = {0};
     header[0] = *(FTU8 *)(wfp->res+wfp->Src);
     header[1] = *(FTU8 *)(wfp->res+wfp->Src+1);
-#elif defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#elif defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     FTU8 header[2] = {0};
     fread(header,1,2,wfp->res);
     fseek(wfp->res,wfp->Src,SEEK_SET);
@@ -395,7 +452,7 @@ FTVOID resIsZlib(FTU32 para)
 }
 FTU32 appResOpen (FTU8 *path)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrFuncPara *pwfp = 0;
     FILE *pFile;
 
@@ -451,7 +508,7 @@ FTU32 appResOpen (FTU8 *path)
 }
 FTU32 appResSize (FTU32 resHDL)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrFuncPara *para = (wrFuncPara *)resHDL;
     FTU32 size;
 
@@ -498,7 +555,7 @@ FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeF
 }
 FTVOID appResClose (FTU32 resHDL)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     wrFuncPara *para = (wrFuncPara *)resHDL;
     fclose(para->res);
 #elif defined(STM32F4)
@@ -510,34 +567,74 @@ FTVOID appResClose (FTU32 resHDL)
 
 #endif
 }
+
+FTU8 appFileExist (FTC8 *path) 
+{
+    FTU32 resHDL;
+
+    resHDL = appResOpen((FTU8 *)path);
+    if (resHDL == 0) {
+        FTPRINT("\nappFileExist: file open error");
+        return 0;
+    }
+
+    if (!appResSize(resHDL)) {
+        appResClose(resHDL);
+        FTPRINT("\nappFileExist: file size 0");
+        return 0;
+    }
+
+    return 1;
+}
+FTU32 appGetNumFromStr(FTU8 *str)
+{
+    FTU32 tmp = 0, i = 0;
+
+    while (str[i]) {
+        if (str[i] >= '0' && str[i] <= '9') {
+            tmp *= 10;
+            tmp += (FTU32)(str[i] - '0');
+        } else {
+            return 0;
+        }
+        if (++i >= 10) {
+            return 0;
+        }
+    }
+
+    return tmp;
+}
 /* the chkExceed flag provid the flexibility while using puzzle overlap function */
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen)
 {
     FTU32 Len, resHDL;
 
-    resHDL = appResOpen((FTU8 *)path);
-    if (resHDL == 0) {
-        FTPRINT("\nappFileToRamG: file open error");
-        return 0;
-    }
+    if (!appFlashPath(path, &Len)) {
+        
+        resHDL = appResOpen((FTU8 *)path);
+        if (resHDL == 0) {
+            FTPRINT("\nappFileToRamG: file open error");
+            return 0;
+        }
 
-    Len = appResSize(resHDL);
-    if (chkExceed && (FT800_RAMG_SIZE < inAddr + Len)) {
+        Len = appResSize(resHDL);
+        if (chkExceed && (EVE_RAMG_SIZE < inAddr + Len)) {
+            appResClose(resHDL);
+            FTPRINT("\nappFileToRamG: EVE_RAMG_SIZE < inAddr + Len");
+            return 0;
+        }
+
+        Len = appResToDes(resHDL,inAddr,0,Len,resIsZlib);
+
+        if (outAddr) {
+            appResToDes(resHDL,(FTU32)outAddr,0,outLen,resWrBuf);
+        }
+
         appResClose(resHDL);
-        FTPRINT("\nappFileToRamG: FT800_RAMG_SIZE < inAddr + Len");
-        return 0;
     }
-
-    Len = appResToDes(resHDL,inAddr,0,Len,resIsZlib);
-
-    if (outAddr) {
-        appResToDes(resHDL,(FTU32)outAddr,0,outLen,resWrBuf);
-    }
-
-    appResClose(resHDL);
-
     return Len;
 }
+
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
     FTU32 i, src, l;
@@ -557,13 +654,27 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
              */
             if (ZLIB_LEN == pbmpHD[i].len) {
                 pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
+            } 
+#if defined(DEF_BT81X)            
+            else if (FLH_LEN == pbmpHD[i].len) {
+                /* 
+                reuse the len_lut for the flash address in setbitmap command use
+                when using flash to display raw (only for ASTC)
+                no RAM is needed, EVE render directly from Flash
+                */
+                pbmpHD[i].len_lut = appFlashAddr(pbmpHD[i].path);
+                pbmpHD[i].len = 0;
+            } else if (ZFLH_LEN == pbmpHD[i].len) {
+                appFlashUnzip(pbmpHD[i].path, src);
+                pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
             }
+#endif
         } else {
             FTPRINT("\nappLoadBmp: Len 0");
             return APP_ERR_LEN;
         }
         src += pbmpHD[i].len;
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
         if (PALETTED8 == pbmpHD[i].format || 
             PALETTED565 == pbmpHD[i].format || 
             PALETTED4444 == pbmpHD[i].format) {
@@ -610,49 +721,47 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 
     return APP_OK;
 }
-/*
- * You may do this bitmap related display list setup here
- * or do it in your own routine
- * all base on your actual application needed
- * it just one of the way to tell the EVE about bitmap information
- */
-FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+FTU8 appUseSetBitmp(FTU32 s, bmpHDR_st *p)
 {
-    FTU32 i, src;
-
-    for (i = 0, src = ramgAddr; i < nums; i++) {
-        HAL_DlpBufIn(BITMAP_HANDLE(i+bmpHdl));
-        HAL_DlpBufIn(BITMAP_SOURCE(src));
-        HAL_DlpBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
-#ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(pbmpHD[i]) >> 10,pbmpHD[i].high>>9));
-#endif       
-        /* 
-         * select NEAREST or BILINEAR base on your image and requirement
-         * NEAREST: make the image shap clear
-         * BILINEAR: make the image shap smooth
-         */
-        HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
-#ifdef DEF_81X
-        HAL_DlpBufIn(BITMAP_SIZE_H(pbmpHD[i].wide >> 9,pbmpHD[i].high>>9));
-#endif         
-        src += pbmpHD[i].len;
-#ifdef DEF_81X
-        if (PALETTED8 == pbmpHD[i].format || 
-                PALETTED565 == pbmpHD[i].format || 
-                PALETTED4444 == pbmpHD[i].format) {
-            src += pbmpHD[i].len_lut;
-        }
-#endif
+#if defined(DEF_81X) || defined(DEF_BT81X)
+    /* 
+     * when using SETBITMAP 
+     * NEAREST,BORDER,BORDER would be the only
+     * option in size, you may use size seperatly
+     * when you wish to set other option such as BILINEAR
+     */
+    if (p->len) {
+        CoCmd_SETBITMAP(s,p->format,p->wide,p->high);
+    } else {
+        /* when len is zero, it means ASTC format in flash
+           use the len_lut to pass the flash address*/
+        CoCmd_SETBITMAP(0x800000 | (p->len_lut) / 32,p->format,p->wide,p->high);
     }
-
-    HAL_DlpBufIn(DISPLAY());
-    HAL_BufToReg(RAM_DL,0);
+    return 1;
+#else
+    return 0;
+#endif
 }
+FTVOID appPalette(FTU32 *ps, bmpHDR_st *p)
+{
+#if defined(DEF_81X) || defined(DEF_BT81X)
+    FTU32 format = p->format, src = *ps;
 
+    switch (format) {
+        case PALETTED8:
+        case PALETTED565:
+        case PALETTED4444:
+            src += p->len_lut;
+            *ps = src;
+            break;
+        default:
+            break;
+    }
+#endif
+}
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-    if (nums > FT800_BMP_EXT_HANDLE || bmpHdl >= FT800_BMP_EXT_HANDLE) {
+    if (nums > EVE_BMP_EXT_HANDLE || bmpHdl >= EVE_BMP_EXT_HANDLE) {
         FTPRINT("\nappBmpToRamG: items exceed");
         return APP_ERR_HDL_EXC;
     }
@@ -665,13 +774,307 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 
     return APP_OK;
 }
+FTU32 appEveCRC(FTU32 eve_addr, FTU32 len)
+{
+    FTU32 addr = HAL_Read32(REG_CMD_WRITE), cmd[4];
+    /* the result would be saved in co-processor's command buffer
+       so need to mark the current offset down
+       then do the read out at result offset
+       to tell the result*/
+    cmd[0] = CMD_MEMCRC;
+    cmd[1] = eve_addr;
+    cmd[2] = len;
+    cmd[3] = 0;
+    HAL_CmdExeNow(cmd, 4);
+    
+    return HAL_Read32(RAM_CMD+addr+4*3);
+}
+FTVOID appEveZERO(FTU32 eve_addr, FTU32 len)
+{
+    FTU32 cmd[3];
+    cmd[0] = CMD_MEMZERO;
+    cmd[1] = eve_addr;
+	cmd[2] = len;
+    HAL_CmdExeNow(cmd, 3);
+}
+FTU8 appFlashPath (FTC8 *path, FTU32 *len)
+{
+#if defined(DEF_BT81X)
+    FTU8 tmp[] = "ZFLASH:";
+
+    if (!memcmp(path, tmp, 7)) {
+        appFlashSetFull();
+        *len = ZFLH_LEN;
+        return 1;
+    }
+    
+    if (!memcmp(path, &tmp[1], 6)) {
+        appFlashSetFull();
+        *len = FLH_LEN;
+        return 1;
+    }
+#endif
+    return 0;
+}
+#if defined(DEF_BT81X)
+FTVOID resWrFlash (FTU32 para)
+{
+    wrFuncPara *wfp = (wrFuncPara *) para;
+
+    /* make sure command buffer clean */
+    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
+    
+    /* then start sending the command */
+    HAL_CmdToReg(CMD_FLASHWRITE);
+    HAL_CmdToReg(wfp->Des);
+    HAL_CmdToReg(wfp->len);
+    resWrEveCmd((FTU32)wfp);
+}
+FTU32 appFlashAddr(FTC8 *path)
+{
+    FTU8 *p = (FTU8 *)path;
+
+    /* either 'ZFLASH:' or 'FLASH:', others all wrong */
+    if (p[6] == ':') {
+        return appGetNumFromStr(&p[7]);
+    } else if (p[5] == ':') {
+        return appGetNumFromStr(&p[6]);
+    }
+
+    return 0;
+}
+FTVOID appFlashUnzip(FTC8 *path, FTU32 src)
+{
+    FTU32 cmd[5] = {0};
+
+    cmd[0] = CMD_FLASHSOURCE;
+    cmd[1] = appFlashAddr(path);
+    cmd[2] = CMD_INFLATE2;
+    cmd[3] = src;
+    cmd[4] = OPT_FLASH;
+    HAL_CmdExeNow(cmd,5);
+}
+FTU8 appFlashSetFull(FTVOID)
+{
+    FTU32 addr, a[2];
+
+    if(FLASH_STATUS_FULL == HAL_Read32(REG_FLASH_STATUS)) {
+        FTPRINT("\nFlash: already in full mode");
+        return 0;
+    }
+    
+    a[0] = CMD_FLASHDETACH;
+    HAL_CmdExeNow(a, 1);
+    
+    a[0] = CMD_FLASHATTACH;
+    HAL_CmdExeNow(a, 1);
+    
+    a[0] = CMD_FLASHFAST;
+    a[1] = 0;
+    /* the result would be saved in co-processor's command buffer
+       so need to mark the current offset down
+       then do the read out at result offset
+       to tell the result*/
+    addr = HAL_Read32(REG_CMD_WRITE);
+    HAL_CmdExeNow(a, 2);
+    
+    switch (HAL_Read32(RAM_CMD+addr+4)) {
+        case 0:
+            FTPRINT("\nFlash: successful set full");
+            return 0;
+        case 0xE001:
+            FTPRINT("\nFlash: flash is not supported");
+            return 1; 
+        case 0xE002:
+            FTPRINT("\nFlash: no header detected in sector 0");
+            return 1; 
+        case 0xE003:
+            FTPRINT("\nFlash: sector 0 data failed integrity check");
+            return 1; 
+        case 0xE004:
+            FTPRINT("\nFlash: device/blob mismatch");
+            return 1; 
+        case 0xE005:
+            FTPRINT("\nFlash: failed full-speed test");
+            return 1; 
+        default:
+            FTPRINT("\nFlash: unknown failure");
+            return 1; 
+    }
+}
+FTU8 appFlashToEVE(FTU32 f_addr, FTU32 e_addr, FTU32 len)
+{
+    FTU32 cmd[4];
+    
+    if (f_addr % 64 || e_addr % 4 || len % 4) {
+        FTPRINT("\nappFlashToEVE: input error");
+        return 1;
+    }
+
+    cmd[0] = CMD_FLASHREAD;
+    cmd[1] = e_addr;
+    cmd[2] = f_addr;
+    cmd[3] = len;
+    HAL_CmdExeNow(cmd, 4);
+
+    return 0;
+}
+FTVOID appFlashErase(FTVOID)
+{
+    FTU32 cmd = CMD_FLASHERASE;
+
+    HAL_CmdExeNow(&cmd, 1);
+}
+FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
+{
+#define CHECK_NUM   3 //head, middle, tail
+#define CHECK_LEN   256
+#define CHECK_EVE_TMP  (EVE_RAMG_SIZE - CHECK_LEN)
+    FTU8 buf[CHECK_LEN] = {0};
+    FTU32 Len, block, resHDL, point, count, crc;
+
+    resHDL = appResOpen(golden_file);
+    if (resHDL == 0) {
+        FTPRINT("\nappFlashVerify: file open error");
+        return 0;
+    }
+    
+    if (f_addr%64) {
+        FTPRINT("\nappFlashVerify: flash addr error");
+        appResClose(resHDL);
+        return 0;
+    }
+
+    Len = appResSize(resHDL);
+    /* if too small, don't have to pick check point
+       just check the first CHECK_LEN*/
+    if (Len <= CHECK_NUM*CHECK_LEN) {
+        count = 1;
+        block = (Len < CHECK_LEN)?(Len - Len%4):Len;
+    } else {
+        count = 3;
+        block = CHECK_LEN;
+    }
+    point = 0;
+    
+    while (count) {
+        /* read a piece of file to a block */
+        if (appResToDes(resHDL,(FTU32)buf,point,block,resWrBuf) != block) {
+            FTPRINT("\nappFlashVerify: file read error");
+            appResClose(resHDL);
+            return 0;
+        }
+        /* if there is a way to calulate the crc32
+           in MCU the same way as EVE (zlib) does
+           it would be even better than sending data to eve
+           then do the crc32, but I don't found any
+           convenience way to do so...
+
+           send that piece of file to EVE for CRC
+        */
+        HAL_Write8Src(CHECK_EVE_TMP, buf, block);
+        crc = appEveCRC(CHECK_EVE_TMP, block);
+        /* clear the temp space in EVE */
+		appEveZERO(CHECK_EVE_TMP, block);
+
+        /* read a piece of flash to EVE */
+		if (appFlashToEVE(f_addr+point, CHECK_EVE_TMP, block)) {
+			FTPRINT("\nappFlashVerify: fail to write to eve");
+			return 0;
+		}
+
+        /* do CRC in EVE and compare the CRC with file piece*/
+        if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
+            FTPRINT("\nappFlashVerify: crc not match");
+            appResClose(resHDL);
+            return 0;
+        }
+
+		count--;
+
+        if (count == 2) {
+            /* check the middle of the body, skip the none 64 align part */
+            point = (Len - CHECK_LEN)/2 - ((Len - CHECK_LEN)/2)%64;
+        } else if (count == 1) {
+            /* check the tail of the body, skip the none 64 align part */
+            point = (Len - CHECK_LEN) - (Len - CHECK_LEN)%64;
+        }
+    }
+
+    appResClose(resHDL);
+
+    return 1;
+}
+
+FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
+{
+    FTU32 resHDL, Len;
+
+    resHDL = appResOpen(f_file);
+    if (resHDL == 0) {
+        FTPRINT("\nappFlashProg: file open error");
+        return 0;
+    }
+    
+    /* if the original file length not 256 byte align
+       it would pad some extra bytes at the tail*/
+    Len = appResSize(resHDL);
+    Len += Len%256?(256 - Len%256):0;
+    
+    if (f_addr%256) {
+        FTPRINT("\nappFlashProg: file addr error");
+        appResClose(resHDL);
+        return 0;
+    }
+
+    if (appResToDes(resHDL,f_addr, 0, Len, resWrFlash) != Len) {
+        FTPRINT("\nappFlashProg: file program error");
+        appResClose(resHDL);
+        return 0;
+    }
+    
+    return Len;
+}
+#endif
+/*
+ * You may do this bitmap related display list setup here
+ * or do it in your own routine
+ * all base on your actual application needed
+ * it just one of the way to tell the EVE about bitmap information
+ */
+FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+{
+    FTU32 i, src;
+
+    HAL_CmdBufIn(CMD_DLSTART);
+    for (i = 0, src = ramgAddr; i < nums; i++) {
+        HAL_CmdBufIn(BITMAP_HANDLE(i+bmpHdl));
+        if (!appUseSetBitmp(src, pbmpHD+i)) {
+            HAL_CmdBufIn(BITMAP_SOURCE(src));
+            HAL_CmdBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
+            /* 
+             * select NEAREST or BILINEAR base on your image and requirement
+             * NEAREST: make the image shap clear
+             * BILINEAR: make the image shap smooth
+             */
+            HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
+        }
+        src += pbmpHD[i].len;
+
+        appPalette(&src, pbmpHD + i);
+    }
+
+    HAL_CmdBufIn(DISPLAY());
+    HAL_CmdBufIn(CMD_SWAP);
+    HAL_BufToReg(RAM_CMD,0);
+}
 
 STATIC FTVOID appUI_GetEVEID (FTVOID)
 {
-    EVE_ID = HAL_Read8(EVE_ID_REG);
+    READ_ID = HAL_Read8(EVE_ID_REG);
 #if defined(DBG_PRINT)
     FTPRINT("\nChip: ");
-    switch (EVE_ID) {
+    switch (READ_ID) {
         case 0x10:
             FTPRINT("FT810");
             break;
@@ -683,6 +1086,12 @@ STATIC FTVOID appUI_GetEVEID (FTVOID)
             break;
         case 0x13:
             FTPRINT("FT813");
+            break;
+        case 0x15:
+            FTPRINT("BT815");
+            break;
+        case 0x16:
+            FTPRINT("BT816");
             break;
         default:
             /* only new FT81X able to read the EVE ID */
@@ -701,7 +1110,7 @@ STATIC FTVOID appUI_SpiInit ( FTVOID )
      */
 #ifdef MSVC2010EXPRESS
     vc2010_spi_init();
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     //do nothing
 #elif defined(STM32F4)
     stm32f4SPI1Init(SPI_BaudRatePrescaler_8);
@@ -718,7 +1127,7 @@ STATIC FTVOID appUI_SpiInit ( FTVOID )
 }
 STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
     //do nothing
 #elif defined(STM32F4)
     //do nothing
@@ -728,11 +1137,11 @@ STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
     ft9xx_sdc_init();
 #else
     /* set the GPIO pin */
-    pinMode(FT800_SPI_CS, OUTPUT);
-    digitalWrite(FT800_SPI_CS, HIGH);
+    pinMode(EVE_SPI_CS, OUTPUT);
+    digitalWrite(EVE_SPI_CS, HIGH);
 
-    pinMode(FT800_PD_N, OUTPUT);
-    digitalWrite(FT800_PD_N, HIGH);
+    pinMode(EVE_PD_N, OUTPUT);
+    digitalWrite(EVE_PD_N, HIGH);
 
     arduino_sdcardInit();
 #endif
@@ -744,11 +1153,11 @@ STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 STATIC FTVOID appUI_EVEActive ( FTVOID )
 {
     HAL_Cfg(FT_GPU_ACTIVE_M);
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
     /* 81X need more action for the active */
     HAL_Cfg(FT_GPU_ACTIVE_M);
 #endif
-    FTDELAY(50);
+    FTDELAY(300);
 }
 
 STATIC FTVOID appUI_EVEClk ( FTVOID )
@@ -761,7 +1170,7 @@ STATIC FTVOID appUI_EVEClk ( FTVOID )
     /* Set the clk to external clock */
     HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
 #endif
-#ifndef DEF_81X
+#if !defined(DEF_81X) && !defined(DEF_BT81X)
     /* default 48MHz, no need to config
     HAL_Cfg(FT_GPU_PLL_48M);  
     */
@@ -778,7 +1187,7 @@ STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
 
     FT_WriteGPIO(ftHandle, 0xBB, OnOff?0x88:0x08);
     FTDELAY(PWC_DELAY);
-#elif defined(MSVC2012EMU)
+#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
     /* Do nothing */
 #elif defined(STM32F4)
     /* Share the PD13/LED3 pin with PD pin of EVE */
@@ -794,10 +1203,10 @@ STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
     gpio_write(FT9XX_PD, OnOff?1:0);
     FTDELAY(PWC_DELAY);
 #else
-    digitalWrite(FT800_PD_N, OnOff?LOW:HIGH);
+    digitalWrite(EVE_PD_N, OnOff?LOW:HIGH);
     FTDELAY(PWC_DELAY);
 
-    digitalWrite(FT800_PD_N, OnOff?HIGH:LOW);
+    digitalWrite(EVE_PD_N, OnOff?HIGH:LOW);
     FTDELAY(PWC_DELAY);
     /* 
      * I was not quite understand why a read action is needed
@@ -811,7 +1220,7 @@ STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
 STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
 {
     /* set DISP to output, then enable the DISP */
-#if defined(DEF_81X)
+#if defined(DEF_81X) || defined(DEF_BT81X)
     /*
        Bit 31-16: Reserved
        Bit 15 : Controlling the direction of pin DISP. For DISP functionality, this bit
@@ -840,7 +1249,7 @@ STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
     HAL_Write16(REG_GPIOX,0x800F);
 #else
     /*
-       Bit 0 - 7 : These bits configure the direction of GPIO pins of the FT800. Bit 0 controls
+       Bit 0 - 7 : These bits configure the direction of GPIO pins of the EVE. Bit 0 controls
        the direction of GPIO0 and Bit 7 controls the direction of GPIO7. The bit value 1
        means the GPIO pin is set as an output, otherwise it means an input. After reset, only
        the GPIO7 is set to output by default.
@@ -886,18 +1295,18 @@ STATIC FTVOID appUI_EVETchCfg ( FTVOID )
      * you may change it depends on your real system
      */
 #if !defined(LCD_WVGA)
-    HAL_Write16(REG_TOUCH_RZTHRESH,FT800_TOUCH_THRESHOLD);
+    HAL_Write16(REG_TOUCH_RZTHRESH,EVE_TOUCH_THRESHOLD);
 #endif
     HAL_Write16(REG_CYA_TOUCH,(HAL_Read16(REG_CYA_TOUCH) | 0x8000));
 #endif
 }
 STATIC FTVOID appUI_EVESetSPI (FTU32 type)
 {
-#ifdef DEF_81X
+#if defined(DEF_81X) || defined(DEF_BT81X)
     if (type == 4) {
-        HAL_Write8(REG_SPI_WIDTH, EVE_QSPI | FT800_SPI_DUMMY);
+        HAL_Write8(REG_SPI_WIDTH, EVE_QSPI | EVE_SPI_DUMMY);
     } else if (type == 2) {
-        HAL_Write8(REG_SPI_WIDTH, EVE_DSPI | FT800_SPI_DUMMY);
+        HAL_Write8(REG_SPI_WIDTH, EVE_DSPI | EVE_SPI_DUMMY);
     } else {
         HAL_Write8(REG_SPI_WIDTH, EVE_SSPI);
     }
@@ -923,58 +1332,66 @@ STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
         HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
         HAL_CmdBufIn(CLEAR(1,1,1));
 
-        switch (EVE_ID) {
+        switch (READ_ID) {
             case 0x10:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT810");
                 break;
             case 0x11:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT811");
                 break;
             case 0x12:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT812");
                 break;
             case 0x13:
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"FT813");
+                break;
+            case 0x15:
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
+                        VER_FONT,OPT_CENTERX,"BT815");
+                break;
+            case 0x16:
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
+                        VER_FONT,OPT_CENTERX,"BT816");
                 break;
             default:
                 /* only new FT81X able to read the EVE ID */
-                CoCmd_TEXT(FT800_LCD_WIDTH/3,FT800_LCD_HIGH/4,
+                CoCmd_TEXT(EVE_LCD_WIDTH/3,EVE_LCD_HIGH/4,
                         VER_FONT,OPT_CENTERX,"EVE Chip");
                 break;
         }
 #if defined(DEF_CAP_MULTI)
-        CoCmd_TEXT(FT800_LCD_WIDTH/3*2,FT800_LCD_HIGH/4,
+        CoCmd_TEXT(EVE_LCD_WIDTH/3*2,EVE_LCD_HIGH/4,
                 VER_FONT,OPT_CENTERX,"CAP-M");
 #elif defined(DEF_CAP_NONMULTI)
-        CoCmd_TEXT(FT800_LCD_WIDTH/3*2,FT800_LCD_HIGH/4,
+        CoCmd_TEXT(EVE_LCD_WIDTH/3*2,EVE_LCD_HIGH/4,
                 VER_FONT,OPT_CENTERX,"CAP-NM");
 #else
-        CoCmd_TEXT(FT800_LCD_WIDTH/3*2,FT800_LCD_HIGH/4,
+        CoCmd_TEXT(EVE_LCD_WIDTH/3*2,EVE_LCD_HIGH/4,
                 VER_FONT,OPT_CENTERX,"RES");
 #endif
-        CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,
+        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,
                 VER_FONT,OPT_CENTERX,"Ver: "APPS_VER);
-        CoCmd_TEXT(FT800_LCD_WIDTH/2-10,FT800_LCD_HIGH/4*3,
+        CoCmd_TEXT(EVE_LCD_WIDTH/2-10,EVE_LCD_HIGH/4*3,
                 CAL_FONT,OPT_CENTERX,"MCU CMD Buf: ");
-        CoCmd_NUMBER(FT800_LCD_WIDTH/2+40,FT800_LCD_HIGH/4*3,
+        CoCmd_NUMBER(EVE_LCD_WIDTH/2+40,EVE_LCD_HIGH/4*3,
                 CAL_FONT,OPT_CENTERX,HAL_CmdBufSize());
 #if defined(STM32F4)
-        CoCmd_TEXT(FT800_LCD_WIDTH/2-30,FT800_LCD_HIGH/4*3+10,
+        CoCmd_TEXT(EVE_LCD_WIDTH/2-30,EVE_LCD_HIGH/4*3+10,
                 CAL_FONT,OPT_CENTERX,"File addr: ");
-        CoCmd_NUMBER(FT800_LCD_WIDTH/2+40,FT800_LCD_HIGH/4*3+10,
+        CoCmd_NUMBER(EVE_LCD_WIDTH/2+40,EVE_LCD_HIGH/4*3+10,
                 CAL_FONT,OPT_CENTERX,FILE_SADDR);
 #endif
         if (SYS_HANG) {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE*2,
+            CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH - CAL_WIDE*2,
                     CAL_FONT,OPT_CENTERX,"system hange due to memory limit!");
         } else {
-            CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE*2,
+            CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH - CAL_WIDE*2,
                     CAL_FONT,OPT_CENTERX,"press and hold to force in calibration");
-            CoCmd_NUMBER(FT800_LCD_WIDTH/2,FT800_LCD_HIGH - CAL_WIDE,
+            CoCmd_NUMBER(EVE_LCD_WIDTH/2,EVE_LCD_HIGH - CAL_WIDE,
                     CAL_FONT,OPT_CENTERX,count);
         }
 
@@ -1009,7 +1426,7 @@ STATIC FTU32 appUI_EVEGetFrq (FTVOID)
          /* Inputs */  : "r"(r)
          /* Using */   : "$r0"
         );
-#elif defined(STM32F4) || defined(MSVC2012EMU) || defined(MSVC2010EXPRESS)
+#elif defined(STM32F4) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(MSVC2010EXPRESS)
     FTDELAY(r/1000);
 #else
     delayMicroseconds(r);
@@ -1045,7 +1462,7 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
        VCycle VOffset VSync0 VSync1 
        PCLK Swizzle PCLKPol Cspread Dither
      */
-    FT800_LCD lcd = {FT800_LCD_WIDTH,FT800_LCD_HIGH, 
+    EVE_LCD lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
 #if defined(LCD_WVGA)
         /* PCLK is critical,
            sometime it may need to set to larger number (2,3)
@@ -1122,7 +1539,7 @@ STATIC FTU8 appUI_EVEVerify (FTVOID)
     FTU8 count = RETRY_COUNT;
 
     FTPRINT("\nVerify: ");
-    while ((HAL_Read8(REG_ID) != FT800_ID ||
+    while ((HAL_Read8(REG_ID) != EVE_ID ||
            HAL_Read8(REG_CPURESET)) &&
            count) {
         FTPRINT(".");
@@ -1191,9 +1608,17 @@ STATIC appRet_en appUI_WaitCal (FTVOID)
     appUI_EVEClnScrn();
     return APP_OK; 
 }
+
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline)
 {
     sprintf((char *)dbg_str_buf,"%s:%d",p_fname,(int)fline);
+}
+FTVOID appUI_EVEBeforeLaunch(FTVOID)
+{
+#if defined(DEF_BT81X)
+    // clean up the error report area
+	HAL_Write8(RAM_ERR_REPORT, 0);
+#endif    
 }
 FTVOID UI_INIT (FTVOID)
 {
@@ -1232,9 +1657,13 @@ FTVOID UI_INIT (FTVOID)
     /* after use single SPI to config the EVE
        set the SPI base on real HW: SPI/DSPI/QSPI */
     appUI_EVESetSPI(EVE_SPI_TYPE); 
-
-    appUI_WaitCal();
    
+    /* you may put some initial steps
+       before launch here */
+    appUI_EVEBeforeLaunch();
+    
+    appUI_WaitCal();
+
     FTPRINT("\nDisplay inited");
 }
 /*
@@ -1244,12 +1673,31 @@ FTVOID UI_INIT (FTVOID)
  */
 FTVOID UI_END (FTVOID)
 {
+#if defined(DEF_BT81X)
+	FTU8 reg_rd = HAL_Read8(RAM_ERR_REPORT);
+    /* 
+       in company's sampleapp code if fault reported, 
+       read REG_CMD_READ == 0xFFF, for the fault report indicater
+       but in my real pratice, read the RAM_ERR_REPORT 
+       if any none '\0', means some error message in it
+       should be better
+     */
+	if (reg_rd)	{
+		HAL_Read8Buff(RAM_ERR_REPORT, dbg_str_buf, EVE_DBG_BUF_LEN);
+	}
+#endif
+    HAL_CoReset();
+
     HAL_CmdBufIn(CMD_DLSTART);
+    // give a RED background to highlight the error
     HAL_CmdBufIn(CLEAR_COLOR_RGB(0xFF,0,0));
     HAL_CmdBufIn(CLEAR(1,1,1));
-    CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/2,24,
-               OPT_CENTER,dbg_str_buf);
+    CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,24,
+               OPT_CENTER,(FTC8 *)dbg_str_buf);
     HAL_CmdBufIn(DISPLAY());
     HAL_CmdBufIn(CMD_SWAP);
     HAL_BufToReg(RAM_CMD,0);
+    
+    FTPRINT("\nEVE ended");
+	FTDELAY(5000);
 }

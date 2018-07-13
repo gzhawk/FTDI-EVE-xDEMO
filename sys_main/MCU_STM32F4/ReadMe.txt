@@ -18,7 +18,7 @@ Some information you may like from ST:
 5. Read this to know how to connect the programming cable (we use J-LINK):
 	http://www.segger.com/admin/uploads/evalBoardDocs/AN00014_ConnectingJLinkToSTM32F407Discovery.pdf
 
-6. the connection between STM32F4Discovery and FT800 CC Card as below:
+6. the connection between STM32F4Discovery and EVE CC Card as below:
     SCK : PA5
 	MISO: PA6
 	MOSI: PA7

@@ -10,7 +10,7 @@
 #define MENU_FONT 23
 #define TOGGLE_FONT 18
 #define TOGGLE_DSKP_W   55
-#define TOGGLE_DSKP_X   (FT800_LCD_WIDTH - TOGGLE_DSKP_W - 15)
+#define TOGGLE_DSKP_X   (EVE_LCD_WIDTH - TOGGLE_DSKP_W - 15)
 #define TOGGLE_DSKP_Y   8
 #define ICON_W 32
 #define ICON_H 32
@@ -25,28 +25,28 @@
 /* TOUCH_COUNT_XXX numbers depand on your CPU speed */
 #define TOUCH_COUNT_ACTIVE 50
 #define CLR_BRD CLEAR_COLOR_RGB(203,222,182)
-#define GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,FT800_LCD_HIGH,0)
+#define GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,EVE_LCD_HIGH,0)
 
 #define CLOSET_W_DEFAULT  (3*ICON_W)
-#define CLOSET_W_TAG      (FT800_LCD_WIDTH/32)//the tag area of closet, at the very left side of closet
-#define CLOSET_W_BAR      (FT800_LCD_WIDTH/16)//the very right side of closet, color is RGB_BAR
+#define CLOSET_W_TAG      (EVE_LCD_WIDTH/32)//the tag area of closet, at the very left side of closet
+#define CLOSET_W_BAR      (EVE_LCD_WIDTH/16)//the very right side of closet, color is RGB_BAR
 
 #define CLOSET_X       (CLOSET_W_TAG+(CLOSET_W_DEFAULT)/2)
-#define CLOSET_Y(i)    ((FT800_LCD_HIGH/5)*((i)+1))
+#define CLOSET_Y(i)    ((EVE_LCD_HIGH/5)*((i)+1))
 
 #define RGB_TITLE COLOR_RGB(0xFF,0xFF,0xFF)
 #define RGB_TRANS COLOR_RGB(200, 200, 200)
 #define RGB_PLACE COLOR_RGB(170, 170, 170)
 #define RGB_BAR   COLOR_RGB(0xFF,0xFF,0)
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 #define PATH_TRANS ROOT_PATH"dragicon\\trans.raw"
 #define PATH_PLACE ROOT_PATH"dragicon\\place.raw"
 #else
 #define PATH_TRANS ROOT_PATH"trans.raw"
 #define PATH_PLACE ROOT_PATH"place.raw"
 
-#define DESKTOP_TAG_ADDR (CALD_TAG_ADDR+CALD_TAG_LEN+FT800_CAL_PARA_NUM*FTU32_LEN)
+#define DESKTOP_TAG_ADDR (CALD_TAG_ADDR+CALD_TAG_LEN+EVE_CAL_PARA_NUM*FTU32_LEN)
 #define DESKTOP_TAG_DATA "DSKP"
 #define DESKTOP_TAG_LEN  4
 /* 
@@ -137,18 +137,18 @@ STATIC FTVOID genGrid (FTU8 num)
 
 	for (i = 0; i < num; i++) {
 		if (num <= ICON_CLASS_ITEMS) {
-			h = (FT800_LCD_HIGH - 2*ICON_H)/2;
-			w = (FT800_LCD_WIDTH-CLOSET_W_TAG)/(num+1);
+			h = (EVE_LCD_HIGH - 2*ICON_H)/2;
+			w = (EVE_LCD_WIDTH-CLOSET_W_TAG)/(num+1);
 			desktop_grid[i][0] = w * (i+1);
 			desktop_grid[i][1] = h;
 		} else {
-			h = (FT800_LCD_HIGH - 2*ICON_H)/3;
+			h = (EVE_LCD_HIGH - 2*ICON_H)/3;
 			if (i < ICON_CLASS_ITEMS) {
-				w = (FT800_LCD_WIDTH-CLOSET_W_TAG)/(ICON_CLASS_ITEMS+1);
+				w = (EVE_LCD_WIDTH-CLOSET_W_TAG)/(ICON_CLASS_ITEMS+1);
 				desktop_grid[i][0] = w * (i+1);
 				desktop_grid[i][1] = h;
 			} else {
-				w = (FT800_LCD_WIDTH-CLOSET_W_TAG)/(num - ICON_CLASS_ITEMS + 1);
+				w = (EVE_LCD_WIDTH-CLOSET_W_TAG)/(num - ICON_CLASS_ITEMS + 1);
 				desktop_grid[i][0] = w * ((i%ICON_CLASS_ITEMS)+1);
 				desktop_grid[i][1] = 2*h;
 			}
@@ -209,7 +209,7 @@ STATIC desktop_node_st * list_create (icon_st * p)
 
 STATIC FTVOID desktop_list_destory_tag (FTVOID)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 
 #elif defined(STM32F4)
 
@@ -218,7 +218,7 @@ STATIC FTVOID desktop_list_destory_tag (FTVOID)
 #endif
 }
 
-#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(STM32F4) && !defined(FT9XXEV)
+#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(MSVC2017EMU) && !defined(STM32F4) && !defined(FT9XXEV)
 STATIC FTU8 desktop_list_check_tag (FTVOID)
 {
 	FTU8 tag[] = DESKTOP_TAG_DATA;
@@ -253,7 +253,7 @@ STATIC desktop_node_st * desktop_list_search (icon_st *p, FTU8 *pindex)
 
 STATIC FTVOID desktop_list_save (FTVOID)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 
 #elif defined(STM32F4)
 
@@ -368,7 +368,7 @@ STATIC FTU8 desktop_list_insert_end (icon_st * p, FTU8 save)
 
 STATIC FTU8 desktop_list_read (FTVOID)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(FT9XXEV)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
 	return 0;
 #elif defined(STM32F4)
 	return 0;
@@ -439,8 +439,8 @@ STATIC FTVOID rects (FTU32 x0, FTU32 y0, FTU32 x1, FTU32 y1, FTU32 rgb)
 {
 	HAL_CmdBufIn(BEGIN(RECTS)); 
 	HAL_CmdBufIn(rgb); 
-	HAL_CmdBufIn(VERTEX2F((x0)*FT800_PIXEL_UNIT,(y0)*FT800_PIXEL_UNIT)); 
-	HAL_CmdBufIn(VERTEX2F((x1)*FT800_PIXEL_UNIT,(y1)*FT800_PIXEL_UNIT)); 
+	HAL_CmdBufIn(VERTEX2F((x0)*EVE_PIXEL_UNIT,(y0)*EVE_PIXEL_UNIT)); 
+	HAL_CmdBufIn(VERTEX2F((x1)*EVE_PIXEL_UNIT,(y1)*EVE_PIXEL_UNIT)); 
 	HAL_CmdBufIn(END());
 }
 
@@ -452,14 +452,14 @@ STATIC FTVOID Swing (icon_st *i)
 	HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
 	HAL_CmdBufIn(BEGIN(BITMAPS));
 	CoCmd_LOADIDENTITY;
-	CoCmd_TRANSLATE(ICON_W/2*FT800_TRANSFORM_MAX,ICON_H/2*FT800_TRANSFORM_MAX);
-	CoCmd_ROTATE(R*FT800_TRANSFORM_MAX/360);
-	CoCmd_TRANSLATE(-ICON_W/2*FT800_TRANSFORM_MAX,-ICON_H/2*FT800_TRANSFORM_MAX);
+	CoCmd_TRANSLATE(ICON_W/2*EVE_TRANSFORM_MAX,ICON_H/2*EVE_TRANSFORM_MAX);
+	CoCmd_ROTATE(R*EVE_TRANSFORM_MAX/360);
+	CoCmd_TRANSLATE(-ICON_W/2*EVE_TRANSFORM_MAX,-ICON_H/2*EVE_TRANSFORM_MAX);
 	CoCmd_SETMATRIX;
 	/* display in ICON central */
 	HAL_CmdBufIn(BITMAP_HANDLE(i->handle));
 	HAL_CmdBufIn(CELL(i->cell));
-	HAL_CmdBufIn(VERTEX2F((i->X-ICON_W/2)*FT800_PIXEL_UNIT,(i->Y-ICON_H/2)*FT800_PIXEL_UNIT));
+	HAL_CmdBufIn(VERTEX2F((i->X-ICON_W/2)*EVE_PIXEL_UNIT,(i->Y-ICON_H/2)*EVE_PIXEL_UNIT));
 	defaultMatrix();
 	HAL_CmdBufIn(END());
 	if (R > 0) {
@@ -493,15 +493,15 @@ STATIC FTVOID displayCloset (icon_st *p, tEvent_e event, FTU8 Touch)
 	/* closet tag */
 	HAL_CmdBufIn(TAG_MASK(1));
 	HAL_CmdBufIn(TAG(TG_TAG_TRANS));
-	rects(0,0,CLOSET_W_TAG,FT800_LCD_HIGH/ICON_CLASS,RGB_TRANS);
+	rects(0,0,CLOSET_W_TAG,EVE_LCD_HIGH/ICON_CLASS,RGB_TRANS);
 	HAL_CmdBufIn(TAG(TG_TAG_PLACE));
-	rects(0,FT800_LCD_HIGH/ICON_CLASS,CLOSET_W_TAG,FT800_LCD_HIGH,RGB_PLACE);
+	rects(0,EVE_LCD_HIGH/ICON_CLASS,CLOSET_W_TAG,EVE_LCD_HIGH,RGB_PLACE);
 	HAL_CmdBufIn(TAG_MASK(0));
 	/* closet space */
 	if (closet_list.list[0].handle == HDL_TRANS) {
-		rects(CLOSET_W_TAG,0,i,FT800_LCD_HIGH,RGB_TRANS);
+		rects(CLOSET_W_TAG,0,i,EVE_LCD_HIGH,RGB_TRANS);
 	} else {
-		rects(CLOSET_W_TAG,0,i,FT800_LCD_HIGH,RGB_PLACE);
+		rects(CLOSET_W_TAG,0,i,EVE_LCD_HIGH,RGB_PLACE);
 	}
 
 	/* show closet background */
@@ -536,14 +536,14 @@ STATIC FTVOID displayCloset (icon_st *p, tEvent_e event, FTU8 Touch)
 		}
 		if (Touch && event == T_CLK && inTarget(p, &closet_list.list[i])) {
 			CoCmd_LOADIDENTITY;
-			CoCmd_TRANSLATE(ICON_W/2*FT800_TRANSFORM_MAX,ICON_H/2*FT800_TRANSFORM_MAX);
-			CoCmd_SCALE(FT800_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U,FT800_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U);
-			CoCmd_TRANSLATE(-ICON_W/2*FT800_TRANSFORM_MAX,-ICON_H/2*FT800_TRANSFORM_MAX);
+			CoCmd_TRANSLATE(ICON_W/2*EVE_TRANSFORM_MAX,ICON_H/2*EVE_TRANSFORM_MAX);
+			CoCmd_SCALE(EVE_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U,EVE_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U);
+			CoCmd_TRANSLATE(-ICON_W/2*EVE_TRANSFORM_MAX,-ICON_H/2*EVE_TRANSFORM_MAX);
 			CoCmd_SETMATRIX;
 		}
 		HAL_CmdBufIn(BITMAP_HANDLE(closet_list.list[i].handle));
 		HAL_CmdBufIn(CELL(closet_list.list[i].cell));
-		HAL_CmdBufIn(VERTEX2F((closet_list.list[i].X-ICON_W/2)*FT800_PIXEL_UNIT,(closet_list.list[i].Y-ICON_H/2)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((closet_list.list[i].X-ICON_W/2)*EVE_PIXEL_UNIT,(closet_list.list[i].Y-ICON_H/2)*EVE_PIXEL_UNIT));
 		defaultMatrix();
 	}
 
@@ -558,7 +558,7 @@ STATIC FTVOID displayDesktop (icon_st *p, tEvent_e event, FTU8 Touch)
 	desktop_node_st *tmp = phead;
 	
 	HAL_CmdBufIn(RGB_TITLE);
-	CoCmd_TEXT(g_closet_line+(FT800_LCD_WIDTH-g_closet_line)/2,0,MENU_FONT,OPT_CENTERX,"Desktop");
+	CoCmd_TEXT(g_closet_line+(EVE_LCD_WIDTH-g_closet_line)/2,0,MENU_FONT,OPT_CENTERX,"Desktop");
 
 	if (tmp) {
 		HAL_CmdBufIn(TAG_MASK(1));
@@ -575,14 +575,14 @@ STATIC FTVOID displayDesktop (icon_st *p, tEvent_e event, FTU8 Touch)
 				}
 				if (Touch && event == T_CLK && inTarget(p, tmp->pdesktop_list)) {
 					CoCmd_LOADIDENTITY;
-					CoCmd_TRANSLATE(ICON_W/2*FT800_TRANSFORM_MAX,ICON_H/2*FT800_TRANSFORM_MAX);
-					CoCmd_SCALE(FT800_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U,FT800_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U);
-					CoCmd_TRANSLATE(-ICON_W/2*FT800_TRANSFORM_MAX,-ICON_H/2*FT800_TRANSFORM_MAX);
+					CoCmd_TRANSLATE(ICON_W/2*EVE_TRANSFORM_MAX,ICON_H/2*EVE_TRANSFORM_MAX);
+					CoCmd_SCALE(EVE_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U,EVE_TRANSFORM_MAX/ICON_ZOOM_D*ICON_ZOOM_U);
+					CoCmd_TRANSLATE(-ICON_W/2*EVE_TRANSFORM_MAX,-ICON_H/2*EVE_TRANSFORM_MAX);
 					CoCmd_SETMATRIX;	
 				}
 				HAL_CmdBufIn(BITMAP_HANDLE(tmp->pdesktop_list->handle));
 				HAL_CmdBufIn(CELL(tmp->pdesktop_list->cell));
-				HAL_CmdBufIn(VERTEX2F((tmp->pdesktop_list->X-ICON_W/2)*FT800_PIXEL_UNIT,(tmp->pdesktop_list->Y-ICON_H/2)*FT800_PIXEL_UNIT));
+				HAL_CmdBufIn(VERTEX2F((tmp->pdesktop_list->X-ICON_W/2)*EVE_PIXEL_UNIT,(tmp->pdesktop_list->Y-ICON_H/2)*EVE_PIXEL_UNIT));
 				defaultMatrix();
 			}
 			tmp = tmp->next;			
@@ -597,12 +597,12 @@ STATIC FTVOID displayBar (FTVOID)
 	/* display closet bar */
 	HAL_CmdBufIn(TAG_MASK(1));
 	HAL_CmdBufIn(TAG(TG_BAR));
-	rects(g_closet_line-CLOSET_W_BAR,0,g_closet_line,FT800_LCD_HIGH,RGB_BAR);
+	rects(g_closet_line-CLOSET_W_BAR,0,g_closet_line,EVE_LCD_HIGH,RGB_BAR);
 	HAL_CmdBufIn(END());
 	HAL_CmdBufIn(TAG_MASK(0));
 }
 
-#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(FT9XXEV)
+#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(MSVC2017EMU) && !defined(FT9XXEV)
 STATIC FTVOID displayToggle (FTU8 state)
 {
 	/*TODO: actuall, the deperator should be 0xFF "Unsave/xffSave"
@@ -678,7 +678,7 @@ STATIC FTU8 displayItems (icon_st *p, FTU8 Touch, FTU8 *pSave)
 	/* show icon on desktop */
 	displayDesktop(p, lastEvent, Touch);
 
-#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(FT9XXEV)
+#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(MSVC2017EMU) && !defined(FT9XXEV)
 	/* show desktop toggle */
 	displayToggle(*pSave);
 #endif
@@ -762,9 +762,9 @@ STATIC FTU8 displayItems (icon_st *p, FTU8 Touch, FTU8 *pSave)
 FTVOID subScreen (FTU32 para)
 {
 	static FTU8 ifLoaded = 0;
-	FTU16 i = FT800_LCD_WIDTH/5*2, j = 0;
+	FTU16 i = EVE_LCD_WIDTH/5*2, j = 0;
 	if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(HDL_TRANS, RAM_G, &bmpHD[0], ICON_CLASS)){
 			DBGPRINT;
 			return;
@@ -778,23 +778,23 @@ FTVOID subScreen (FTU32 para)
 		HAL_CmdBufIn(CLEAR(1,1,1));
 		GRAD_BKG;
 
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/5,MENU_FONT,OPT_CENTERX,"SubScreen");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/5,MENU_FONT,OPT_CENTERX,"SubScreen");
 		HAL_CmdBufIn(BEGIN(BITMAPS));
 		HAL_CmdBufIn(BITMAP_HANDLE(icon_select.handle));
 		HAL_CmdBufIn(CELL(icon_select.cell));
-		HAL_CmdBufIn(VERTEX2F((i-ICON_W/2)*FT800_PIXEL_UNIT,(FT800_LCD_HIGH/2-ICON_W/2)*FT800_PIXEL_UNIT));
+		HAL_CmdBufIn(VERTEX2F((i-ICON_W/2)*EVE_PIXEL_UNIT,(EVE_LCD_HIGH/2-ICON_W/2)*EVE_PIXEL_UNIT));
 		HAL_CmdBufIn(END());
-		CoCmd_TEXT(FT800_LCD_WIDTH/2,FT800_LCD_HIGH/5*4,MENU_FONT,OPT_CENTERX,"Tap any place in screen to return");
+		CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/5*4,MENU_FONT,OPT_CENTERX,"Tap any place in screen to return");
 
 		HAL_CmdBufIn(DISPLAY());
 		HAL_CmdBufIn(CMD_SWAP);
 		HAL_BufToReg(RAM_CMD,0);
 		if (j) {
-			if (--i == FT800_LCD_WIDTH/5*2) {
+			if (--i == EVE_LCD_WIDTH/5*2) {
 				j = 0;
 			}
 		} else {
-			if (++i == FT800_LCD_WIDTH/5*3) {
+			if (++i == EVE_LCD_WIDTH/5*3) {
 				j = 1;
 			}
 		}
@@ -823,7 +823,7 @@ FTVOID dragIcon (FTU32 para)
 	return;
 #endif
 	if (ifLoaded == 0) {
-		/* load bitmap resources data into FT800 */
+		/* load bitmap resources data into EVE */
 		if(APP_OK != appBmpToRamG(HDL_TRANS, RAM_G, &bmpHD[0], ICON_CLASS)){
 			DBGPRINT;
 			return;
@@ -844,7 +844,7 @@ FTVOID dragIcon (FTU32 para)
 		tmp = HAL_Read32(REG_TOUCH_SCREEN_XY);
 		X = (tmp>>16)&0xFFFF;
 		Y = tmp&0xFFFF;
-		if (Y <= FT800_LCD_HIGH && X <= FT800_LCD_WIDTH) {
+		if (Y <= EVE_LCD_HIGH && X <= EVE_LCD_WIDTH) {
 			iconLocation.Y = Y;
 			iconLocation.X = X;
 

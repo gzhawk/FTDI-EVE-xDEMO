@@ -1,5 +1,5 @@
 # 
-# It's a makefile for FT800 demo for STM32 MCU
+# It's a makefile for EVE demo for STM32 MCU
 # The reason we use  "script" way in stead of using a "IDE" (Keil, Tasking, TrueSTUDIO, Eclipse, etc.) is
 # try to provide user more flexiblity, to expand what they want to do, or make them easy porting
 # to the environment they used to play on, and make the build environment independent
