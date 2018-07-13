@@ -924,14 +924,10 @@ STATIC FTVOID dispDate (FTVOID)
     /* use a mask bitmap to give an effect */
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_MASK));
     HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,MASK_ENLARGE*imgHeader[HDL_MASK].wide,imgHeader[HDL_MASK].high));
-#ifdef DEF_81X
     HAL_CmdBufIn(BITMAP_SIZE_H(MASK_ENLARGE*imgHeader[HDL_MASK].wide >> 9,imgHeader[HDL_MASK].high>>9));
-#endif
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_MASK_D));
     HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,MASK_ENLARGE*imgHeader[HDL_MASK_D].wide,imgHeader[HDL_MASK_D].high));
-#ifdef DEF_81X
     HAL_CmdBufIn(BITMAP_SIZE_H(MASK_ENLARGE*imgHeader[HDL_MASK_D].wide >> 9,imgHeader[HDL_MASK_D].high>>9));
-#endif
 
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;

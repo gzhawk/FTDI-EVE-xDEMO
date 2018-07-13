@@ -575,32 +575,22 @@ FTVOID ally_special_treatment(FTVOID)
     /* special treatment for number bitmap to use cell */
     HAL_DlpBufIn(BITMAP_HANDLE(I_NUM_S));
     HAL_DlpBufIn(BITMAP_LAYOUT(bmp_header[I_NUM_S].format,appGetLinestride(bmp_header[I_NUM_S]),bmp_header[I_NUM_S].high/10));
-#ifdef DEF_81X
     HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(bmp_header[I_NUM_S]) >> 10,(bmp_header[I_NUM_S].high/10)>>9));
-#endif       
     HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmp_header[I_NUM_S].wide,(bmp_header[I_NUM_S].high/10)));
-#ifdef DEF_81X
     HAL_DlpBufIn(BITMAP_SIZE_H(bmp_header[I_NUM_S].wide >> 9,(bmp_header[I_NUM_S].high/10)>>9));
-#endif 
     /* special treatment for shadow bitmap to use cell */
     HAL_DlpBufIn(BITMAP_HANDLE(I_SHADOW));
     HAL_DlpBufIn(BITMAP_LAYOUT(bmp_header[I_SHADOW].format,appGetLinestride(bmp_header[I_SHADOW]),bmp_header[I_SHADOW].high/2));
-#ifdef DEF_81X
     HAL_DlpBufIn(BITMAP_LAYOUT_H(appGetLinestride(bmp_header[I_SHADOW]) >> 10,(bmp_header[I_SHADOW].high/2)>>9));
-#endif       
     HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,bmp_header[I_SHADOW].wide,(bmp_header[I_SHADOW].high/2)));
-#ifdef DEF_81X
     HAL_DlpBufIn(BITMAP_SIZE_H(bmp_header[I_SHADOW].wide >> 9,(bmp_header[I_SHADOW].high/2)>>9));
-#endif         
     /* special treatment for rotate bitmap
        need to use BILINEAR
        high > wide: use high in both side
        high < wide: use wide in both side*/
     HAL_DlpBufIn(BITMAP_HANDLE(I_NDL));
     HAL_DlpBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,bmp_header[I_NDL].high*2,bmp_header[I_NDL].high*2));
-#ifdef DEF_81X
     HAL_DlpBufIn(BITMAP_SIZE_H((bmp_header[I_NDL].high*2) >> 9,(bmp_header[I_NDL].high*2)>>9));
-#endif         
     HAL_DlpBufIn(DISPLAY());
     HAL_BufToReg(RAM_DL,0);
 }
