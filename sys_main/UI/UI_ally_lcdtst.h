@@ -5,16 +5,13 @@
 	Date  : 2016/Jun
 */
 
-#define TST_BMP_W    (800)
-#define TST_BMP_H    (480)
-
 FTVOID create_bitmap(FTVOID)
 {
     FTU32 w,h,addr;
     /* create a black and white test background bitmap
        for LCD test*/
-    for (h = 0,addr = RAM_G; h < TST_BMP_H; h++) {
-        for (w = 0; w < TST_BMP_W; w += 2) {
+    for (h = 0,addr = RAM_G; h < EVE_LCD_HIGH; h++) {
+        for (w = 0; w < EVE_LCD_WIDTH; w += 2) {
             /* use RGB565, 2byte/pixel */
             HAL_Write8(addr, 0xFF);
             HAL_Write8(addr+1, 0xFF);
@@ -27,10 +24,10 @@ FTVOID create_bitmap(FTVOID)
     HAL_DlpBufIn(BITMAP_HANDLE(0));
     HAL_DlpBufIn(BITMAP_SOURCE(RAM_G));
 
-    HAL_DlpBufIn(BITMAP_LAYOUT(RGB565,TST_BMP_W*2,TST_BMP_H));
-    HAL_DlpBufIn(BITMAP_LAYOUT_H((TST_BMP_W*2)>>10,TST_BMP_H>>9));
-    HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,TST_BMP_W,TST_BMP_H));
-    HAL_DlpBufIn(BITMAP_SIZE_H(TST_BMP_W>>9,TST_BMP_H>>9));
+    HAL_DlpBufIn(BITMAP_LAYOUT(RGB565,EVE_LCD_WIDTH*2,EVE_LCD_HIGH));
+    HAL_DlpBufIn(BITMAP_LAYOUT_H((EVE_LCD_WIDTH*2)>>10,EVE_LCD_HIGH>>9));
+    HAL_DlpBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,EVE_LCD_WIDTH,EVE_LCD_HIGH));
+    HAL_DlpBufIn(BITMAP_SIZE_H(EVE_LCD_WIDTH>>9,EVE_LCD_HIGH>>9));
 
     HAL_DlpBufIn(DISPLAY());
     HAL_BufToReg(RAM_DL,0);
