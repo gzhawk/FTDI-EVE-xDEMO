@@ -41,7 +41,6 @@
 #define UI_AMICON
 #define UI_DIAL
 #define UI_FV_INVENSYS
-#define UI_FLASH_ANIM
 #define UI_FLASH_PROG
 /* UI for customer: demonstration */
 #define UI_CJ
@@ -55,6 +54,7 @@
 #define UI_SLIP_M
 #define UI_VJDZ
 #define UI_AUPU
+#define UI_FLASH_ANIM
 #endif
 
 /*-------------------------------------------------Demo Related hardware setting
@@ -229,7 +229,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "6.A.43.0"
+#define APPS_VER "6.A.43.1"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -260,7 +260,18 @@
  * you may bypass the calibration phase, when no touch in your UI
  */
 #define CAL_NEEDED
-
+/* you need to carfully consider the size of the block
+ * base on your system available memory and data transfer buffering space 
+ * WINDOWS: consider it as unlimited memory
+ * FT9xx  : totally got 64K memory
+ */
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
+#define MCU_BLOCK_SIZE      (10*1024)
+#else
+/* limited by sdcard sector size
+ * should be the same as SDC_SECTOR_SIZE if sdcard.h be used */
+#define MCU_BLOCK_SIZE      (512)
+#endif
 /*-------------------------------------------------------------MSVC2010EXPRESS*/
 #ifdef MSVC2010EXPRESS
 #include "vc2010_xdemo.h"
