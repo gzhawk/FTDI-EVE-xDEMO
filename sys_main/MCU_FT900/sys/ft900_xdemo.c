@@ -8,14 +8,137 @@
 extern FTVOID timerISR(FTVOID);
 #endif
 
+FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
+
+STATIC FTVOID rdStart ( FTU32 addr )
+{
+    FTU8 tmp[FT9XX_SPI_RXLEN] = {0};
+
+    tmp[0] = (FTU8)(addr >> 16);
+    tmp[1] = (FTU8)(addr >> 8);
+    tmp[2] = (FTU8)addr;
+
+    FT9XX_CS_LOW;
+    spi_writen(SPIM,tmp,FT9XX_SPI_RXLEN);
+}
+
+STATIC FTVOID wrStart ( FTU32 addr )
+{
+    FTU8 tmp[FT9XX_SPI_TXLEN] = {0};
+
+    tmp[0] = (FTU8)(0x80 | (addr >> 16));
+    tmp[1] = (FTU8)(addr >> 8);
+    tmp[2] = (FTU8)addr;
+
+    FT9XX_CS_LOW;
+    spi_writen(SPIM,tmp,FT9XX_SPI_TXLEN);
+}
+
+FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
+{
+    wrStart(addr);
+
+    spi_writen(SPIM,&data,1);
+
+    FT9XX_CS_HIGH;
+}
+
+FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
+{
+    FTU32 i;
+
+    wrStart(addr);
+
+    i = len; /* just to remove compile warning */
+    spi_writen(SPIM,src,i);
+
+    FT9XX_CS_HIGH;
+}
+
+FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
+{
+    wrStart(addr);
+
+    spi_writen(SPIM,(FTU8 *)&data,2);
+
+    FT9XX_CS_HIGH;
+}
+
+FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
+{
+    wrStart(addr);
+
+    spi_writen(SPIM,(FTU8 *)&data,4);
+
+    FT9XX_CS_HIGH;
+}
+
+FTVOID HAL_Cfg ( FTU8 cfg )
+{
+    FTU8 tmp[FT9XX_SPI_TXLEN] = {0};
+    tmp[0] = cfg;
+    tmp[1] = 0;
+    tmp[2] = 0;
+
+    FT9XX_CS_LOW;
+    spi_writen(SPIM,tmp,FT9XX_SPI_TXLEN);
+    FT9XX_CS_HIGH;
+}
+
+FTU8 HAL_Read8 ( FTU32 addr )
+{
+    FTU8 tmp[4] = {0};
+    rdStart(addr);
+    spi_readn(SPIM,tmp,spi_dummy+1);
+    FT9XX_CS_HIGH;
+    return tmp[spi_dummy];
+}
+
+FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len )
+{
+    rdStart(addr);
+
+    spi_readn(SPIM,buff,spi_dummy+len);
+    
+    FT9XX_CS_HIGH;
+    
+    return len;
+}
+
+FTU16 HAL_Read16 ( FTU32 addr )
+{
+    FTU8 tmp[4] = {0};
+    rdStart(addr);
+    spi_readn(SPIM,(FTU8 *)&tmp,spi_dummy+2);
+    FT9XX_CS_HIGH;
+
+    return tmp[spi_dummy]| \
+        (tmp[spi_dummy+1]<<8);
+}
+
+FTU32 HAL_Read32 ( FTU32 addr )
+{
+    FTU8 tmp[8] = {0};
+    rdStart(addr);
+    spi_readn(SPIM,(FTU8 *)&tmp,spi_dummy+4);
+    FT9XX_CS_HIGH;
+
+    return tmp[spi_dummy]| \
+        (tmp[spi_dummy+1]<<8)| \
+        (tmp[spi_dummy+2]<<16)| \
+        (tmp[spi_dummy+3]<<24);
+}
+
 FTVOID ft9xx_apps_sys_dummy (FTU32 para)
 {
+/* do nothing for dumy print */
 }
 
 FTVOID ft9xx_dumy_print (char *p)
 {
 /* do nothing for dumy print */
 }
+
 FTVOID ft9xx_fatfs_dbg_info(FRESULT ret)
 {
 	switch (ret) {
@@ -81,6 +204,7 @@ FTVOID ft9xx_fatfs_dbg_info(FRESULT ret)
             break;
     }
 }
+
 FTVOID ft9xx_ili9488_cmd (FTU8 *pdata, FTU32 num)
 {
 	FT9XX_ILI9488_CS_LOW;
@@ -94,6 +218,7 @@ FTVOID ft9xx_ili9488_cmd (FTU8 *pdata, FTU32 num)
 
 	FT9XX_ILI9488_CS_HIGH;
 }
+
 FTVOID ft9xx_init_ili9488 (FTVOID)
 {
 	FTU8 tmp[5] = {0};
@@ -156,6 +281,7 @@ FTVOID ft9xx_init_ili9488 (FTVOID)
 	tmp[1] = 0xb0;
 	ft9xx_ili9488_cmd(tmp,2);
 }
+
 FTVOID ft9xx_int_print (char *p)
 {
 	sys_enable(sys_device_uart0);
@@ -171,6 +297,7 @@ FTVOID ft9xx_int_print (char *p)
 	FTPRINT("\n");
 	FTPRINT(p);
 }
+
 FTVOID ft9xx_int_timer (FTVOID)
 {
 #if defined(DEF_TIMER)
@@ -200,6 +327,7 @@ FTVOID ft9xx_int_timer (FTVOID)
     timer_start(timer_select_a);
 #endif
 }
+
 FTVOID ft9xx_init (FTVOID)
 {
 	interrupt_enable_globally();
@@ -348,69 +476,219 @@ FTU64 get_fattime (FTVOID)
 	return 0;
 }
 
-FTVOID ft9xx_invaild_tag (FTC8 *dataPath)
+FTVOID HAL_invaild_tag (FTC8 *dataPath)
 {
 	FTPRINT("\ninvalid the tag...");
     ft9xx_fatfs_dbg_info(f_unlink((const TCHAR*)dataPath));
 }
 
-FTU8 ft9xx_is_tag_vaild (FIL *f_hdl, FTC8 *dPath)
+FTU8 HAL_is_tag_vaild (FTC8 *dPath)
 {
     FTU8 tag[] = CALD_TAG_DATA, p[CALD_TAG_LEN];
     FTU32 i;
 
-	if (FR_OK != f_open(f_hdl, (const TCHAR*)dPath, FA_READ)) {
+	if (FR_OK != f_open(&FT9xxFile, (const TCHAR*)dPath, FA_READ)) {
 		FTPRINT("\nno c data file");
 		return 0;
 	}
 
-    f_read(f_hdl, p,4,&i);
+    f_read(&FT9xxFile, p,4,&i);
 
 	FTPRINT("\nis the tag vaild...");
     if (memcmp(tag,p,CALD_TAG_LEN)) {
         FTPRINT("invaild");
-        f_close(f_hdl);
+        f_close(&FT9xxFile);
         return 0;
     } else {
         FTPRINT("vaild");
-        f_close(f_hdl);
+        f_close(&FT9xxFile);
         return 1;
     }
 }
 
-FTVOID ft9xx_save_cdata (FIL *f_hdl, FTC8 *dataPath, FTU8 *p)
+FTVOID HAL_save_cdata (FTC8 *dataPath, FTU8 *p)
 {
 	FTU32 i;
     FTU8 tag[] = CALD_TAG_DATA;
 
-	if (FR_OK != f_open(f_hdl, (const TCHAR*)dataPath, FA_WRITE | FA_CREATE_NEW)) {
+	if (FR_OK != f_open(&FT9xxFile, (const TCHAR*)dataPath, FA_WRITE | FA_CREATE_NEW)) {
 		FTPRINT("\nfail to open c data file");
 		return;
 	}
     
     FTPRINT("\nwrite tag to file...");
-    ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)tag,4,&i));
+    ft9xx_fatfs_dbg_info(f_write(&FT9xxFile, (FTVOID *)tag,4,&i));
     FTPRINT("\nwrite c data to file...");
-    ft9xx_fatfs_dbg_info(f_write(f_hdl, (FTVOID *)p,EVE_CAL_PARA_NUM*4,&i));
+    ft9xx_fatfs_dbg_info(f_write(&FT9xxFile, (FTVOID *)p,EVE_CAL_PARA_NUM*4,&i));
 
-	f_close(f_hdl);
+	f_close(&FT9xxFile);
 }
 
-FTVOID ft9xx_restore_cdata (FIL *f_hdl, FTC8 *dPath, FTVOID *p)
+FTVOID HAL_restore_cdata (FTC8 *dataPath, FTU8 *p)
 {
 	FTU32 i;
 
     FTPRINT("\nrestore c data from file...");
-	f_open(f_hdl, (const TCHAR*)dPath, FA_READ);
-    f_lseek(f_hdl, CALD_TAG_LEN);
-    ft9xx_fatfs_dbg_info(f_read(f_hdl, p,EVE_CAL_PARA_NUM*4,&i));
-	f_close(f_hdl);
+
+	f_open(&FT9xxFile, (const TCHAR*)dataPath, FA_READ);
+    
+    f_lseek(&FT9xxFile, CALD_TAG_LEN);
+    
+    ft9xx_fatfs_dbg_info(f_read(&FT9xxFile, p,EVE_CAL_PARA_NUM*4,&i));
+	
+    f_close(&FT9xxFile);
 }
 
-FTVOID ft9xx_vaild_tag (FTVOID)
+FTVOID HAL_vaild_tag (FTVOID)
 {
 	/* already save tag to file together with c data */
 	/* give some time to file system to finish operation */
 	delayms(100);
 }
 
+FTVOID HAL_ili9488 (FTVOID)
+{
+    /*
+     * spi sck = system clock/SPI_Div, 100MHz/256=390KHz
+     * ILI9488 looks like need 500KHz, 100MHz/128=781KHz, 
+     * for FT900 no 200 can be selected 
+     */
+    ft9xx_spi_init(1,128);
+    ft9xx_init_ili9488();
+}
+
+FTVOID FTUDELAY(FTU32 uS)
+{
+    __asm__
+        (
+         "   move.l  $r0,%0"
+         "\n\t"
+         "   mul.l   $r0,$r0,100"
+         "\n\t"
+         "1:"
+         "\n\t"
+         "   sub.l   $r0,$r0,3"
+         "\n\t" /* Subtract the loop time = 4 cycles */
+         "   cmp.l   $r0,0"
+         "\n\t" /* Check that the counter is equal to 0 */
+         "   jmpc    gt, 1b"
+         "\n\t"
+         /* Outputs */ :
+         /* Inputs */  : "r"(uS)
+         /* Using */   : "$r0"
+        );
+}
+
+FTVOID HAL_speed_up (FTU32 type)
+{
+    /* use the highest speed of clk of SPI on MM900 module */
+    if (type == 4) {
+        ft9xx_spi_init(type,8);
+    } else {
+        ft9xx_spi_init(type,2);
+    }
+}
+
+FTVOID HAL_PwdCyc ( FTU8 OnOff )
+{
+#define PWC_DELAY 20
+    gpio_write(FT9XX_PD, OnOff?0:1);
+    FTDELAY(PWC_DELAY);
+
+    gpio_write(FT9XX_PD, OnOff?1:0);
+    FTDELAY(PWC_DELAY);
+}
+
+FTVOID HAL_SpiInit ( FTVOID )
+{
+    /* 
+    the SPI clock shall not exceed 11MHz before system clock is enabled. 
+    After system clock is properly enabled, 
+    the SPI clock is allowed to go up to 30MHz.	
+     
+    spi sck = system clock/SPI_Div, 100MHz/16=6.25MHz*/
+    ft9xx_spi_init(1,16);
+}
+
+FTVOID HAL_preparation (FTVOID)
+{
+    ft9xx_init();
+
+    ft9xx_sdc_init();
+}
+
+FTU32 HAL_WriteSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
+{
+    FTU32 l = 0;
+
+    f_lseek((FIL*)handle, src);
+    
+    if (len > 0) {
+        f_read((FIL*)handle, (FTVOID *)des, len, &l);
+    }
+
+    return l;
+}
+
+FTU8 * HAL_LoopMemMalloc (FTU32 handle, FTU32 src, FTU32 len)
+{
+    return file_buff;
+}
+
+FTVOID HAL_LoopMemRead (FTU32 handle, FTU8 **ppbuf, FTU32 len)
+{
+    FTU32 l;
+
+    f_read((FIL*)handle, (FTVOID *)*ppbuf, len, &l);
+}
+
+FTVOID HAL_LoopMemFree (FTU32 buf)
+{
+    // do nothing
+}
+
+FTU32 HAL_SegFileOpen (FTU8 *path)
+{
+    if (FR_OK != f_open(&FT9xxFile, (const TCHAR*)path, FA_READ)) {
+        FTPRINT("\nHAL_SegFileOpen: file open error");
+        return 0;
+    }
+
+    return 1;
+}
+
+FTU32 HAL_SegFileSize (FTU32 handle)
+{
+    FTU32 l = f_size((FIL*)handle);
+    
+    return BYTES4ALIGN(l);
+}
+
+FTVOID HAL_SegFileClose (FTU32 handle)
+{
+    f_close((FIL*)handle);
+}
+
+FTU8 HAL_ZlibCompressed (FTU32 handle, FTU32 src)
+{
+    FTU8 header[2] = {0};
+    FTU32 l = 0;
+
+    f_read((FIL*)handle, (FTVOID *)header, 2, &l);
+    f_lseek((FIL*)handle,src);
+    /*
+       zLib compression header
+       +---+---+
+       |CMF|FLG|
+       +---+---+
+
+       78 01 - No Compression/low
+       78 9C - Default Compression
+       78 DA - Best Compression 
+     */
+    if (header[0] == 0x78 && header[1] == 0x9C) {
+        return 1;
+    } else {
+        return 0;
+    }
+}

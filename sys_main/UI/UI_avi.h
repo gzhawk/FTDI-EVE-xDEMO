@@ -146,7 +146,7 @@ STATIC FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FT
 	HAL_BufToReg(RAM_CMD, 0);
 
 	/* write data to RAM_G */
-	appResToDes(resHDL, mfifo_addr, index, first_block, resWrEve);
+	SegmentOperation(resHDL, index, mfifo_addr, first_block, 0);
 
 	index += first_block;
 
@@ -180,7 +180,7 @@ STATIC FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FT
 				 * fifo |---r---w---|
 				 * l    |**|
 				 */
-				appResToDes(resHDL, mfifo_addr+mfifo_wr, index, l, resWrEve);
+				SegmentOperation(resHDL, index, mfifo_addr+mfifo_wr, l, 0);
 
 				HAL_Write32(REG_MEDIAFIFO_WRITE, mfifo_wr+l);
 			} else if (mfifo_size == mfifo_wr) {
@@ -191,7 +191,7 @@ STATIC FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FT
 				 */
 				l = (mfifo_rd >= l)?l:mfifo_rd - 4;
 				
-				appResToDes(resHDL, mfifo_addr, index, l, resWrEve);
+				SegmentOperation(resHDL, index, mfifo_addr, l, 0);
 
 				HAL_Write32(REG_MEDIAFIFO_WRITE, l);
 			} else {
@@ -200,7 +200,7 @@ STATIC FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FT
 				 * l1   |*****|
 				 * l2   |*******|
 				 */
-				appResToDes(resHDL, mfifo_addr+mfifo_wr, index, mfifo_size - mfifo_wr, resWrEve);
+				SegmentOperation(resHDL, index, mfifo_addr+mfifo_wr, mfifo_size - mfifo_wr, 0);
 
 				index += (mfifo_size - mfifo_wr);
 				
@@ -208,7 +208,7 @@ STATIC FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FT
 
 				l = (mfifo_rd >= l)?l:mfifo_rd - 4;
 
-				appResToDes(resHDL, mfifo_addr, index, l, resWrEve);
+				SegmentOperation(resHDL, index, mfifo_addr, l, 0);
 
 				HAL_Write32(REG_MEDIAFIFO_WRITE, l);
 			}
@@ -222,7 +222,7 @@ STATIC FTU32 mfifoAviWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 avi_addr,FT
 				l = mfifo_rd - mfifo_wr - 4;
 			}
 				
-			appResToDes(resHDL, mfifo_addr+mfifo_wr, index, l, resWrEve);
+			SegmentOperation(resHDL, index, mfifo_addr+mfifo_wr, l, 0);
 
 			HAL_Write32(REG_MEDIAFIFO_WRITE, mfifo_wr+l);
 		}
@@ -261,7 +261,7 @@ STATIC FTVOID cmdbufAviWrite (FTU32 resHDL, FTU32 file_len, FTU32 opt)
 	while (i < file_len) {
 		l = HAL_Read32(REG_CMDB_SPACE);
 		/* copy it into CMD buffer in EVE */
-		appResToDes(resHDL, REG_CMDB_WRITE, i, l, resWrEve);
+		SegmentOperation(resHDL, i, REG_CMDB_WRITE, l, 0);
 		i += l;
 /* 
 it's doable to stop the CMD_PLAYVIDEO in following way
@@ -291,13 +291,13 @@ STATIC FTU32 AVIToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 flagAddr, FTU32 fifoAdd
 {
 	FTU32 resHDL, Len;
 
-	resHDL = appResOpen(path);
+	resHDL = HAL_SegFileOpen(path);
 	if (resHDL == 0) {
 		DBGPRINT;
 		return 0;
 	}
 
-	Len = appResSize(resHDL);
+	Len = HAL_SegFileSize(resHDL);
 
 	if (OPT_MEDIAFIFO & opt) {
 		mfifoAviWrite(fifoAddr,fifoSize,ramgAddr,flagAddr,opt,resHDL,Len);
@@ -305,7 +305,7 @@ STATIC FTU32 AVIToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 flagAddr, FTU32 fifoAdd
 		cmdbufAviWrite(resHDL, Len, opt);
 	}
 
-	appResClose(resHDL);
+	HAL_SegFileClose(resHDL);
 	return Len;
 }
 /* 

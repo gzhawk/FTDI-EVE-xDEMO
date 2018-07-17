@@ -31,19 +31,6 @@ FTU8 READ_ID = 0;
 
 FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = "Error occur / Stop display";
 
-typedef struct wrFuncPara_ {
-    FTRES res; // operation source point
-    FTU32 Src; // operation starting point
-    FTU32 Des; // operation destination point
-    FTU32 len; // operation length
-}wrFuncPara;
-
-wrFuncPara fPara = {0};
-
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)
-FTU8 file_buff[MCU_BLOCK_SIZE] = {0};
-#endif
-
 #if defined(CAL_NEEDED)
 STATIC appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
 {
@@ -72,66 +59,18 @@ STATIC appRet_en appCalForce (FTC8 *dataPath)
           reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
     /* make the tag part invalid */
-#if defined(STM32F4)
-    stm32f4_invaild_tag();
-#elif defined(MSVC2012EMU)
-    vc2012emu_invaild_tag(dataPath);
-#elif defined(MSVC2017EMU)
-    vc2017emu_invaild_tag(dataPath);
-#elif defined(MSVC2010EXPRESS)
-    vc2010_invaild_tag(dataPath);
-#elif defined(FT9XXEV)
-    ft9xx_invaild_tag(dataPath);
-#else
-    arduino_invaild_tag();
-#endif
+    HAL_invaild_tag(dataPath);
 
     /* do calibration to get the CData */
-#if defined(STM32F4)
-    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (STM32F4)",dataPath)) {
-#elif defined(MSVC2012EMU)
-    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2012Emu)",dataPath)) {
-#elif defined(MSVC2017EMU)
-    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2017Emu)",dataPath)) {
-#elif defined(MSVC2010EXPRESS)
-    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (VC2010)",dataPath)) {
-#elif defined(FT9XXEV)
-    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (FT9XX)",dataPath)) {
-#else
-    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point (Arduino)",dataPath)) {
-#endif
-        for (i = 0; i < EVE_CAL_PARA_NUM; reg+=FTU32_LEN,i++) {
+    if (APP_OK == appCalCmd(FONT_CAL,(FTC8 *)"Tap the flashing point",dataPath)) {
+        for (i = 0; i < EVE_CAL_PARA_NUM; reg+=4,i++) {
             CData[i] = HAL_Read32(reg);
         }
         /* save the CData */
-#if defined(STM32F4)
-        stm32f4_save_cdata((FTU16 *)CData);
-#elif defined(MSVC2012EMU)
-        vc2012emu_save_cdata(dataPath, (FTU8 *)CData);
-#elif defined(MSVC2017EMU)
-        vc2017emu_save_cdata(dataPath, (FTU8 *)CData);
-#elif defined(MSVC2010EXPRESS)
-        vc2010_save_cdata(dataPath, (FTU8 *)CData);
-#elif defined(FT9XXEV)
-        ft9xx_save_cdata(&FT9xxFile,dataPath, (FTU8 *)CData);
-#else
-        arduino_save_cdata((FTU8 *)CData);
-#endif
+        HAL_save_cdata(dataPath, (FTU8 *)CData);
 
         /* make the tag part valid */
-#if defined(STM32F4)
-        stm32f4_vaild_tag();
-#elif defined(MSVC2012EMU)
-        vc2012emu_vaild_tag();
-#elif defined(MSVC2017EMU)
-        vc2017emu_vaild_tag();
-#elif defined(MSVC2010EXPRESS)
-        vc2010_vaild_tag();
-#elif defined(FT9XXEV)
-        ft9xx_vaild_tag();
-#else
-        arduino_vaild_tag();
-#endif
+        HAL_vaild_tag();
     }
     return APP_OK;
 }
@@ -141,47 +80,20 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
     FTU32 CData[EVE_CAL_PARA_NUM] = {0};
     FTU32 reg = REG_TOUCH_TRANSFORM_A, i = 0;
 
-#if defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(MSVC2010EXPRESS) || defined(FT9XXEV)
     if (force || (dPath == NULL)) {
-#else
-        if (force) {
-#endif
-            return appCalForce(dPath);
-    }
-
-#if defined(STM32F4)
-    if (!stm32f4_is_tag_vaild()) {
-#elif defined(MSVC2012EMU)
-    if (!vc2012emu_is_tag_vaild(dPath)) {
-#elif defined(MSVC2017EMU)
-    if (!vc2017emu_is_tag_vaild(dPath)) {
-#elif defined(MSVC2010EXPRESS)
-    if (!vc2010_is_tag_vaild(dPath)) {
-#elif defined(FT9XXEV)
-    if (!ft9xx_is_tag_vaild(&FT9xxFile,dPath)) {
-#else
-    if (!arduino_is_tag_vaild()) {
-#endif
         return appCalForce(dPath);
     }
 
-#if defined(STM32F4)
-    stm32f4_restore_cdata((FTU16 *)CData);
-#elif defined(MSVC2012EMU)
-    vc2012emu_restore_cdata(dPath, (FTU8 *)CData);
-#elif defined(MSVC2017EMU)
-    vc2017emu_restore_cdata(dPath, (FTU8 *)CData);
-#elif defined(MSVC2010EXPRESS)
-    vc2010_restore_cdata(dPath, (FTU8 *)CData);
-#elif defined(FT9XXEV)
-    ft9xx_restore_cdata(&FT9xxFile,dPath, (FTVOID *)CData);
-#else
-    arduino_restore_cdata((FTU8 *)CData);
-#endif
+    if (!HAL_is_tag_vaild(dPath)) {
+        return appCalForce(dPath);
+    }
+
+    HAL_restore_cdata(dPath, (FTU8 *)CData);
+    
     while (reg <= REG_TOUCH_TRANSFORM_F) {
         HAL_Write32(reg, CData[i]);
         i++;
-        reg += FTU32_LEN;
+        reg += 4;
     }
     return APP_OK;
 }
@@ -267,319 +179,73 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
 
     return linestride;
 }
-/* 
- * call back routine for multi-platform
- * read data from Src (MCU, EVE, Flash, SD Card) to Des (MCU, EVE, Flash, SD Card)
- * at a time 
- * set the length as return
- */
-FTVOID resWrBuf (FTU32 para)
+
+FTVOID SegmentOperation (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 toCoPro)
 {
-    wrFuncPara *wfp = (wrFuncPara *) para;
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    fseek(wfp->res,wfp->Src,SEEK_SET);
-    if (wfp->len > 0) {
-        fread((FTVOID *)wfp->Des,1,wfp->len,wfp->res);
-    }
-#elif defined(STM32F4)
-    FTU32 i;
-    for (i = 0; i < wfp->len ; i++) {
-        *(FTU8 *)(wfp->Des+i) = *(FTU8 *)(wfp->res+wfp->Src+i);
-    }
-#elif defined(FT9XXEV)
-    FTU32 l;
-    f_lseek(wfp->res,wfp->Src);
-    if (wfp->len > 0) {
-        f_read(wfp->res, (FTVOID *)wfp->Des,wfp->len,&l);
-    }
-#else/* Arduino */
-    FTU32 i,l;
-    FTU8 p[SDC_SECTOR_SIZE] = {0};
-
-    /* only accept forward read
-     * make sure not backward over read 
-     * the previous finished read info */
-    if (wfp->res.offset > wfp->Src) {
-        wfp->len = 0;
-        FTPRINT("\nresWrBuf: backward reading");
-        return;
-    }
-
-    for (l = 0, i = wfp->Src%SDC_SECTOR_SIZE; l < wfp->len; ) {
-        wfp->res.readsector(p);
-        for (; i < SDC_SECTOR_SIZE && l < wfp->len; i++,l++) {
-            *(FTU8 *)(wfp->Des+l) = p[i];
-        }
-        i = 0;
-    }
-
-#endif
-}
-
-/* 
- * call back routine for multi-platform
- * read data from Src (MCU, EVE, Flash, SD Card) to Des (EVE-CMD, EVE-DLP, EVE-RAM_G)
- * block by block
- * in loop buffer in EVE (CMD buffer), or RAM_G, or DLP
- * set the length as return
- */
-STATIC FTVOID resEveMemOperation (FTU32 para, FTU8 isCmdLoopBuf)
-{
-    wrFuncPara *wfp = (wrFuncPara *) para;
     /* make sure the data length into EVE is 4bytes aligned */
-    FTU32 i,block,l,file_len = BYTES4ALIGN(wfp->len);
+    FTU32 i,block,l,file_len = BYTES4ALIGN(len);
     FTU8 * p = 0;
 
-    if (isCmdLoopBuf) {
+    if (toCoPro) {
         block = CMDBUF_SIZE/2;
     } else {
         block = MCU_BLOCK_SIZE;
     }
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    p = (FTU8 *)malloc(block);
-    if (p == 0) {
-        FTPRINT("\neve mem: no memory");
-        wfp->len = 0;
-        return;
+    p = HAL_LoopMemMalloc(handle, src, block);
+    if(!p){
+        FTPRINT("\nno segment memory");
+        return; 
     }
-#elif defined(STM32F4)
-    p = (FTU8 *)wfp->res+wfp->Src;
-#else
-    p = file_buff;
-/* it may not be a necessary step, but leave it here for now */
-#if 0 
-    /* only accept increasly read
-     * make sure not over read the previous reading */
-    if (wfp->res.offset > wfp->Src) {
-        FTPRINT("\neve mem: offset error");
-        wfp->len = 0;
-        return;
-    }
-#endif
-#endif
 
     for (i = 0; i < file_len; i += l) {
         l = ((file_len - i) > block)?block:(file_len - i);
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-        fread(p,1,l,wfp->res);
-#elif defined(FT9XXEV)
-        /* 
-           f_read need to pass a variable to last para 
-           just reuse wfp->len for it, nothing special meaning
-         */
-        f_read(wfp->res, (FTVOID *)p,l,&(wfp->len));
-#elif defined(STM32F4)
-        p += l;
-#else
-        wfp->res.readsector(p);
-#endif
-        if (isCmdLoopBuf) {
+        
+        HAL_LoopMemRead(handle, &p, l);
+        
+        if (toCoPro) {
             HAL_CmdWait(HAL_EVELoopMemWr(RAM_CMD, HAL_Read32(REG_CMD_WRITE), CMDBUF_SIZE, p, l));
         } else {
-            HAL_Write8Src(wfp->Des+i, p, l);
-        }
-    }
-    wfp->len = file_len;
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    free(p);
-#endif
-}
-FTVOID resWrEve (FTU32 para)
-{
-    resEveMemOperation(para, 0);
-}
-FTVOID resWrEveCmd (FTU32 para)
-{
-    resEveMemOperation(para, 1);
-}
-FTVOID resIsZlib(FTU32 para)
-{
-    wrFuncPara *wfp = (wrFuncPara *) para;
-#if defined(STM32F4)
-    FTU8 header[2] = {0};
-    header[0] = *(FTU8 *)(wfp->res+wfp->Src);
-    header[1] = *(FTU8 *)(wfp->res+wfp->Src+1);
-#elif defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    FTU8 header[2] = {0};
-    fread(header,1,2,wfp->res);
-    fseek(wfp->res,wfp->Src,SEEK_SET);
-#elif defined(FT9XXEV)
-    FTU8 header[2] = {0};
-    FTU32 l = 0;
-    f_read(wfp->res, (FTVOID *)header,2,&l);
-    f_lseek(wfp->res,wfp->Src);
-#else /* Arduino */
-    FTU8 header[512] = {0};
-    wfp->res.readsector(header);
-    wfp->res.seek(wfp->Src);
-#endif
-    /*
-       zLib compression header
-       +---+---+
-       |CMF|FLG|
-       +---+---+
-
-       78 01 - No Compression/low
-       78 9C - Default Compression
-       78 DA - Best Compression 
-     */
-    if (header[0] == 0x78) {
-        if (header[1] == 0x9C) {
-            /* make sure command buffer clean */
-            HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
-            /* then start sending the command */
-            HAL_CmdToReg(CMD_INFLATE);
-            HAL_CmdToReg(wfp->Des);
-            resWrEveCmd(para);
-            /* 
-               give a special length for the return routine
-               to do some special handle for zlib file
-             */
-            wfp->len = ZLIB_LEN;
-            return;
-        } else {
-            /* 
-               so far as I know
-               our tools only generate default compressed file
-             */
-            wfp->len = 0;
-            return; 
+            HAL_Write8Src(des+i, p, l);
         }
     }
 
-    resWrEve(para);
+    HAL_LoopMemFree((FTU32)p);
 }
-FTU32 appResOpen (FTU8 *path)
+
+FTU32 FileProcess(FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
 {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    wrFuncPara *pwfp = 0;
-    FILE *pFile;
-
-    if(NULL == path)
-    {  
-        FTPRINT("\nappResOpen: path null");
-        return 0;
+    if (HAL_ZlibCompressed(handle, src)) {
+        /* make sure command buffer clean */
+        HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
+        /* then start sending the command */
+        HAL_CmdToReg(CMD_INFLATE);
+        HAL_CmdToReg(des);
+        SegmentOperation(handle, src, des, len, 1);
+        /* 
+           give a special length for the return routine
+           to do some special handle for zlib file
+         */
+        return ZLIB_LEN;
+    } else {
+        SegmentOperation(handle, src, des, len, 0);
+        
+        return len;
     }
-
-    pFile = fopen((FTC8 *)path,"rb");
-    if(NULL == pFile)
-    {  
-        FTPRINT("\nappResOpen: file open error");
-        return 0;
-    }
-
-    pwfp = &fPara;
-    if (pwfp) {
-        pwfp->res = pFile;
-    }
-
-    return (FTU32)pwfp;
-#elif defined(STM32F4)
-    return stm32f4fileopen(path, (FTU32)&fPara);
-#elif defined(FT9XXEV)
-    wrFuncPara *pwfp = 0;
-    if (FR_OK != f_open(&FT9xxFile, (const TCHAR*)path, FA_READ)) {
-        FTPRINT("\nappResOpen: file open error");
-        return 0;
-    }
-    pwfp = &fPara;
-    if (pwfp) {
-        pwfp->res = &FT9xxFile;
-    }
-
-    return (FTU32)pwfp;
-#else/* Arduino */
-    wrFuncPara *pwfp = 0;
-    Reader sdC;
-
-    if (0 == sdC.openfile((FT8 *)path)) {
-        FTPRINT("\nappResOpen: file open error");
-        return 0;
-    }
-
-    pwfp = &fPara;
-    if (pwfp) {
-        pwfp->res = sdC;
-    }
-
-    return (FTU32)pwfp;
-#endif
-}
-FTU32 appResSize (FTU32 resHDL)
-{
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    wrFuncPara *para = (wrFuncPara *)resHDL;
-    FTU32 size;
-
-    fseek(para->res,0,SEEK_END);
-    size = ftell(para->res);
-    fseek(para->res,0,SEEK_SET);
-
-    return BYTES4ALIGN(size);
-#elif defined(STM32F4)
-    return BYTES4ALIGN(stm32f4filesize(resHDL));
-#elif defined(FT9XXEV)
-    wrFuncPara *para = (wrFuncPara *)resHDL;
-    return BYTES4ALIGN(f_size(para->res));
-#else/* Arduino */
-    wrFuncPara *para = (wrFuncPara *)resHDL;
-    return BYTES4ALIGN(para->res.size);
-#endif
-}
-/*
- * The reason why use this way other than directly
- * use open/read/write/close is:
- * some system do not has file system, and some
- * has file system, in order to make the code 
- * use same structure for better managment 
- * between each platform, I make a middle level
- * API (appResOpen,appResToDes,appResClose)
- * for multiple and flexability usage of "file" handling
- * in writeFunc
- */
-FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeFunc)
-{
-    wrFuncPara *para = (wrFuncPara *)resHDL;
-
-    if (writeFunc) {
-        para->Src = Src;
-        para->Des = Des;
-        para->len = len;
-        writeFunc(resHDL);
-        /* writeFunc may change the len so use para after writeFunc executed */
-        return para->len;
-    }
-
-    return 0;
-}
-FTVOID appResClose (FTU32 resHDL)
-{
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    wrFuncPara *para = (wrFuncPara *)resHDL;
-    fclose(para->res);
-#elif defined(STM32F4)
-
-#elif defined(FT9XXEV)
-    wrFuncPara *para = (wrFuncPara *)resHDL;
-    f_close(para->res);
-#else/* Arduino */
-
-#endif
 }
 
 FTU8 appFileExist (FTC8 *path) 
 {
     FTU32 resHDL;
 
-    resHDL = appResOpen((FTU8 *)path);
+    resHDL = HAL_SegFileOpen((FTU8 *)path);
     if (resHDL == 0) {
         FTPRINT("\nappFileExist: file open error");
         return 0;
     }
 
-    if (!appResSize(resHDL)) {
-        appResClose(resHDL);
+    if (!HAL_SegFileSize(resHDL)) {
+        HAL_SegFileClose(resHDL);
         FTPRINT("\nappFileExist: file size 0");
         return 0;
     }
@@ -611,26 +277,26 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 
     if (!appFlashPath(path, &Len)) {
         
-        resHDL = appResOpen((FTU8 *)path);
+        resHDL = HAL_SegFileOpen((FTU8 *)path);
         if (resHDL == 0) {
             FTPRINT("\nappFileToRamG: file open error");
             return 0;
         }
 
-        Len = appResSize(resHDL);
+        Len = HAL_SegFileSize(resHDL);
         if (chkExceed && (EVE_RAMG_SIZE < inAddr + Len)) {
-            appResClose(resHDL);
+            HAL_SegFileClose(resHDL);
             FTPRINT("\nappFileToRamG: EVE_RAMG_SIZE < inAddr + Len");
             return 0;
         }
 
-        Len = appResToDes(resHDL,inAddr,0,Len,resIsZlib);
+        Len = FileProcess(resHDL,0,inAddr,Len);
 
         if (outAddr) {
-            appResToDes(resHDL,(FTU32)outAddr,0,outLen,resWrBuf);
+            HAL_WriteSrcToDes(resHDL,0,(FTU32)outAddr,outLen);
         }
 
-        appResClose(resHDL);
+        HAL_SegFileClose(resHDL);
     }
     return Len;
 }
@@ -817,18 +483,17 @@ FTU8 appFlashPath (FTC8 *path, FTU32 *len)
     return 0;
 }
 #if defined(DEF_BT81X)
-FTVOID resWrFlash (FTU32 para)
+FTU32 appFlashSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
 {
-    wrFuncPara *wfp = (wrFuncPara *) para;
-
     /* make sure command buffer clean */
     HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
     
     /* then start sending the command */
     HAL_CmdToReg(CMD_FLASHWRITE);
-    HAL_CmdToReg(wfp->Des);
-    HAL_CmdToReg(wfp->len);
-    resWrEveCmd((FTU32)wfp);
+    HAL_CmdToReg(des);
+    HAL_CmdToReg(len);
+    SegmentOperation(handle, src, des, len, 1);
+    return len;
 }
 FTU32 appFlashAddr(FTC8 *path)
 {
@@ -933,7 +598,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     FTU8 buf[CHECK_LEN] = {0};
     FTU32 Len, block, resHDL, point, count, crc;
 
-    resHDL = appResOpen(golden_file);
+    resHDL = HAL_SegFileOpen(golden_file);
     if (resHDL == 0) {
         FTPRINT("\nappFlashVerify: file open error");
         return 0;
@@ -941,11 +606,11 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     
     if (f_addr%64) {
         FTPRINT("\nappFlashVerify: flash addr error");
-        appResClose(resHDL);
+        HAL_SegFileClose(resHDL);
         return 0;
     }
 
-    Len = appResSize(resHDL);
+    Len = HAL_SegFileSize(resHDL);
     /* if too small, don't have to pick check point
        just check the first CHECK_LEN*/
     if (Len <= CHECK_NUM*CHECK_LEN) {
@@ -959,9 +624,9 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     
     while (count) {
         /* read a piece of file to a block */
-        if (appResToDes(resHDL,(FTU32)buf,point,block,resWrBuf) != block) {
+        if (HAL_WriteSrcToDes(resHDL,point,(FTU32)buf,block) != block) {
             FTPRINT("\nappFlashVerify: file read error");
-            appResClose(resHDL);
+            HAL_SegFileClose(resHDL);
             return 0;
         }
         /* if there is a way to calulate the crc32
@@ -986,7 +651,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
         /* do CRC in EVE and compare the CRC with file piece*/
         if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
             FTPRINT("\nappFlashVerify: crc not match");
-            appResClose(resHDL);
+            HAL_SegFileClose(resHDL);
             return 0;
         }
 
@@ -1001,7 +666,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
         }
     }
 
-    appResClose(resHDL);
+    HAL_SegFileClose(resHDL);
 
     return 1;
 }
@@ -1010,7 +675,7 @@ FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
 {
     FTU32 resHDL, Len;
 
-    resHDL = appResOpen(f_file);
+    resHDL = HAL_SegFileOpen(f_file);
     if (resHDL == 0) {
         FTPRINT("\nappFlashProg: file open error");
         return 0;
@@ -1018,18 +683,18 @@ FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
     
     /* if the original file length not 256 byte align
        it would pad some extra bytes at the tail*/
-    Len = appResSize(resHDL);
+    Len = HAL_SegFileSize(resHDL);
     Len += Len%256?(256 - Len%256):0;
     
     if (f_addr%256) {
         FTPRINT("\nappFlashProg: file addr error");
-        appResClose(resHDL);
+        HAL_SegFileClose(resHDL);
         return 0;
     }
 
-    if (appResToDes(resHDL,f_addr, 0, Len, resWrFlash) != Len) {
+    if (appFlashSrcToDes(resHDL,0, f_addr, Len) != Len) {
         FTPRINT("\nappFlashProg: file program error");
-        appResClose(resHDL);
+        HAL_SegFileClose(resHDL);
         return 0;
     }
     
@@ -1101,55 +766,19 @@ STATIC FTVOID appUI_GetEVEID (FTVOID)
 #endif
 }
 
-STATIC FTVOID appUI_SpiInit ( FTVOID )
+STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 {
+    HAL_preparation();
+
+    HAL_McuCmdBufInit();
     /* 
        the SPI clock shall not exceed 11MHz before system clock is enabled. 
        After system clock is properly enabled, 
        the SPI clock is allowed to go up to 30MHz.	
      */
-#ifdef MSVC2010EXPRESS
-    vc2010_spi_init();
-#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    //do nothing
-#elif defined(STM32F4)
-    stm32f4SPI1Init(SPI_BaudRatePrescaler_8);
-#elif defined(FT9XXEV)
-    /*spi sck = system clock/SPI_Div, 100MHz/16=6.25MHz*/
-    ft9xx_spi_init(1,16);
-#else
-    /*spi sck = system clock/DIVx, 16MHz/2 = 8MHz*/
-    SPI.begin();
-    SPI.setClockDivider(SPI_CLOCK_DIV2);
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setDataMode(SPI_MODE0);
-#endif
+    HAL_SpiInit();
 }
-STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
-{
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    //do nothing
-#elif defined(STM32F4)
-    //do nothing
-#elif defined(FT9XXEV)
-    ft9xx_init();
 
-    ft9xx_sdc_init();
-#else
-    /* set the GPIO pin */
-    pinMode(EVE_SPI_CS, OUTPUT);
-    digitalWrite(EVE_SPI_CS, HIGH);
-
-    pinMode(EVE_PD_N, OUTPUT);
-    digitalWrite(EVE_PD_N, HIGH);
-
-    arduino_sdcardInit();
-#endif
-
-    HAL_McuCmdBufInit();
-
-    appUI_SpiInit();
-}
 STATIC FTVOID appUI_EVEActive ( FTVOID )
 {
     HAL_Cfg(FT_GPU_ACTIVE_M);
@@ -1176,45 +805,6 @@ STATIC FTVOID appUI_EVEClk ( FTVOID )
     */
 #endif
     FTDELAY(CLK_DELAY);
-}
-
-#define PWC_DELAY 20
-STATIC FTVOID appUI_EVEPwdCyc ( FTU8 OnOff )
-{
-#ifdef MSVC2010EXPRESS
-    FT_WriteGPIO(ftHandle, 0xBB, OnOff?0x08:0x88);
-    FTDELAY(PWC_DELAY);
-
-    FT_WriteGPIO(ftHandle, 0xBB, OnOff?0x88:0x08);
-    FTDELAY(PWC_DELAY);
-#elif defined(MSVC2012EMU) || defined(MSVC2017EMU)
-    /* Do nothing */
-#elif defined(STM32F4)
-    /* Share the PD13/LED3 pin with PD pin of EVE */
-    STM_EVAL_LEDOff(LED3);
-    FTDELAY(PWC_DELAY);
-
-    STM_EVAL_LEDOn(LED3);
-    FTDELAY(PWC_DELAY);
-#elif defined(FT9XXEV)
-    gpio_write(FT9XX_PD, OnOff?0:1);
-    FTDELAY(PWC_DELAY);
-
-    gpio_write(FT9XX_PD, OnOff?1:0);
-    FTDELAY(PWC_DELAY);
-#else
-    digitalWrite(EVE_PD_N, OnOff?LOW:HIGH);
-    FTDELAY(PWC_DELAY);
-
-    digitalWrite(EVE_PD_N, OnOff?HIGH:LOW);
-    FTDELAY(PWC_DELAY);
-    /* 
-     * I was not quite understand why a read action is needed
-     * but for VM801Plus module, it seems like a critical action 
-     */
-    HAL_Read16(0);
-#endif
-
 }
 
 STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
@@ -1312,14 +902,7 @@ STATIC FTVOID appUI_EVESetSPI (FTU32 type)
     }
 #endif
 
-#if defined(FT9XXEV)
-    /* use the highest speed of clk of SPI on MM900 module */
-    if (type == 4) {
-        ft9xx_spi_init(type,8);
-    } else {
-        ft9xx_spi_init(type,2);
-    }
-#endif
+    HAL_speed_up(type);
 }
 #define VER_FONT 25
 #define CAL_FONT 20
@@ -1379,12 +962,7 @@ STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
                 CAL_FONT,OPT_CENTERX,"MCU CMD Buf: ");
         CoCmd_NUMBER(EVE_LCD_WIDTH/2+40,EVE_LCD_HIGH/4*3,
                 CAL_FONT,OPT_CENTERX,HAL_CmdBufSize());
-#if defined(STM32F4)
-        CoCmd_TEXT(EVE_LCD_WIDTH/2-30,EVE_LCD_HIGH/4*3+10,
-                CAL_FONT,OPT_CENTERX,"File addr: ");
-        CoCmd_NUMBER(EVE_LCD_WIDTH/2+40,EVE_LCD_HIGH/4*3+10,
-                CAL_FONT,OPT_CENTERX,FILE_SADDR);
-#endif
+        
         if (SYS_HANG) {
             CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH - CAL_WIDE*2,
                     CAL_FONT,OPT_CENTERX,"system hange due to memory limit!");
@@ -1407,30 +985,9 @@ STATIC FTU32 appUI_EVEGetFrq (FTVOID)
     FT32 r = 15625;
 
     t0 = HAL_Read32(REG_CLOCK); /* t0 read */
-#if defined(FT9XXEV)
-    __asm__
-        (
-         "   move.l  $r0,%0"
-         "\n\t"
-         "   mul.l   $r0,$r0,100"
-         "\n\t"
-         "1:"
-         "\n\t"
-         "   sub.l   $r0,$r0,3"
-         "\n\t" /* Subtract the loop time = 4 cycles */
-         "   cmp.l   $r0,0"
-         "\n\t" /* Check that the counter is equal to 0 */
-         "   jmpc    gt, 1b"
-         "\n\t"
-         /* Outputs */ :
-         /* Inputs */  : "r"(r)
-         /* Using */   : "$r0"
-        );
-#elif defined(STM32F4) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(MSVC2010EXPRESS)
-    FTDELAY(r/1000);
-#else
-    delayMicroseconds(r);
-#endif
+
+    FTUDELAY(r);
+
     t1 = HAL_Read32(REG_CLOCK); /* t1 read */
     /* bitshift 6 places is the same as multiplying 64 */
     return ((t1 - t0) * 64); 
@@ -1521,15 +1078,10 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
     HAL_Write32(REG_OUTBITS,0);
      */
 
-#if defined(LCD_HVGA) && defined(FT9XXEV)
-    /*
-     * spi sck = system clock/SPI_Div, 100MHz/256=390KHz
-     * ILI9488 looks like need 500KHz, 100MHz/128=781KHz, 
-     * for FT900 no 200 can be selected 
-     */
-    ft9xx_spi_init(1,128);
-    ft9xx_init_ili9488();
+#if defined(LCD_HVGA)
+    HAL_ili9488();
 #endif
+
     /* start to display */
     HAL_Write8(REG_PCLK,lcd.PCLK);
 }
@@ -1628,7 +1180,7 @@ FTVOID UI_INIT (FTVOID)
      * the input should be 0,
      * but all the offical board outside should be 1
      * so leave it 1 */
-    appUI_EVEPwdCyc(1);
+    HAL_PwdCyc(1);
 
     appUI_EVEActive();
 

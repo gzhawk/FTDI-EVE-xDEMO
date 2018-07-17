@@ -7,18 +7,7 @@
 #ifndef _EVE_APP_H_
 #define _EVE_APP_H_
 
-/* you need to carfully consider the size of the block
- * base on your system available memory and data transfer buffering space 
- * WINDOWS: consider it as unlimited memory
- * FT9xx  : totally got 64K memory
- */
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
-#define MCU_BLOCK_SIZE      (10*1024)
-#else
-/* limited by sdcard sector size
- * should be the same as SDC_SECTOR_SIZE if sdcard.h be used */
-#define MCU_BLOCK_SIZE      (512)
-#endif
+
 
 /* Attention, so far as I know, Arduino platform may force the number to 0
  * if you define the number larger than system allow
@@ -71,31 +60,22 @@ typedef enum appRet_ {
     APP_ERR_HDL_EXC,
     APP_ERR_LEN,
 } appRet_en;
-/* 
- * application routine call back pointer
- * for easy modulize the code
- * and better application structure
- */
+
 typedef FTVOID (* AppFunc) (FTU32);
 
-FTVOID resWrBuf (FTU32 para);
-FTVOID resWrEve (FTU32 para);
-FTVOID resWrEveCmd (FTU32 para);
 FTU8 appFileExist (FTC8 *path);
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen);
 appRet_en appWaitCal (FTVOID);
 FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
-FTU32 appResOpen (FTU8 *path);
-FTU32 appResSize (FTU32 resHDL);
-FTU32 appResToDes (FTU32 resHDL, FTU32 Des, FTU32 Src, FTU32 len, AppFunc writeFunc);
-FTVOID appResClose (FTU32 resHDL);
 FTU32 appGetLinestride(bmpHDR_st bmpHD);
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
 FTU32 appEveCRC(FTU32 eve_addr, FTU32 len);
 FTVOID appEveZERO(FTU32 eve_addr, FTU32 len);
 FTU8 appFlashPath (FTC8 *path, FTU32 *len);
+FTVOID SegmentOperation (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 toCoPro);
+
 #if defined(DEF_BT81X)
 FTVOID resWrFlash (FTU32 para);
 FTU8 appFlashSetFull(FTVOID);
@@ -106,10 +86,8 @@ FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr);
 FTU32 appFlashAddr(FTC8 *path);
 FTVOID appFlashUnzip(FTC8 *path, FTU32 src);
 #endif
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
-FTVOID arduino_simugpio(FTU8 flag);
-FTVOID arduino_sdcardInit (FTVOID);
-#endif
+
 FTVOID UI_INIT (FTVOID);
 FTVOID UI_END (FTVOID);
+
 #endif

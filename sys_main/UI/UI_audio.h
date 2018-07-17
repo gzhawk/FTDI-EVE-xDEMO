@@ -19,15 +19,15 @@ FTU8 parseWAV (audio_hd_t *paudio_hd)
 	FTU8 pbuf[WAV_HEAD_LEN];
 	FTU32 resHDL;
 
-	resHDL = appResOpen(paudio_hd->path);
+	resHDL = HAL_SegFileOpen(paudio_hd->path);
 	if(0 == resHDL){  
 		DBGPRINT;
 		paudio_hd->dsize = 0;
-		appResClose(resHDL);
+		HAL_SegFileClose(resHDL);
 		return 0;
 	}
 
-	appResToDes(resHDL,(FTU32)pbuf,0,WAV_HEAD_LEN,resWrBuf);
+	SegmentOperation(resHDL,0,(FTU32)pbuf,WAV_HEAD_LEN,0);
 	
 	if ('R' == pbuf[0] &&
 		'I' == pbuf[1] &&
@@ -38,19 +38,19 @@ FTU8 parseWAV (audio_hd_t *paudio_hd)
 			paudio_hd->dsize = *(FTU32 *)&pbuf[WAV_HEAD_DLEN];
 			paudio_hd->type = LINEAR_SAMPLES;
 			paudio_hd->freq = *(FTU16 *)&pbuf[WAV_HEAD_LEN];
-			appResClose(resHDL);
+			HAL_SegFileClose(resHDL);
 			return 1;
 		} else {
 			DBGPRINT;
 			paudio_hd->dsize = 0;
-			appResClose(resHDL);
+			HAL_SegFileClose(resHDL);
 			return 0;
 		}
 	} else {
 		/* should be RAW file */
-		paudio_hd->dsize = appResSize(resHDL);
+		paudio_hd->dsize = HAL_SegFileSize(resHDL);
 		/* type and freq should be filled outside */
-		appResClose(resHDL);
+		HAL_SegFileClose(resHDL);
 		return 0;
 	}
 }
@@ -73,7 +73,7 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 		return 0;
 	}
 
-	resHDL = appResOpen(paudio_hd->path);
+	resHDL = HAL_SegFileOpen(paudio_hd->path);
 	
 	loop = (paudio_hd->dsize > EVE_AUD_WINDOW_SIZE)?1:0;
 	audioLen = (paudio_hd->dsize < EVE_AUD_WINDOW_SIZE)?paudio_hd->dsize:EVE_AUD_WINDOW_SIZE;
@@ -95,7 +95,7 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 	while ( paudio_hd->dsize ) {
 		fBlock = (paudio_hd->dsize < EVE_AUD_BLOCK_SIZE) ? paudio_hd->dsize : EVE_AUD_BLOCK_SIZE;
 
-		appResToDes(resHDL,wraddr,paudio_hd->index,fBlock,resWrEve);
+		SegmentOperation(resHDL,paudio_hd->index,wraddr,fBlock,0);
 
 		if (0 == paudio_hd->index) {
 			/* start to play the sound only once */
@@ -162,7 +162,7 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 				HAL_Write8(REG_PLAYBACK_PLAY,0);
 			}
 
-			appResClose(resHDL);
+			HAL_SegFileClose(resHDL);
 			return 1;
 		}
 	}
@@ -179,7 +179,7 @@ FTU32 audPlay(audio_hd_t *paudio_hd, AppFunc disp_func)
 	HAL_Write32(REG_PLAYBACK_LENGTH,0);
 	HAL_Write8(REG_PLAYBACK_PLAY,0);
 	
-	appResClose(resHDL);
+	HAL_SegFileClose(resHDL);
 	return 1;
 }
 
@@ -210,7 +210,7 @@ FTVOID screenShow (FTU32 para)
 FTVOID playaudio (FTU32 cashPara)
 {
 	audio_hd_t raw_hd = {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)
+#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)|| defined(MSVC2017EMU)
 		(FTU8 *)ROOT_PATH"aud\\Chopin.raw",
 #else
 		(FTU8 *)ROOT_PATH"Chopin.raw",

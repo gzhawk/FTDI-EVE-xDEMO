@@ -46,8 +46,6 @@ typedef unsigned long  FTU64;
 
 #define FTRANDOM(M) (rand()%(M))
 
-#define FTRES FIL* 
-
 #define EVE_CAL_PARA_NUM (6)
 
 #define FT9XX_UART0_RX 49
@@ -109,10 +107,35 @@ void ft9xx_init (void);
 void ft9xx_spi_init (unsigned char spi_type, unsigned int spi_div);
 void ft9xx_int_print (char *p);
 void ft9xx_sdc_init (void);
-unsigned char ft9xx_is_tag_vaild (FIL *f_hdl, const char *dPath);
-void ft9xx_invaild_tag (const char *dataPath);
-void ft9xx_save_cdata (FIL *f_hdl, const char *dataPath, unsigned char *p);
-void ft9xx_restore_cdata (FIL *f_hdl, const char *dataPath, void *p);
-void ft9xx_vaild_tag (void);
 FTVOID ft9xx_apps_sys_dummy (FTU32 para);
+
+FTVOID HAL_restore_cdata (FTC8 *dataPath, FTU8 *p);
+FTU8 HAL_is_tag_vaild (FTC8 *dPath);
+FTVOID HAL_vaild_tag (FTVOID);
+FTVOID HAL_invaild_tag (FTC8 *dataPath);
+FTVOID HAL_save_cdata (FTC8 *dataPath, FTU8 *p);
+FTVOID HAL_ili9488 (FTVOID);
+FTVOID FTUDELAY(FTU32 uS);
+FTVOID HAL_speed_up (FTU32 type);
+FTVOID HAL_PwdCyc ( FTU8 OnOff );
+FTVOID HAL_SpiInit ( FTVOID );
+FTVOID HAL_preparation (FTVOID);
+FTU32 HAL_WriteSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len);
+FTU8 * HAL_LoopMemMalloc (FTU32 handle, FTU32 src, FTU32 len);
+FTVOID HAL_LoopMemRead (FTU32 handle, FTU8 **buf, FTU32 len);
+FTVOID HAL_LoopMemFree (FTU32 buf);
+FTU32 HAL_SegFileOpen (FTU8 *path);
+FTU32 HAL_SegFileSize (FTU32 handle);
+FTVOID HAL_SegFileClose (FTU32 handle);
+FTU8 HAL_ZlibCompressed (FTU32 handle, FTU32 src);
+
+FTVOID HAL_Cfg ( FTU8 cfg );
+FTVOID HAL_Write8 ( FTU32 addr, FTU8 data );
+FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len );
+FTVOID HAL_Write16 ( FTU32 addr, FTU16 data );
+FTVOID HAL_Write32 ( FTU32 addr, FTU32 data );
+FTU8 HAL_Read8 ( FTU32 addr );
+FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len );
+FTU16 HAL_Read16 ( FTU32 addr );
+FTU32 HAL_Read32 ( FTU32 addr );
 

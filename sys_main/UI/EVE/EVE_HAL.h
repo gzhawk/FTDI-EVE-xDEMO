@@ -45,9 +45,6 @@
 #define REG_FLAG_CLN          (0xFFFFFFFF)
 #define EVE_TRACK_VALUE_MAX (0xFFFF)
 #define EVE_TRANSFORM_MAX   (0x10000)
-#define FTU32_LEN             4
-#define FTU16_LEN             2
-#define FTU8_LEN              1
 
 #define EVE_SPI_DUMMY       (0x04)
 
@@ -252,15 +249,6 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
 
 #endif
 
-FTVOID HAL_Cfg ( FTU8 cfg );
-FTU8 HAL_Read8 ( FTU32 addr );
-FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len );
-FTU16 HAL_Read16 ( FTU32 addr );
-FTU32 HAL_Read32 ( FTU32 addr );
-FTVOID HAL_Write8 ( FTU32 addr, FTU8 data );
-FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len );
-FTVOID HAL_Write16 ( FTU32 addr, FTU16 data );
-FTVOID HAL_Write32 ( FTU32 addr, FTU32 data );
 FTU32 HAL_CalResultAddr (FTVOID);
 FTVOID HAL_CoReset (FTVOID);
 FTVOID HAL_CmdWait (FTU16 CmdWrAddr);

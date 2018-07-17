@@ -73,22 +73,22 @@ FTU32 fileload (FTU8 * p_file, FTU32 mfifo_addr)
 {
 	FTU32 resHDL, len;
 
-	resHDL = appResOpen(p_file);
+	resHDL = HAL_SegFileOpen(p_file);
 	if (resHDL == 0) {
 		DBGPRINT;
 		return 0;
 	}
 
-	len = appResSize(resHDL);
+	len = HAL_SegFileSize(resHDL);
 	if (len == 0) {
-		appResClose(resHDL);
+		HAL_SegFileClose(resHDL);
 		DBGPRINT;
 		return 0;
 	}
 
-	appResToDes(resHDL, mfifo_addr, 0, len, resWrEve);
+	SegmentOperation(resHDL, 0, mfifo_addr, len, 0);
 		
-	appResClose(resHDL);
+	HAL_SegFileClose(resHDL);
 
 	return len;
 }

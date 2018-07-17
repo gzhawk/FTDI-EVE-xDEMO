@@ -67,7 +67,7 @@ STATIC FTU32 mfifoImageWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr
 	HAL_BufToReg(RAM_CMD, 0);
 
 	/* write data to RAM_G */
-	appResToDes(resHDL, mfifo_addr, 0, file_len, resWrEve);
+	SegmentOperation(resHDL, 0, mfifo_addr, file_len, 0);
 
 	HAL_Write32(REG_MEDIAFIFO_WRITE, file_len);
 
@@ -88,15 +88,15 @@ STATIC FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoS
 {
 	FTU32 resHDL, Len;
 
-	resHDL = appResOpen(path);
+	resHDL = HAL_SegFileOpen(path);
 	if (resHDL == 0) {
 		DBGPRINT;
 		return 0;
 	}
 
-	Len = appResSize(resHDL);
+	Len = HAL_SegFileSize(resHDL);
 	if (EVE_RAMG_SIZE < ramgAddr + Len) {
-		appResClose(resHDL);
+		HAL_SegFileClose(resHDL);
 		DBGPRINT;
 		return 0;
 	}
@@ -107,7 +107,7 @@ STATIC FTU32 ImageToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 fifoAddr, FTU32 fifoS
 	 */
 	mfifoImageWrite(fifoAddr,fifoSize,ramgAddr,resHDL,Len);
 		
-	appResClose(resHDL);
+	HAL_SegFileClose(resHDL);
 
 	return Len;
 }

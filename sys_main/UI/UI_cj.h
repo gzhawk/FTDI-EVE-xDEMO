@@ -567,7 +567,7 @@ FTU32 cj_mfifoJpegWrite (FTU32 mfifo_addr, FTU32 mfifo_size,FTU32 disp_addr,FTU3
 	HAL_BufToReg(RAM_CMD, 0);
 
 	/* write data to RAM_G */
-	appResToDes(resHDL, mfifo_addr, 0, file_len, resWrEve);
+	SegmentOperation(resHDL, 0, mfifo_addr, file_len, 0);
 
 	HAL_Write32(REG_MEDIAFIFO_WRITE, file_len);
 
@@ -598,24 +598,24 @@ FTVOID cj_JPEGToRamG(FTU8 flag)
 	}
 
 	if (flag) {
-		resHDL = appResOpen((FTU8 *)PATH_PWM);
+		resHDL = HAL_SegFileOpen((FTU8 *)PATH_PWM);
 	} else {
-		resHDL = appResOpen((FTU8 *)PATH_SWT);
+		resHDL = HAL_SegFileOpen((FTU8 *)PATH_SWT);
 	}
 
 	if (resHDL == 0) {
 		DBGPRINT;
 	}
 
-	Len = appResSize(resHDL);
+	Len = HAL_SegFileSize(resHDL);
 	if (EVE_RAMG_SIZE < RAM_G + Len) {
-		appResClose(resHDL);
+		HAL_SegFileClose(resHDL);
 		DBGPRINT;
 	}
 
 	cj_mfifoJpegWrite(CJ_FIFOADDR,CJ_FIFOSIZE,RAM_G,OPT_MEDIAFIFO,resHDL,Len);
 
-	appResClose(resHDL);
+	HAL_SegFileClose(resHDL);
 }
 
 /* avoid intermittent touch */
