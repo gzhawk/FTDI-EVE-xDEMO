@@ -89,7 +89,6 @@
     defined(UI_COOBOT))
 #define LCD_WQVGA
 #define EVE_SPI_TYPE 1
-#define DEF_DISPLAY
 #endif
 
 #if defined(UI_LITTLESWAN)
@@ -97,7 +96,6 @@
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
-#define DEF_DISPLAY
 #endif
 
 #if defined(UI_FLASH_ANIM) || \
@@ -105,7 +103,6 @@
 #define DEF_BT81X
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
-#define DEF_DISPLAY
 #endif
 /*-------------------------------------------FT9XX, MSVC platform, None STM32 */
 #if (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU))
@@ -141,21 +138,18 @@
 #define EVE_SPI_TYPE 1
 #endif
 
-#define DEF_DISPLAY
 #endif
 
 #if (defined(UI_MIDEA_W))
 #define DEF_81X
 #define LCD_WQVGA
 #define EVE_SPI_TYPE 1
-#define DEF_DISPLAY
 #endif
 
 #if defined(UI_AUPU)
 #define DEF_81X
 #define LCD_HVGA
 #define EVE_SPI_TYPE 1
-#define DEF_DISPLAY
 #endif
 
 #endif
@@ -166,7 +160,6 @@
 #if defined(UI_XIZI)
 #define LCD_WQVGA
 #define EVE_SPI_TYPE 1
-#define DEF_DISPLAY
 #endif
 
 #if defined(UI_RIPPLE) || \
@@ -175,7 +168,6 @@
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
-#define DEF_DISPLAY
 #endif
 #endif
 
@@ -202,11 +194,10 @@
 #define DEF_CAP_MULTI
 #endif
 
-#define DEF_DISPLAY
 #endif
 
-/*------------------------------------------prevent undefined hardware setting */
-#if !defined(DEF_DISPLAY)
+/*-----------------------------------------------prevent undefined LCD setting */
+#if !defined(LCD_QVGA) && !defined(LCD_HVGA) && !defined(LCD_WQVGA) && !defined(LCD_WVGA)
 #error "no display be selected"
 #endif
 
