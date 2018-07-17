@@ -53,14 +53,14 @@ typedef enum TAG_DEF_e {
 	TAG_CLCK_LTAG,
 	TAG_CLCK_MTAG,
 	TAG_CLCK_RTAG
-};
+} TAG_DEF_E;
 
 
 typedef enum TOUCH_DEF_e {
 	TOUCH_NO = 0,
 	TOUCH_PRESS,
 	TOUCH_RELES,
-};
+} TOUCH_DEF_E;
 
 typedef struct track_ctrl_ {
 	FT32 SkipP;  //skip the too small forward moving (trembling)
