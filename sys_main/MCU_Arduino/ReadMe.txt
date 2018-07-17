@@ -1,10 +1,9 @@
-copy sys_main\MCU_Arduino\*.* to sys_main\
-copy sys_main\UI\UI.h to sys_main\
-copy sys_main\UI\EVE\*.* to sys_main\, and change all the .c to .cpp
-rename sys_main\sys_main.c to sys_main\sys_main.cpp
 
-(prepare.bat may help you do above, and clean.bat can clean them)
+1. execute prepare.bat before you open the Arduino IDE
 
-copy the specific ui file in sys_main\UI\ to sys_main\
-execute sys_main\sys_main.ino to open Arduino IDE
+2. copy the specific ui file in sys_main\UI\ to sys_main\
+
+3. execute sys_main\sys_main.ino to open Arduino IDE, do the debugging
+
+4. execute clean.bat after you finish using the Arduino IDE
 
