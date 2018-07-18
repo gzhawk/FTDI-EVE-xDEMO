@@ -8,6 +8,8 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
+
+
 /*------------------------------------------demo setting, platform limitation */
 #if !defined(UI_FLASH_ANIM) && \
     !defined(UI_FLASH_PROG) && \
@@ -55,8 +57,10 @@
 #error "use '#defined UI_XXX' to select a demo"
 #endif
 
-/* actually, nowhere using this define excecpt for
-   demo platform compatable check*/
+/* 
+    actually, nowhere using ARDUINO define
+    only for demo platform compatable check
+*/
 #if (!defined(FT9XXEV) && \
      !defined(STM32F4) && \
      !defined(MSVC2010EXPRESS) && \
