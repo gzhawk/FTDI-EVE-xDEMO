@@ -8,8 +8,6 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-//use '#define UI_XXX' here
-
 /*------------------------------------------demo setting, platform limitation */
 #if !defined(UI_FLASH_ANIM) && \
     !defined(UI_FLASH_PROG) && \
@@ -54,7 +52,7 @@
     !defined(UI_DRAGICON) && \
     !defined(UI_ALLY_LCDTST) && \
     !defined(UI_TOUCH)
-#error "no demo be selected"
+#error "use '#defined UI_XXX' to select a demo"
 #endif
 
 /* actually, nowhere using this define excecpt for
