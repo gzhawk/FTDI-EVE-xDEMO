@@ -9,7 +9,6 @@
 #define _PLATFORM_H_
 
 /*TODO: define your UI_XXX here */
-#define UI_BITMAP
 /* 
     actually, nowhere using ARDUINO define
     only for demo platform compatable check
