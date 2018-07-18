@@ -287,7 +287,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "6.A.43.1"
+#define APPS_VER "5.B.43.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
