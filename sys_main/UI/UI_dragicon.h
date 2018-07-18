@@ -734,6 +734,7 @@ STATIC FTU8 displayItems (icon_st *p, FTU8 Touch, FTU8 *pSave)
 					g_closet_line = CLOSET_W_BAR;
 					closet_list.active = 0;
 					closet_list.alpha = 0;
+                	appGP.appIndex = 1;
 					return 1;
 				case TG_PLACE_0:
 				case TG_PLACE_1:
@@ -748,6 +749,7 @@ STATIC FTU8 displayItems (icon_st *p, FTU8 Touch, FTU8 *pSave)
 					g_closet_line = CLOSET_W_BAR;
 					closet_list.active = 0;
 					closet_list.alpha = 0;
+                	appGP.appIndex = 1;
 					return 1;
 				default:
 					break;
