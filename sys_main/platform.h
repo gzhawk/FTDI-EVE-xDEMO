@@ -4,11 +4,11 @@
     Email : hawk.gao@ftdichip.com	
     Date  : 2013/Oct
  */
-/* define your UI_XXX here */
+
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-
+/* define your UI_XXX here */
 
 /*------------------------------------------demo setting, platform limitation */
 #if !defined(UI_FLASH_ANIM) && \
