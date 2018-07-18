@@ -8,58 +8,68 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-#define UI_EVEUI
-#if 0
-/* UI for customer: technical support */
-#define UI_EVEUI
-#define UI_MEMOPT
-#define UI_AVI
-#define UI_JPGDISP
-#define UI_DISPRAW
-#define UI_FONT
-#define UI_BITMAP
-#define UI_BKGND
-#define UI_AUDIO
-#define UI_DRAGICON
-#define UI_DXT1
-#define UI_FVIDEO
-#define UI_RIPPLE
-#define UI_TOUCH
-#define UI_LITTLESWAN
-#define UI_ALLYTECH
-#define UI_ALLY_FONT
-#define UI_ALLY_ROTATE
-#define UI_ALLY_MODEB
-#define UI_ALLY_LCDTST
-#define UI_ALLY_SWAP
-#define UI_BSH
-#define UI_COOBOT
-#define UI_PUZZLE
-#define UI_MIDEA
-#define UI_XIZI_BKGND
-#define UI_BOMS_HID
-#define UI_AMICON
-#define UI_DIAL
-#define UI_FV_INVENSYS
-#define UI_FLASH_PROG
-/* UI for customer: demonstration */
-#define UI_CJ
-#define UI_STELIGENT
-#define UI_LIERDA
-#define UI_MIDEA_W
-#define UI_WELLING
-#define UI_XIZI
-#define UI_GRG
-#define UI_NJTOYO
-#define UI_SLIP_M
-#define UI_VJDZ
-#define UI_AUPU
-#define UI_FLASH_ANIM
+//use '#define UI_XXX' here
+
+/*------------------------------------------demo setting, platform limitation */
+#if !defined(UI_FLASH_ANIM) && \
+    !defined(UI_FLASH_PROG) && \
+    !defined(UI_DIAL) && \
+    !defined(UI_BSH) && \
+    !defined(UI_GRG) && \
+    !defined(UI_PUZZLE) && \
+    !defined(UI_MIDEA) && \
+    !defined(UI_FVIDEO_INVENSYS) && \
+    !defined(UI_AMICON) && \
+    !defined(UI_XIZI_BKGND) && \
+    !defined(UI_FVIDEO) && \
+    !defined(UI_BKGND) && \
+    !defined(UI_DXT1) && \
+    !defined(UI_DISPRAW) && \
+    !defined(UI_FONT) && \
+    !defined(UI_WELLING) && \
+    !defined(UI_COOBOT) && \
+    !defined(UI_LITTLESWAN) && \
+    !defined(UI_AVI) && \
+    !defined(UI_BITMAP) && \
+    !defined(UI_LIERDA) && \
+    !defined(UI_CJ) && \
+    !defined(UI_ALLYTECH) && \
+    !defined(UI_ALLY_MODEB) && \
+    !defined(UI_ALLY_SWAP) && \
+    !defined(UI_JPGDISP) && \
+    !defined(UI_SLIP_M) && \
+    !defined(UI_NJTOYO) && \
+    !defined(UI_BOMS_HID) && \
+    !defined(UI_ALLY_ROTATE) && \
+	!defined(UI_VJDZ) && \
+    !defined(UI_STELIGENT) && \
+    !defined(UI_MIDEA_W) && \
+    !defined(UI_AUPU) && \
+    !defined(UI_RIPPLE) && \
+    !defined(UI_ALLY_FONT) && \
+    !defined(UI_XIZI) && \
+    !defined(UI_EVEUI) && \
+    !defined(UI_AUDIO) && \
+    !defined(UI_MEMOPT) && \
+    !defined(UI_DRAGICON) && \
+    !defined(UI_ALLY_LCDTST) && \
+    !defined(UI_TOUCH)
+#error "no demo be selected"
 #endif
 
+/* actually, nowhere using this define excecpt for
+   demo platform compatable check*/
+#if (!defined(FT9XXEV) && \
+     !defined(STM32F4) && \
+     !defined(MSVC2010EXPRESS) && \
+     !defined(MSVC2012EMU) && \
+     !defined(MSVC2017EMU))
+#define ARDUINO
+#endif
 /*-------------------------------------------------Demo Related hardware setting
- * DEF_81X          when using FT81X, or DEMO run as FT80X 
- * DEF_BT81X        when using BT81X, or DEMO run as BT80X 
+ * DEF_80X          when using FT80X 
+ * DEF_81X          when using FT81X
+ * DEF_BT81X        when using BT81X
  * DEF_CAP_MULTI    Cap touch with multiple touch control, or DEMO run as res TCP 
  * DEF_CAP_NONMULTI Cap touch with single touch control, or DEMO run as res TCP 
  * LCD_QVGA         320x240
@@ -69,9 +79,24 @@
  * EVE_SPI_TYPE     SPI, DSPI or QSPI supported, only FT81X can set to 2 or 4
  *                  also, need to know if your MCU use what kind of SPI
  */
-/* not support STM32 */
-#if !defined(STM32F4)
-/*-----------------------------------Arduino, FT9XX, MSVC platform, None STM32*/
+
+/*------------------------------------------demo setting, platform limitation */
+#if defined(UI_FLASH_ANIM) || \
+    defined(UI_FLASH_PROG)
+#define DEF_BT81X
+#define LCD_WVGA
+#define DEF_CAP_NONMULTI
+#define EVE_SPI_TYPE 4
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X) || \
+     defined(DEF_81X))
+#error "no supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
 #if (defined(UI_DIAL) || \
     defined(UI_BSH) || \
     defined(UI_GRG) || \
@@ -87,25 +112,31 @@
     defined(UI_FONT) || \
     defined(UI_WELLING) || \
     defined(UI_COOBOT))
+#define DEF_81X
 #define LCD_WQVGA
+#define DEF_CAP_NONMULTI
 #define EVE_SPI_TYPE 1
+
+#if defined(STM32F4)
+#error "no supported"
+#endif
 #endif
 
+/*----------------------------------------------------------------------------*/
 #if defined(UI_LITTLESWAN)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X))
+#error "no supported"
+#endif
 #endif
 
-#if defined(UI_FLASH_ANIM) || \
-    defined(UI_FLASH_PROG)
-#define DEF_BT81X
-#define LCD_WVGA
-#define EVE_SPI_TYPE 1
-#endif
-/*-------------------------------------------FT9XX, MSVC platform, None STM32 */
-#if (defined(FT9XXEV) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU))
+/*----------------------------------------------------------------------------*/
 
 #if (defined(UI_AVI) || \
     defined(UI_BITMAP) || \
@@ -121,13 +152,7 @@
     defined(UI_ALLY_ROTATE) || \
 	defined(UI_VJDZ) || \
     defined(UI_STELIGENT)
-#if 0 // enable the BT81X define here when needed
-#define DEF_BT81X 
-#else
 #define DEF_81X
-#endif
-#define DEF_CAP_NONMULTI
-#define LCD_WVGA
 
 #if ((defined(UI_NJTOYO) || \
       defined(UI_AVI)) && \
@@ -138,66 +163,144 @@
 #define EVE_SPI_TYPE 1
 #endif
 
+#define DEF_CAP_NONMULTI
+#define LCD_WVGA
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X))
+#error "no supported"
+#endif
 #endif
 
-#if (defined(UI_MIDEA_W))
+/*----------------------------------------------------------------------------*/
+#if defined(UI_MIDEA_W)
 #define DEF_81X
 #define LCD_WQVGA
+#define DEF_CAP_NONMULTI
 #define EVE_SPI_TYPE 1
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X))
+#error "no supported"
+#endif
 #endif
 
+/*----------------------------------------------------------------------------*/
 #if defined(UI_AUPU)
 #define DEF_81X
 #define LCD_HVGA
+#define DEF_CAP_NONMULTI
 #define EVE_SPI_TYPE 1
+
+#if (defined(FT9XXEV) || \
+     defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X))
+#error "no supported"
+#endif
 #endif
 
-#endif
-
-/*--------------------------------------------------MSVC platform, None STM32 */
-#if (defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU))
-
-#if defined(UI_XIZI)
-#define LCD_WQVGA
-#define EVE_SPI_TYPE 1
-#endif
-
+/*----------------------------------------------------------------------------*/
 #if defined(UI_RIPPLE) || \
     defined(UI_ALLY_FONT)
 #define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
+
+#if (defined(FT9XXEV) || \
+     defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X))
+#error "no supported"
 #endif
 #endif
 
+/*----------------------------------------------------------------------------*/
+#if defined(UI_XIZI)
+#define DEF_80X 
+
+#define LCD_WQVGA
+#define EVE_SPI_TYPE 1
+#define DEF_CAP_NONMULTI
+
+#if (defined(FT9XXEV) || \
+     defined(ARDUINO) || \
+     defined(STM32F4))
+#error "no supported"
+#endif
 #endif
 
-/*------------------------------------------------Android, FT9XX, MSVC, STM32 */
+/*----------------------------------------------------------------------------*/
 #if defined(UI_EVEUI) || \
     defined(UI_AUDIO) || \
     defined(UI_MEMOPT) || \
-    defined(UI_ALLY_LCDTST) || \
-    defined(UI_DRAGICON) || \
-    defined(UI_TOUCH)
-#if 1 // enable the BT81X define here when needed
-#define DEF_BT81X 
-#else
+    defined(UI_DRAGICON)
 #define DEF_81X
+
+#if defined(DEF_80X)
+#define LCD_WQVGA
+#else
+#define LCD_WVGA
 #endif
+
+#define DEF_CAP_NONMULTI
+#define EVE_SPI_TYPE 1
+
+#if (defined(DEF_80X))
+#error "no supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
+#if defined(UI_ALLY_LCDTST)
+#define DEF_81X
 #define DEF_CAP_NONMULTI
 #define LCD_WVGA
 #define EVE_SPI_TYPE 1
 
+#if (defined(DEF_80X))
+#error "no supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
 #if defined(UI_TOUCH)
-#undef DEF_CAP_NONMULTI
+#define DEF_81X
 #define DEF_CAP_MULTI
+#define LCD_WVGA
+#define EVE_SPI_TYPE 1
+
+#if (defined(DEF_80X))
+#error "no supported"
+#endif
 #endif
 
+/*----------------------------------------------prevent undefined EVE setting */
+#if (!defined(DEF_80X) && \
+     !defined(DEF_81X) && \
+     !defined(DEF_BT81X))
+#error "no EVE be selected"
 #endif
 
-/*-----------------------------------------------prevent undefined LCD setting */
-#if !defined(LCD_QVGA) && !defined(LCD_HVGA) && !defined(LCD_WQVGA) && !defined(LCD_WVGA)
+/*----------------------------------------------prevent undefined SPI setting */
+#ifndef EVE_SPI_TYPE
+#error "no SPI be selected"
+#endif
+
+/*--------------------------------------------prevent undefined TOUCH setting */
+#if (!defined(DEF_CAP_NONMULTI) && \
+     !defined(DEF_CAP_MULTI))
+#error "no touch be selected"
+#endif
+
+/*----------------------------------------------prevent undefined LCD setting */
+#if (!defined(LCD_QVGA) && \
+    !defined(LCD_HVGA) && \
+    !defined(LCD_WQVGA) && \
+    !defined(LCD_WVGA))
 #error "no display be selected"
 #endif
 
