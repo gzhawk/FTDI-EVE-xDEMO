@@ -10,7 +10,7 @@ FTU8 trigger = 0;
 FTU8 pre_tag = 0;
 FTU32 key_data = 0;
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
 #define LOGO1_PATH ROOT_PATH"steligent\\logo1.raw"
 #define LOGO2_PATH ROOT_PATH"steligent\\logo2.raw"
 #define TRI_PATH ROOT_PATH"steligent\\tri.raw"

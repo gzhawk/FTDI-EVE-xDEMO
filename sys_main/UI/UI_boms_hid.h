@@ -8,8 +8,6 @@
 #define RET_W    80
 #define RET_H    40
 
-#if defined(MSVC2012EMU) || defined(MSVC2017EMU)
-
 test_rate_t rate_data = {0};
 #define DISK_LIST_LEN 3
 FTU8 diskList[DISK_LIST_LEN][3] = {"G:","E:","F:"};
@@ -417,6 +415,4 @@ FTVOID keyboard_to_pc (FTU32 para)
 AppFunc APPS_UI[] = {
 	keyboard_to_pc
 };
-#else
-#error "not for this platform"
-#endif
+

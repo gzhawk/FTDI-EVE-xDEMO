@@ -5,7 +5,7 @@
 	Date  : 2014/Jan
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define PATH_SCN1_C0 ROOT_PATH"xizi\\bk0_c0.raw"
 #define PATH_SCN1_C1 ROOT_PATH"xizi\\bk0_c1.raw"
 #define PATH_SCN1_B0 ROOT_PATH"xizi\\bk0_b0.raw"
@@ -27,7 +27,7 @@
 #define PATH_SCN2_B1 ROOT_PATH"bk1_b1.raw"
 #endif
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR)
 #define DXT1_PATH_LEN   (30)
 #define DXT1_PATH_INDEX_RUN (17)
 #else
@@ -196,7 +196,7 @@ STATIC FTVOID Disp2Pic (moving_st *pm1, moving_st *pm2)
 	HAL_CmdBufIn(END());
 
 	HAL_CmdBufIn(COLOR_RGB(0xFF,0,0));
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4,DXT1_TLT_FONT,OPT_CENTERX,"You would see a line in background");
 	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,DXT1_TLT_FONT,OPT_CENTERX,"Because original background content");
 	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4*3,DXT1_TLT_FONT,OPT_CENTERX,"Do not continues link from head to end");

@@ -26,7 +26,7 @@ FTU8 screen_title[FONT_LINE][FONT_LEN] = {
 	{3,4,5,6,7,8,0}//make design easy
 }; 
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define PATH_LINE1 ROOT_PATH"font\\line1.raw"
 #define PATH_LINE2 ROOT_PATH"font\\line2.raw"
 #else
