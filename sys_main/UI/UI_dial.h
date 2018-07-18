@@ -37,7 +37,6 @@
 
 #define TRACK_HIGH2 200           //this paramater same as the shadow bitmap length(H8_400x1.png),when WINDOW_ANGLE is 180, the length is arc diameter 
 #define TRACK_HIGH3 400           //this paramater same as the shadow bitmap length(H8_200x1.png),when WINDOW_ANGLE is 180, the length is arc diameter 
-#define TRACK_LEN3 50             //track width
 #define TRACK_LEN3 70             //track width
 #define TRACK_LEN4 140             //track width
 
@@ -280,7 +279,7 @@ FTVOID ScrollerInit0(Ft_App_Scroller_t *pScroll,Ft_App_Scroller_t *initScroll,di
 
 appRet_en dialBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, BMP_para *pbmpHD,FTU32 width,FTU32 high)
 {
-	FTU32 i, src;
+	FTU32 src;
 	src = ramgAddr;
 	if (bmpHdl >= EVE_BMP_EXT_HANDLE) {
 		DBGPRINT;
@@ -308,7 +307,6 @@ appRet_en dialBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, BMP_para *pbmpHD,FTU32 wid
 STATIC FTVOID downBKBitmap(Ft_App_Scroller_t *pScroll)
 {
 	static FTU8 ifLoaded = 0;
-	FTU8 i, j;
 	FTU32 addr=0;
 	    addr = RAM_G;
 	//if (ifLoaded == 0) {
@@ -344,7 +342,7 @@ STATIC FTVOID downBKBitmap(Ft_App_Scroller_t *pScroll)
 FTVOID drawContext(Ft_App_Scroller_t *pScroll,display_context *array_Display,FTU8 len)
 {
 	FTU8 i=0;
-	FTU32 display_x=0,display_y=0,display_y_roll=0,temp,display_y_sel=0;
+	FTU32 display_x=0,display_y=0,display_y_roll=0,display_y_sel=0;
 	if(pScroll->verticalORhorizontal == HORIZONTAL){
 		for(i=0;i<len;i++){
 			(array_Display+i)->display_y = pScroll->window_middle_y;
