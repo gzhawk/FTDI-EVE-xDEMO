@@ -2,9 +2,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <Windows.h>
-#include <direct.h>
 #include <time.h>
+
+#if defined(VC_MPSSE)
+#include "libMPSSE_spi.h"
+FT_HANDLE ftHandle;
+#endif
+
+#if defined(VC_EMULATOR)
+#include <direct.h>
 #include <io.h>
+#endif
 
 typedef const char     FTC8;
 typedef signed char    FT8;
@@ -17,7 +25,7 @@ typedef signed long    FT64;
 typedef unsigned long  FTU64;
 #define FTVOID void
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && defined(VC_EMULATOR)
 typedef unsigned __int8 uint8_t;
 typedef signed __int8 int8_t;
 typedef unsigned __int16 uint16_t;
@@ -28,13 +36,6 @@ typedef unsigned __int64 uint64_t;
 typedef signed __int64 int64_t;
 #endif
 
-typedef uint32_t argb8888;
-#include "bt8xxemu_Emulator.h"
-extern BT8XXEMU_Emulator *gEmulator;
-
-#define BTFLASH_DATA_FILE   L"..\\..\\res\\flash\\bt81X.flash"
-#define BTFLASH_DEVICE_TYPE L"mx25lemu"
-#define BTFLASH_SIZE        (16 * 1024 * 1024)
 #define USED_CMD_BUF
 
 #define PROGMEM 
@@ -47,6 +48,64 @@ extern BT8XXEMU_Emulator *gEmulator;
 #define FTUDELAY(mS)    Sleep(mS/1000)
 #define ROOT_PATH "..\\..\\res\\"
 #define CDATA_PATH ROOT_PATH"cdata.bin"
+
+#define STATIC static
+
+#ifdef DBG_PRINT
+#define FTPRINT     printf
+#define DBGPRINT    appUI_DbgPrint(__FUNCTION__,__LINE__)
+#define SYS_INIT    printf("\r\nVer: %s",APPS_VER)
+#else
+#define FTPRINT     vc2012emu_dumy_print
+#define DBGPRINT
+#define SYS_INIT 
+#endif
+
+#define FTRANDOM(M) (rand()%(M))
+
+#define EVE_CAL_PARA_NUM    (6)
+
+#define APPS_SYS vc_apps_sys_dummy
+
+#if defined(VC_MPSSE)
+#define SPI_CLK_12M 12000000
+#define SPI_CLK_15M 15000000
+#define SPI_L_TIMER 2
+#define SPI_INIDIR_IN 0x00000000
+#define SPI_INIDIR_OUT 0x00000001
+#define SPI_INIVAL_LOW 0x00000000
+#define SPI_INIVAL_HIGH 0x00000100
+#define SPI_ENDDIR_IN 0x00000000
+#define SPI_ENDDIR_OUT 0x00010000
+#define SPI_ENDVAL_LOW 0x00000000
+#define SPI_ENDDIR_HIGH 0x01000000
+#define SPI_TXCMD_LEN 3
+#define SPI_RXCMD_LEN 4
+
+
+#define FTMAIN FT32 main (FT32 argc,FT8 *argv[]) 
+#define FTDUMMY
+#define SYS_END    return 0
+
+#endif
+
+#if defined(VC_EMULATOR)
+typedef uint32_t argb8888;
+#include "bt8xxemu_Emulator.h"
+extern BT8XXEMU_Emulator *gEmulator;
+
+#define BTFLASH_DATA_FILE   L"..\\..\\res\\flash\\bt81X.flash"
+#define BTFLASH_DEVICE_TYPE L"mx25lemu"
+#define BTFLASH_SIZE        (16 * 1024 * 1024)
+
+#if defined(DEF_BT81X)
+#define EVEMODE BT8XXEMU_EmulatorBT815
+#elif defined(DEF_81X)
+#define EVEMODE BT8XXEMU_EmulatorFT810
+#else
+#define EVEMODE BT8XXEMU_EmulatorFT800
+#endif
+
 #define FTMAIN FTVOID mcu (BT8XXEMU_Emulator *sender, void *context) 
 #define FTDUMMY \
                 int main(FT32 argc,FT8 *argv[]) \
@@ -73,40 +132,14 @@ extern BT8XXEMU_Emulator *gEmulator;
                   \
 				  return 0; \
 			    }
-
-#define STATIC static
-
-#ifdef DBG_PRINT
-#define FTPRINT     printf
-#define DBGPRINT    appUI_DbgPrint(__FUNCTION__,__LINE__)
-#define SYS_INIT    printf("\r\nVer: %s",APPS_VER)
-#else
-#define FTPRINT     vc2012emu_dumy_print
-#define DBGPRINT
-#define SYS_INIT 
-#endif
-
-#define FTRANDOM(M) (rand()%(M))
-
-#if defined(DEF_BT81X)
-#define EVEMODE BT8XXEMU_EmulatorBT815
-#elif defined(DEF_81X)
-#define EVEMODE BT8XXEMU_EmulatorFT810
-#else
-#define EVEMODE BT8XXEMU_EmulatorFT800
-#endif
-
-#define EVE_CAL_PARA_NUM    (6)
-
-#define APPS_SYS vc2017emu_apps_sys_dummy
-
 #define SYS_END BT8XXEMU_stop(gEmulator)
-
-FTVOID vc2017emu_dumy_print (char *p);
-FTVOID vc2017emu_apps_sys_dummy (FTU32 para);
 
 FTVOID FT8XXEMU_cs(FT8 i);
 FTU32 FT8XXEMU_transfer(FTU32 data);
+#endif
+
+FTVOID vc_dumy_print (char *p);
+FTVOID vc_apps_sys_dummy (FTU32 para);
 
 FTVOID HAL_restore_cdata (FTC8 *dataPath, FTU8 *p);
 FTU8 HAL_is_tag_vaild (FTC8 *dataPath);

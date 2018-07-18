@@ -5,7 +5,7 @@
 	Date  : 2015/July
 */
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define PATH_DISP ROOT_PATH"littleswan\\X1.jpg"
 #define P_LEN 30
 #define P_INX 22
@@ -129,7 +129,7 @@ FTU32 fileload (FTU8 * p_file, FTU32 mfifo_addr)
 FTVOID jpgdisp (FTU32 para)
 {
 	FTU32 len, XY, mfifo_addr = FIFOADDR;
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(VC_MPSSE)&&!defined(VC_EMULATOR)&&!defined(FT9XXEV)
 	FTU32 lenX, lenY;
 #endif
     static FTU8 inited = 0;
@@ -142,7 +142,7 @@ FTVOID jpgdisp (FTU32 para)
             return;
         }
         /*Arduino*/
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(VC_MPSSE)&&!defined(VC_EMULATOR)&&!defined(FT9XXEV)
         /* X2.jpg */
         p_tmp[P_INX]++;
         lenX = len;
@@ -170,20 +170,20 @@ FTVOID jpgdisp (FTU32 para)
 
         if (FIFOADDR == mfifo_addr) {
             mfifo_addr += FIFOGAP;
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(VC_MPSSE)&&!defined(VC_EMULATOR)&&!defined(FT9XXEV)
             len = lenY;
 #endif
             /* do the IO control */
             appGP.appPara = 0;
         } else {
             mfifo_addr = FIFOADDR;
-#if !defined(STM32F4)&&!defined(MSVC2010EXPRESS)&&!defined(MSVC2012EMU)&&!defined(MSVC2017EMU)&&!defined(FT9XXEV)
+#if !defined(STM32F4)&&!defined(VC_MPSSE)&&!defined(VC_EMULATOR)&&!defined(FT9XXEV)
             len = lenX;
 #endif
             /* do the IO control */
             appGP.appPara = 1;
         }
-#if defined(STM32F4) || defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
+#if defined(STM32F4) || defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
         p_tmp[P_INX]++;
         len = fileload(p_tmp, mfifo_addr);
         if (len == 0) {

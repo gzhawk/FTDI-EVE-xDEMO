@@ -7,7 +7,7 @@
 */
 
 #define PATH_LEN 50
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define ANIMATION_NUM 10
 #define ANIMATION_TUB_TAG 7 /* tag number of tube */
 #else
@@ -27,7 +27,7 @@ typedef struct bitmap_ {
 	FTU32 high;
 } bitmap_st;
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define PUZZLE_PATH ROOT_PATH"puzzle\\"
 #else
 #define PUZZLE_PATH 
@@ -38,7 +38,7 @@ bitmap_st brgd_bitmap[] = {
 	{PUZZLE_PATH"0_0.raw",     0,0,144,52}, 
 	{PUZZLE_PATH"189_0.raw",   189,0,4,52},
 	{PUZZLE_PATH"238_0.raw",   238,0,17,52},
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 	/* Due to limited resource of Arduino (2K RAM in total, SD card module use too much RAM)
 	 * we remove some parts of this unchange resources
 	 * it may looks bad, please bear it...
@@ -70,7 +70,7 @@ bitmap_st ani_bitmap[ANIMATION_NUM] = {
 	{PUZZLE_PATH"sound00.raw",  423,0,45,52}, 
 
 	/* if tube position change, ANIMATION_TUB_TAG need to be changed */
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 	/* remove this animation effect in Arduino platform
 	 * since it's too diffical to make the effect run smooth
 	 * in such tiny RAM (2K RAM in total, SD card module use too much RAM)*/
@@ -190,7 +190,7 @@ FTVOID playpuzzle (FTU32 para)
 		return;
 	}
 
-#if !defined(MSVC2010EXPRESS) && !defined(MSVC2012EMU) && !defined(MSVC2017EMU) 
+#if !defined(VC_MPSSE)&&!defined(VC_EMULATOR) 
 	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4,24,OPT_CENTERX,"Due to limited memory in Arduino");
 	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,24,OPT_CENTERX,"We remove some parts of the background");
 	CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/4*3,24,OPT_CENTERX,"Better play me on MSVC");

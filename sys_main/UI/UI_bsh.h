@@ -46,7 +46,7 @@ FTU8 screen_title[BSH_NUM_END+1][BSH_TLT_LEN] = {
 	{16,5,14,0},//{"-10"}
 }; 
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define PATH_BSH_FNT ROOT_PATH"bsh\\bsh.raw"
 #else
 #define PATH_BSH_FNT ROOT_PATH"bsh.raw"

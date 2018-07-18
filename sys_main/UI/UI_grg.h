@@ -210,7 +210,7 @@ typedef enum FONT_NUM_e {
  * can only support equal or less than 8 char file name with 3 char extantion
  */ 
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define PATH_ICON_1 ROOT_PATH"cash\\I1.raw"
 #define PATH_ICON_2 ROOT_PATH"cash\\I2.raw"
 #define PATH_ICON_3 ROOT_PATH"cash\\I3.raw"
@@ -684,7 +684,7 @@ static FTVOID walk (datetime_st *pT, FTU32 init)
 	static FTU32 iBakTick;
 	FTU32 iTick;
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 		iTick = (FTU32)GetTickCount();
 #elif defined(STM32F4)
 		iTick = 0;
@@ -828,7 +828,7 @@ FTVOID cashBootup (FTU32 cashPara)
 #if defined(STM32F4)
 	return;
 #endif
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 	/* load bitmap resources data into EVE */
 	if(APP_OK != appBmpToRamG(BMP_H_0, BOOT_BMP_ADDR, bmpLogoHD, 1)) {
 		DBGPRINT;

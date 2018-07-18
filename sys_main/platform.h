@@ -8,64 +8,15 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-/* define your UI_XXX here */
-
-/*------------------------------------------demo setting, platform limitation */
-#if !defined(UI_FLASH_ANIM) && \
-    !defined(UI_FLASH_PROG) && \
-    !defined(UI_DIAL) && \
-    !defined(UI_BSH) && \
-    !defined(UI_GRG) && \
-    !defined(UI_PUZZLE) && \
-    !defined(UI_MIDEA) && \
-    !defined(UI_FVIDEO_INVENSYS) && \
-    !defined(UI_AMICON) && \
-    !defined(UI_XIZI_BKGND) && \
-    !defined(UI_FVIDEO) && \
-    !defined(UI_BKGND) && \
-    !defined(UI_DXT1) && \
-    !defined(UI_DISPRAW) && \
-    !defined(UI_FONT) && \
-    !defined(UI_WELLING) && \
-    !defined(UI_COOBOT) && \
-    !defined(UI_LITTLESWAN) && \
-    !defined(UI_AVI) && \
-    !defined(UI_BITMAP) && \
-    !defined(UI_LIERDA) && \
-    !defined(UI_CJ) && \
-    !defined(UI_ALLYTECH) && \
-    !defined(UI_ALLY_MODEB) && \
-    !defined(UI_ALLY_SWAP) && \
-    !defined(UI_JPGDISP) && \
-    !defined(UI_SLIP_M) && \
-    !defined(UI_NJTOYO) && \
-    !defined(UI_BOMS_HID) && \
-    !defined(UI_ALLY_ROTATE) && \
-	!defined(UI_VJDZ) && \
-    !defined(UI_STELIGENT) && \
-    !defined(UI_MIDEA_W) && \
-    !defined(UI_AUPU) && \
-    !defined(UI_RIPPLE) && \
-    !defined(UI_ALLY_FONT) && \
-    !defined(UI_XIZI) && \
-    !defined(UI_EVEUI) && \
-    !defined(UI_AUDIO) && \
-    !defined(UI_MEMOPT) && \
-    !defined(UI_DRAGICON) && \
-    !defined(UI_ALLY_LCDTST) && \
-    !defined(UI_TOUCH)
-#error "use '#defined UI_XXX' to select a demo"
-#endif
-
+/*TODO: define your UI_XXX here */
 /* 
     actually, nowhere using ARDUINO define
     only for demo platform compatable check
 */
 #if (!defined(FT9XXEV) && \
      !defined(STM32F4) && \
-     !defined(MSVC2010EXPRESS) && \
-     !defined(MSVC2012EMU) && \
-     !defined(MSVC2017EMU))
+     !defined(VC_MPSSE) && \
+     !defined(VC_EMULATOR))
 #define ARDUINO
 #endif
 /*-------------------------------------------------Demo Related hardware setting
@@ -150,7 +101,6 @@
     defined(UI_JPGDISP) || \
     defined(UI_SLIP_M) || \
     defined(UI_NJTOYO) || \
-    defined(UI_BOMS_HID) || \
     defined(UI_ALLY_ROTATE) || \
 	defined(UI_VJDZ) || \
     defined(UI_STELIGENT)
@@ -175,6 +125,17 @@
 #endif
 #endif
 
+/*----------------------------------------------------------------------------*/
+#if defined(UI_BOMS_HID)
+#define DEF_81X
+#define EVE_SPI_TYPE 1
+#define DEF_CAP_NONMULTI
+#define LCD_WVGA
+
+#ifndef VC_EMULATOR
+#error "not supported"
+#endif
+#endif
 /*----------------------------------------------------------------------------*/
 #if defined(UI_MIDEA_W)
 #define DEF_81X
@@ -325,7 +286,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "6.A.43.1"
+#define APPS_VER "5.B.43.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -361,22 +322,16 @@
  * WINDOWS: consider it as unlimited memory
  * FT9xx  : totally got 64K memory
  */
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
 #define MCU_BLOCK_SIZE      (10*1024)
 #else
 /* limited by sdcard sector size
  * should be the same as SDC_SECTOR_SIZE if sdcard.h be used */
 #define MCU_BLOCK_SIZE      (512)
 #endif
-/*-------------------------------------------------------------MSVC2010EXPRESS*/
-#ifdef MSVC2010EXPRESS
-#include "vc2010_xdemo.h"
-/*-----------------------------------------------------------------MSVC2012EMU*/
-#elif defined(MSVC2012EMU)
-#include "vc2012emu_xdemo.h"
-/*-----------------------------------------------------------------MSVC2017EMU*/
-#elif defined(MSVC2017EMU)
-#include "vc2017emu_xdemo.h"
+/*--------------------------------------------------------VC_EMULATOR,VC_MPSSE*/
+#if defined(VC_MPSSE) || defined(VC_EMULATOR)
+#include "vc_xdemo.h"
 /*---------------------------------------------------------------------STM32F4*/
 #elif defined(STM32F4)
 #include "stm32_xdemo.h"

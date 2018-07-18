@@ -210,7 +210,7 @@ FTVOID screenShow (FTU32 para)
 FTVOID playaudio (FTU32 cashPara)
 {
 	audio_hd_t raw_hd = {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU)|| defined(MSVC2017EMU)
+#if defined(VC_MPSSE) || defined(VC_EMULATOR)
 		(FTU8 *)ROOT_PATH"aud\\Chopin.raw",
 #else
 		(FTU8 *)ROOT_PATH"Chopin.raw",
@@ -227,7 +227,7 @@ FTVOID playaudio (FTU32 cashPara)
  */
 #if 0
 	audio_hd_t wav_hd = {
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU)
+#if defined(VC_MPSSE) || defined(VC_EMULATOR)
 		(FTU8 *)ROOT_PATH"aud\\Chopin.wav",
 #else
 		(FTU8 *)ROOT_PATH"Chopin.wav",

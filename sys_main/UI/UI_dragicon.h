@@ -39,7 +39,7 @@
 #define RGB_PLACE COLOR_RGB(170, 170, 170)
 #define RGB_BAR   COLOR_RGB(0xFF,0xFF,0)
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) || defined(FT9XXEV)
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
 #define PATH_TRANS ROOT_PATH"dragicon\\trans.raw"
 #define PATH_PLACE ROOT_PATH"dragicon\\place.raw"
 #else

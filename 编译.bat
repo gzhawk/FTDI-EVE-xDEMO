@@ -13,26 +13,21 @@ echo.
 echo 3: ARM (STM32)环境下，这是基于STM32F4-Discovery开发板开发的
 echo Discovery只有MCU平台，需要购买CCModule/BasicModule运行。
 echo.
-echo 4: PC环境下，通过VC2010编译环境，模拟MCU控制EVE，
+echo 4: PC环境下，通过VC2017编译环境，模拟MCU控制EVE，
 echo 必须结合使用MPSSE线缆和CCModule/BasicModule进行调试。
 echo.
-echo 5: PC环境下，通过VC2012（注意，是2012，不是2010）编译环境，模拟MCU控制EVE，
+echo 5: PC环境下，通过VC2017编译环境，模拟MCU控制EVE，
 echo 无需额外使用任何外围设备（线缆/模块等等）， 
 echo 他可以直接在PC上模拟出LCD屏，并将运行结果显示在模拟出的LCD屏上
 echo.
-echo 6: PC环境下，通过VC2017（注意，是2017，不是2012/2010）编译环境，模拟MCU控制EVE，
-echo 无需额外使用任何外围设备（线缆/模块等等）， 
-echo 他可以直接在PC上模拟出LCD屏，并将运行结果显示在模拟出的LCD屏上
-echo.
-echo 7: 退出
+echo 6: 退出
 echo.
 
-choice /C:1234567
+choice /C:123456
 
-if errorlevel 7 goto SkipRunme
-if errorlevel 6 goto VC2017
-if errorlevel 5 goto VC2012
-if errorlevel 4 goto VC2010
+if errorlevel 6 goto SkipRunme
+if errorlevel 5 goto VC_Emulator
+if errorlevel 4 goto VC_Mpsse
 if errorlevel 3 goto STM32
 if errorlevel 2 goto Arduino
 if errorlevel 1 goto FT9XX
@@ -113,16 +108,12 @@ echo.
 jlink
 goto SkipRunme
 
-:VC2010
-call sys_main\MCU_VC2010\vc2010.vcxproj
+:VC_Mpsse
+call sys_main\MCU_VC\vc_mpsse.vcxproj
 goto SkipRunme
 
-:VC2012
-call sys_main\MCU_VC2012\vc2012.vcxproj
-goto SkipRunme
-
-:VC2017
-call sys_main\MCU_VC2017\vc2017.vcxproj
+:VC_Emulator
+call sys_main\MCU_VC\vc_emulator.vcxproj
 goto SkipRunme
 
 :SkipRunme

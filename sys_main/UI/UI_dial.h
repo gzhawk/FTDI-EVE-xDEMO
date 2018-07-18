@@ -9,7 +9,7 @@
 
 #define BKGND_BLOB_GRAD_BKG CoCmd_GRADIENT(0,0,0xCBDEB6,0,EVE_LCD_HIGH,0)
 
-#if defined(MSVC2010EXPRESS) || defined(MSVC2012EMU) || defined(MSVC2017EMU) 
+#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
 #define PATH_BK_ICON ROOT_PATH"dial\\L8_H400.raw"
 #define PATH_BK_ICON1 ROOT_PATH"dial\\L8_H200.raw"
 #define PATH_BK_ICON2 ROOT_PATH"dial\\L8_V200.raw"
