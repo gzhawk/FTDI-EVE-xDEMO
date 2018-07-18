@@ -6,6 +6,7 @@
 
 #if defined(VC_MPSSE)
 #include "libMPSSE_spi.h"
+FT_HANDLE ftHandle;
 #endif
 
 #if defined(VC_EMULATOR)

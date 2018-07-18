@@ -285,6 +285,18 @@ FTU32 HAL_Read32 ( FTU32 addr )
 #endif
 }
 
+#if defined(VC_EMULATOR)
+FTVOID FT8XXEMU_cs(FT8 i)
+{
+	BT8XXEMU_chipSelect(gEmulator, i);
+}
+
+FTU32 FT8XXEMU_transfer(FTU32 data)
+{
+    return BT8XXEMU_transfer(gEmulator, data);
+}
+#endif
+
 FTVOID vc_apps_sys_dummy (FTU32 para)
 {
     /* do nothing */
@@ -307,12 +319,68 @@ FTVOID HAL_speed_up (FTU32 type)
 
 FTVOID HAL_PwdCyc ( FTU8 OnOff )
 {
+#if defined(VC_MPSSE)
+    FT_WriteGPIO(ftHandle, 0xBB, OnOff?0x08:0x88);
+    FTDELAY(20);
+
+    FT_WriteGPIO(ftHandle, 0xBB, OnOff?0x88:0x08);
+    FTDELAY(20);
+#elif defined(VC_EMULATOR)
     /* do nothing */
+#endif
 }
 
 FTVOID HAL_SpiInit ( FTVOID )
 {
+#if defined(VC_MPSSE)
+    /* 
+       the SPI clock shall not exceed 11MHz before system clock is enabled. 
+       After system clock is properly enabled, 
+       the SPI clock is allowed to go up to 30MHz.	
+     */
+
+    ChannelConfig cConf;
+	FT_DEVICE_LIST_INFO_NODE devList;
+	FTU32 i;
+
+    Init_libMPSSE();
+
+	SPI_GetNumChannels(&i);
+	while (i == 0) {
+		FTPRINT("\nvc2010_spi_init: no channel");
+		/* Endless loop for error*/;	
+	}
+	
+	i = SPI_GetChannelInfo(0,&devList);
+	while (FT_OK != i) {
+		FTPRINT("\nvc2010_spi_init: no channel info");
+		/* Endless loop for error*/;	
+	}
+
+	i = SPI_OpenChannel(0,&ftHandle);
+	while (FT_OK != i) {
+		FTPRINT("\nvc2010_spi_init: fail to open channel");
+		/* Endless loop for error*/;	
+	}
+	
+	cConf.ClockRate = SPI_CLK_15M;
+	cConf.LatencyTimer= SPI_L_TIMER;
+	cConf.configOptions = SPI_CONFIG_OPTION_MODE0 | 
+		                  SPI_CONFIG_OPTION_CS_DBUS3 | 
+						  SPI_CONFIG_OPTION_CS_ACTIVELOW;
+	cConf.Pin = SPI_INIDIR_IN |
+		        SPI_INIVAL_LOW |
+		        SPI_ENDDIR_IN |
+		        SPI_ENDVAL_LOW;
+
+	i = SPI_InitChannel(ftHandle,&cConf);
+	while (FT_OK != i) {
+		FTPRINT("\nvc2010_spi_init: fail to init channel");
+		/* Endless loop for error*/;	
+	}
+#elif defined(VC_EMULATOR)
     /* do nothing */
+#endif
 }
 
 FTVOID HAL_preparation (FTVOID)
@@ -367,16 +435,6 @@ FTVOID HAL_vaild_tag (FTVOID)
 	/* already save it to file, the file is the 'tag' */
 	/* give some time to file system to finish operation */
 	FTDELAY(100);
-}
-
-FTVOID FT8XXEMU_cs(FT8 i)
-{
-	BT8XXEMU_chipSelect(gEmulator, i);
-}
-
-FTU32 FT8XXEMU_transfer(FTU32 data)
-{
-    return BT8XXEMU_transfer(gEmulator, data);
 }
 
 FTU32 HAL_WriteSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
