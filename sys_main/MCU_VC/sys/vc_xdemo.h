@@ -68,7 +68,6 @@ typedef signed __int64 int64_t;
 #define APPS_SYS vc_apps_sys_dummy
 
 #if defined(VC_MPSSE)
-#define SPI_CLK_12M 12000000
 #define SPI_CLK_15M 15000000
 #define SPI_L_TIMER 2
 #define SPI_INIDIR_IN 0x00000000

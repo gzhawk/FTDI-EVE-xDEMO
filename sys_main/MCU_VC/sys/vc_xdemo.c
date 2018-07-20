@@ -347,19 +347,19 @@ FTVOID HAL_SpiInit ( FTVOID )
 
 	SPI_GetNumChannels(&i);
 	while (i == 0) {
-		FTPRINT("\nvc2010_spi_init: no channel");
+		FTPRINT("\nHAL_SpiInit: no channel");
 		/* Endless loop for error*/;	
 	}
 	
 	i = SPI_GetChannelInfo(0,&devList);
 	while (FT_OK != i) {
-		FTPRINT("\nvc2010_spi_init: no channel info");
+		FTPRINT("\nHAL_SpiInit: no channel info");
 		/* Endless loop for error*/;	
 	}
 
 	i = SPI_OpenChannel(0,&ftHandle);
 	while (FT_OK != i) {
-		FTPRINT("\nvc2010_spi_init: fail to open channel");
+		FTPRINT("\nHAL_SpiInit: fail to open channel");
 		/* Endless loop for error*/;	
 	}
 	
@@ -375,7 +375,7 @@ FTVOID HAL_SpiInit ( FTVOID )
 
 	i = SPI_InitChannel(ftHandle,&cConf);
 	while (FT_OK != i) {
-		FTPRINT("\nvc2010_spi_init: fail to init channel");
+		FTPRINT("\nHAL_SpiInit: fail to init channel");
 		/* Endless loop for error*/;	
 	}
 #elif defined(VC_EMULATOR)
