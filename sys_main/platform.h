@@ -329,6 +329,14 @@
  * should be the same as SDC_SECTOR_SIZE if sdcard.h be used */
 #define MCU_BLOCK_SIZE      (512)
 #endif
+
+/* 
+ * Check if EVE match
+ */
+#if !defined(VC_EMULATOR)
+#define EVE_DEF_CHECK
+#endif
+
 /*--------------------------------------------------------VC_EMULATOR,VC_MPSSE*/
 #if defined(VC_MPSSE) || defined(VC_EMULATOR)
 #include "vc_xdemo.h"

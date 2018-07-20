@@ -734,36 +734,73 @@ FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
     HAL_BufToReg(RAM_CMD,0);
 }
 
-STATIC FTVOID appUI_GetEVEID (FTVOID)
+STATIC FTU8 appUI_GetEVEID (FTVOID)
 {
+    /* for FT81X and later, recommended to 
+       read 1 bytes data from address EVE_ID_REG 
+       before application overwrites this address,
+       since it is located in RAM_G. */
     READ_ID = HAL_Read8(EVE_ID_REG);
-#if defined(DBG_PRINT)
     FTPRINT("\nChip: ");
     switch (READ_ID) {
         case 0x10:
             FTPRINT("FT810");
-            break;
+#if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
         case 0x11:
             FTPRINT("FT811");
-            break;
+#if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
         case 0x12:
             FTPRINT("FT812");
-            break;
+#if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
         case 0x13:
             FTPRINT("FT813");
-            break;
+#if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
         case 0x15:
             FTPRINT("BT815");
-            break;
+#if defined(EVE_DEF_CHECK) && !defined(DEF_BT81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
         case 0x16:
             FTPRINT("BT816");
-            break;
+#if defined(EVE_DEF_CHECK) && !defined(DEF_BT81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
         default:
             /* only new FT81X able to read the EVE ID */
             FTPRINT("EVE");
-            break;
-    }
+#if defined(EVE_DEF_CHECK) && !defined(DEF_80X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
 #endif
+    }
 }
 
 STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
@@ -1100,14 +1137,10 @@ STATIC FTU8 appUI_EVEVerify (FTVOID)
     }
 
     if (count) {
-        FTPRINT("done");
-        /* for FT81X, users are recommended to 
-           read 4 bytes data from address 0xC0000 
-           before application overwrites this address,
-           since it is located in RAM_G. */
-        appUI_GetEVEID();
+        return appUI_GetEVEID();
+    } else {
+        return count;
     }
-    return count;
 }
 
 STATIC FTVOID appUI_EVEClnScrn (FTVOID)
