@@ -524,7 +524,6 @@ FTU8 appFlashSetFull(FTVOID)
     FTU32 addr, a[2];
 
     if(FLASH_STATUS_FULL == HAL_Read32(REG_FLASH_STATUS)) {
-        FTPRINT("\nFlash: already in full mode");
         return 0;
     }
     
