@@ -6,7 +6,7 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "remember copy res/water/bt81x.flash to res/flash, then comment this line"
+#error "copy res/water/bt81x.flash to res/flash, then comment this line"
 #endif
 
 #define BKGRD_PATH         "FLASH:30976"
