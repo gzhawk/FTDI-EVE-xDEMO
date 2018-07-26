@@ -9,6 +9,7 @@
 #define _PLATFORM_H_
 
 /*TODO: define your UI_XXX here */
+#define UI_WATER
 /* 
     actually, nowhere using ARDUINO define
     only for demo platform compatable check
@@ -34,12 +35,27 @@
  */
 
 /*------------------------------------------demo setting, platform limitation */
+#if defined(UI_WATER)
+#define DEF_BT81X
+#define LCD_WQVGA
+#define DEF_CAP_NONMULTI
+#define EVE_SPI_TYPE 1
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X) || \
+     defined(DEF_81X))
+#error "not supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
 #if defined(UI_FLASH_ANIM) || \
     defined(UI_FLASH_PROG)
 #define DEF_BT81X
 #define LCD_WVGA
 #define DEF_CAP_NONMULTI
-#define EVE_SPI_TYPE 4
+#define EVE_SPI_TYPE 1
 
 #if (defined(ARDUINO) || \
      defined(STM32F4) || \
@@ -286,7 +302,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.43.0"
+#define APPS_VER "5.B.44.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
