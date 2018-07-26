@@ -8,8 +8,8 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
-/*TODO: define your UI_XXX here */
-#define UI_FLASH_ANIM
+/*TODO: define your selected UI_XXX here */
+#error "#define UI_XXX"
 /* 
     actually, nowhere using ARDUINO define
     only for demo platform compatable check
@@ -231,20 +231,12 @@
     defined(UI_AUDIO) || \
     defined(UI_MEMOPT) || \
     defined(UI_DRAGICON)
-#define DEF_81X
+#define DEF_80X
 
-#if defined(DEF_80X)
 #define LCD_WQVGA
-#else
-#define LCD_WVGA
-#endif
-
 #define DEF_CAP_NONMULTI
 #define EVE_SPI_TYPE 1
 
-#if (defined(DEF_80X))
-#error "not supported"
-#endif
 #endif
 
 /*----------------------------------------------------------------------------*/
