@@ -1219,7 +1219,8 @@ FTVOID UI_INIT (FTVOID)
     appUI_EVEClk();
 
     if (!appUI_EVEVerify()) {
-        return;
+        FTPRINT("\nEVE init fail");
+        while(1);
     }
     
     FTPRINT("\nEVE inited");
