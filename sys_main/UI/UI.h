@@ -110,6 +110,8 @@ app_para_t appGP = {0};
 #include "UI_flash_prog.h"
 #elif defined(UI_WATER)
 #include "UI_water.h"
+#elif defined(UI_BEAN)
+#include "UI_bean.h"
 #else
 #error "no UI be selected"
 #endif
