@@ -7,6 +7,8 @@
 
 #if defined(VC_EMULATOR)
 #error "copy res/bean/bt81x.flash to res/flash, then comment this line"
+#elif defined(VC_MPSSE)
+#error "program res/bean/bt81x.flash to on-board flash, then comment this line"
 #endif
 
 #define UI_1_PATH     "FLASH:4096"
@@ -20,6 +22,19 @@
 #define ANIM_H        140
 #define ANIM_X        351
 #define ANIM_Y        116
+
+/* I don't have 480x272 screen on my hand now,
+   so use 800x480 screen to demonstrate it
+#ifdef EVE_LCD_WIDTH
+#undef EVE_LCD_WIDTH
+#define EVE_LCD_WIDTH 480
+#endif
+
+#ifdef EVE_LCD_HIGH
+#undef EVE_LCD_HIGH
+#define EVE_LCD_HIGH 272
+#endif
+*/
 
 bmpHDR_st bmp_hdr[] = {
     {UI_1_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
@@ -53,7 +68,10 @@ FTU8 load_resources(bmpHDR_st *p_res, FTU8 num)
 FTVOID loop_frame(FTU32 *pframe, FTU32 max)
 {
     if (*pframe >= max-1) {
-        *pframe = 0;
+        /* this animation file from a gif
+           the gif first 2 frame are blank
+           so skip this two blank frame*/
+        *pframe = 2;
     } else {
         *pframe = *pframe + 1;
     }
@@ -62,7 +80,7 @@ FTVOID loop_frame(FTU32 *pframe, FTU32 max)
 FTVOID bean_machine(FTU32 para)
 {
 	static FTU8 load = 1;
-    static FTU32 frame = 0, anim_x = ANIM_X, anim_y = ANIM_Y;
+    static FTU32 frame = 2, anim_x = ANIM_X, anim_y = ANIM_Y;
     static FT16 seed = 0, move = 0, x1 = -1*EVE_LCD_WIDTH, x2 = 0, x3 = EVE_LCD_WIDTH;
     FTU16 x = (HAL_Read32(REG_TOUCH_SCREEN_XY) >> 16);
 
@@ -77,7 +95,6 @@ FTVOID bean_machine(FTU32 para)
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(255, 255, 255));
 	HAL_CmdBufIn(CLEAR(1, 1, 1));
 
-    
     CoCmd_ANIMFRAME(anim_x, anim_y, ANIM_ADDR, frame);
     loop_frame(&frame, ANIM_FRAM);
 
