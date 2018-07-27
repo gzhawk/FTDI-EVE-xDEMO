@@ -39,25 +39,78 @@ FTC8 prog_info[P_END][FLASH_INFO_LEN] = {
 "Unknown error",
 };
 
+#define DISP_LINE 14
+#define DISP_X    (EVE_LCD_WIDTH / 2)
+#define DISP_FONT 23
+#define DISP_OPT  OPT_CENTER
+
 FTVOID flash_ui (FTU32 para)
 {
+    FTU32 i = EVE_LCD_HIGH / DISP_LINE;
+
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
 	HAL_CmdBufIn(CLEAR(1,1,1));
-	
-	if (appGP.appPara == P_SUCC) {
-	    HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
-	} else if (appGP.appPara == P_STAT_F || 
-		appGP.appPara == P_CK_FILE_F ||
-		appGP.appPara == P_PG_RES_F ||
-		appGP.appPara == P_VR_RES_F ||
-        appGP.appPara == P_ERROR ) {
-	    HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
-	} else {
-	    HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
-	}
 
-	CoCmd_TEXT(EVE_LCD_WIDTH / 2, EVE_LCD_HIGH / 2, 24, OPT_CENTER , (FTC8 *)&prog_info[appGP.appPara][0]);
+    if (appGP.appPara == P_STAT_F) {
+        HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
+        CoCmd_TEXT(DISP_X, i, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_STAT_F][0]);
+    } else if (appGP.appPara == P_STAT) {
+        HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
+        CoCmd_TEXT(DISP_X, i, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_STAT][0]);
+    } else if (appGP.appPara > P_STAT) {
+        HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        CoCmd_TEXT(DISP_X, i, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_STAT][0]);
+    }
+    
+    if (appGP.appPara == P_CK_FILE_F) {
+        HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
+        CoCmd_TEXT(DISP_X, i*2, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_CK_FILE_F][0]);
+    } else if (appGP.appPara == P_CK_FILE) {
+        HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
+        CoCmd_TEXT(DISP_X, i*2, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_CK_FILE][0]);
+    } else if (appGP.appPara > P_CK_FILE) {
+        HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        CoCmd_TEXT(DISP_X, i*2, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_CK_FILE][0]);
+    }
+    
+    if (appGP.appPara > P_ERASE) {
+        HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        CoCmd_TEXT(DISP_X, i*3, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_ERASE][0]);
+    } else if (appGP.appPara == P_ERASE) {
+        HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
+        CoCmd_TEXT(DISP_X, i*3, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_ERASE][0]);
+    }
+
+    if (appGP.appPara == P_PG_RES_F) {
+        HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
+        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES_F][0]);
+    } else if (appGP.appPara == P_PG_RES) {
+        HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
+        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES][0]);
+    } else if (appGP.appPara > P_PG_RES) {
+        HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES][0]);
+    }
+
+    if (appGP.appPara == P_VR_RES_F) {
+        HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
+        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES_F][0]);
+    } else if (appGP.appPara == P_VR_RES) {
+        HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
+        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES][0]);
+    } else if (appGP.appPara > P_VR_RES) {
+        HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES][0]);
+    }
+
+    if (appGP.appPara == P_ERROR) {
+        HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
+        CoCmd_TEXT(DISP_X, i*6, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_ERROR][0]);
+    } else if (appGP.appPara == P_SUCC) {
+        HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        CoCmd_TEXT(DISP_X, i*6, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_SUCC][0]);
+    }
 
     HAL_CmdBufIn(END());
     HAL_CmdBufIn(DISPLAY());
