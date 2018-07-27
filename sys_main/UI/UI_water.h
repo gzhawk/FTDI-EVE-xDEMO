@@ -7,6 +7,8 @@
 
 #if defined(VC_EMULATOR)
 #error "copy res/water/bt81x.flash to res/flash, then comment this line"
+#elif defined(VC_MPSSE)
+#error "program res/water/bt81x.flash to on-board flash, then comment this line"
 #endif
 
 #define BKGRD_PATH         "FLASH:30976"
@@ -47,19 +49,29 @@
 #define SUB_UP_PATH        "FLASH:379904"
 #define SUB_DOWN_PATH      "FLASH:249344"
 
+/* I don't have 480x272 screen on my hand now,
+   so use 800x480 screen to demonstrate it
+#ifdef EVE_LCD_WIDTH
+#undef EVE_LCD_WIDTH
+#define EVE_LCD_WIDTH 480
+#endif
+
+#ifdef EVE_LCD_HIGH
+#undef EVE_LCD_HIGH
+#define EVE_LCD_HIGH 272
+#endif
+*/
+
 bmpHDR_st bmp_hdr_main[] = {
-    {BKGRD_PATH,  0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,480,272},
-    {BAR_PATH,    0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,480,56},
+    {BKGRD_PATH,  0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
+    {BAR_PATH,    0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,56},
     {NUM_PATH,    0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,224,132},
     {DOWN_1_PATH, 0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,DOWN_W,DOWN_H},
     {UP_1_PATH,   0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,UP_W,UP_H},
+    {SUB_UP_PATH, 0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
+    {SUB_DOWN_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
 };
-bmpHDR_st bmp_hdr_sub_up[] = {
-    {SUB_UP_PATH, 0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,480,272},
-};
-bmpHDR_st bmp_hdr_sub_down[] = {
-    {SUB_DOWN_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,480,272},
-};
+
 #define HDL_START   0
 #define SUB_ID_UP   0xaa
 #define SUB_ID_DOWN 0xbb
@@ -70,8 +82,8 @@ typedef enum ITEM_ {
     HDL_NUM,
     HDL_DOWN_1,
     HDL_UP_1,
-    HDL_SUB_UP = HDL_START,
-    HDL_SUB_DOWN = HDL_START,
+    HDL_SUB_UP,
+    HDL_SUB_DOWN,
 } ITEM_ENUM;
 
 typedef enum ITEM_TAG_ {
@@ -105,24 +117,7 @@ FTVOID loop_frame(FTU32 *pframe, FTU32 max)
 
 FTVOID water_machine_sub(FTU32 para)
 {
-	static FTU8 load = 0xFF;
     FTU8 go_back = 0;
-
-	if (load != para) {
-        if (SUB_ID_UP == para) {
-            if(load_resources(bmp_hdr_sub_up, sizeof(bmp_hdr_sub_up)/sizeof(bmpHDR_st))) {
-                return;
-            }
-        }
-
-        if (SUB_ID_DOWN == para) {
-            if(load_resources(bmp_hdr_sub_down, sizeof(bmp_hdr_sub_down)/sizeof(bmpHDR_st))) {
-                return;
-            }
-        }
-
-        load = para;
-	}
 
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(255, 255, 255));
@@ -146,7 +141,6 @@ FTVOID water_machine_sub(FTU32 para)
     while (TOUCHED) {
         go_back = 1;
         appGP.appPara = 0;
-        load = 0xFF;
     }
 
     appGP.appIndex = go_back?0:1;
@@ -234,7 +228,6 @@ FTVOID water_machine(FTU32 para)
         appGP.appIndex = 0;
     } else {
         appGP.appIndex = appGP.appPara?1:0;
-        load = appGP.appPara;
     }
 }
 
