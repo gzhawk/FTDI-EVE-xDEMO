@@ -82,7 +82,8 @@ FTU8 appFlashSetFull(FTVOID);
 FTVOID appFlashErase(FTVOID);
 FTU8 appFlashToEVE(FTU32 flash_addr, FTU32 eve_addr, FTU32 len);
 FTU32 appFlashVerify(FTU8 *golden_file, FTU32 flash_addr);
-FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr);
+FTU32 appFlashProgOneShort(FTU8 *f_file, FTU32 f_addr);
+FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr);
 FTU32 appFlashAddr(FTC8 *path);
 FTVOID appFlashUnzip(FTC8 *path, FTU32 src);
 #endif

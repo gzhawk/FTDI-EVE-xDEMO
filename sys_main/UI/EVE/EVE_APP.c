@@ -670,13 +670,13 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     return 1;
 }
 
-FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
+FTU32 appFlashProgOneShort(FTU8 *f_file, FTU32 f_addr)
 {
     FTU32 resHDL, Len;
 
     resHDL = HAL_SegFileOpen(f_file);
     if (resHDL == 0) {
-        FTPRINT("\nappFlashProg: file open error");
+        FTPRINT("\nappFlashProgOneShort: file open error");
         return 0;
     }
     
@@ -686,18 +686,74 @@ FTU32 appFlashProg(FTU8 *f_file, FTU32 f_addr)
     Len += Len%256?(256 - Len%256):0;
     
     if (f_addr%256) {
-        FTPRINT("\nappFlashProg: file addr error");
+        FTPRINT("\nappFlashProgOneShort: file addr error");
         HAL_SegFileClose(resHDL);
         return 0;
     }
 
     if (appFlashSrcToDes(resHDL,0, f_addr, Len) != Len) {
-        FTPRINT("\nappFlashProg: file program error");
+        FTPRINT("\nappFlashProgOneShort: file program error");
         HAL_SegFileClose(resHDL);
         return 0;
     }
-    
+
+	HAL_SegFileClose(resHDL);
     return Len;
+}
+FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr)
+{
+    static FTU32 resHDL = 0, Len = 0, f_addr_index = 0;
+    FTU32 piece = 0;
+
+    if (!Len || !resHDL) {
+        resHDL = HAL_SegFileOpen(f_file);
+        if (resHDL == 0) {
+            FTPRINT("\nappFlashProgProgress: file open error");
+            resHDL = 0;
+            Len = 0;
+            return 0;
+        }
+
+        /* if the original file length not 256 byte align
+           it would pad some extra bytes at the tail*/
+        Len = HAL_SegFileSize(resHDL);
+        Len += Len%256?(256 - Len%256):0;
+
+        if (f_addr%256) {
+            FTPRINT("\nappFlashProgProgress: file addr error");
+            HAL_SegFileClose(resHDL);
+            resHDL = 0;
+            Len = 0;
+            return 0;
+        }
+
+        f_addr_index = f_addr;
+    }
+
+    piece = f_addr_index - f_addr;
+    piece = Len - piece;
+    if (piece > 100*CMDBUF_SIZE) {
+        piece = 100*CMDBUF_SIZE;
+    }
+
+    if (appFlashSrcToDes(resHDL,0, f_addr_index, piece) != piece) {
+        FTPRINT("\nappFlashProgProgress: file program error");
+        HAL_SegFileClose(resHDL);
+        resHDL = 0;
+        Len = 0;
+        return 0;
+    }
+        
+    f_addr_index += piece;
+    piece = f_addr_index - f_addr;
+	piece = (piece * 100) / Len;
+    
+	if (piece == 100) {
+		HAL_SegFileClose(resHDL);
+		resHDL = 0;
+		Len = 0;
+	}
+    return piece?piece:1;
 }
 #endif
 /*
