@@ -24,8 +24,8 @@
  * DEF_80X          when using FT80X 
  * DEF_81X          when using FT81X
  * DEF_BT81X        when using BT81X
- * DEF_CAP_MULTI    Cap touch with multiple touch control, or DEMO run as res TCP 
- * DEF_CAP_NONMULTI Cap touch with single touch control, or DEMO run as res TCP 
+ * DEF_CAP_MULTI    Cap touch with multiple touch control
+ * DEF_CAP_NONMULTI Res touch or Cap Touch with single touch control
  * LCD_QVGA         320x240
  * LCD_HVGA         320x480 for FTDI ME8XXA_HV35R module
  * LCD_WQVGA        480x272
