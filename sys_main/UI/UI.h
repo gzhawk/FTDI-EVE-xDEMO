@@ -112,6 +112,8 @@ app_para_t appGP = {0};
 #include "UI_water.h"
 #elif defined(UI_BEAN)
 #include "UI_bean.h"
+#elif defined(UI_SCAN)
+#include "UI_scan.h"
 #else
 #error "no UI be selected"
 #endif

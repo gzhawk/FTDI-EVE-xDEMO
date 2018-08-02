@@ -35,6 +35,22 @@
  */
 
 /*------------------------------------------demo setting, platform limitation */
+#if defined(UI_SCAN)
+#define DEF_BT81X
+#define LCD_WQVGA
+#define DEF_CAP_NONMULTI
+#define EVE_SPI_TYPE 1
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X) || \
+     defined(DEF_81X))
+#error "not supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
+
 #if defined(UI_BEAN)
 #define DEF_BT81X
 #define LCD_WQVGA
@@ -324,7 +340,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.45.0"
+#define APPS_VER "5.B.46.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
