@@ -996,6 +996,7 @@ STATIC FTVOID appUI_EVESetSPI (FTU32 type)
 
     HAL_speed_up(type);
 }
+#if defined(CAL_NEEDED)
 #define VER_FONT 25
 #define CAL_FONT 20
 #define CAL_WIDE 15
@@ -1070,6 +1071,7 @@ STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
         HAL_BufToReg(RAM_CMD,0);
     } while (SYS_HANG);
 }
+#endif
 #if defined(TRIM_NEEDED)
 STATIC FTU32 appUI_EVEGetFrq (FTVOID)
 {
