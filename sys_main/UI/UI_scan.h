@@ -54,6 +54,9 @@ FTU8 load_resources(bmpHDR_st *p_res, FTU8 num)
 FTVOID scan_1(FTU32 para)
 {
     static FTU8 load = 1, press = 0, count = 0;
+#if !defined(CAL_NEEDED)
+    static FTU8 tick = 0;
+#endif
 
     if (load) {
         if(load_resources(bmp_hdr, sizeof(bmp_hdr)/sizeof(bmpHDR_st))) {
@@ -84,7 +87,11 @@ FTVOID scan_1(FTU32 para)
 
 	HAL_BufToReg(RAM_CMD, 0);
     
+#if !defined(CAL_NEEDED)
+    if (++tick == COUNT) {
+#else
     while (TOUCHED) {
+#endif
         press = 1;
     }
 
@@ -92,6 +99,9 @@ FTVOID scan_1(FTU32 para)
 	    appGP.appIndex = 1;
         press = 0;
         count = 0;
+#if !defined(CAL_NEEDED)
+        tick = 0;
+#endif
     } else {
 	    appGP.appIndex = 0;
     }
@@ -99,6 +109,9 @@ FTVOID scan_1(FTU32 para)
 FTVOID scan_2(FTU32 para)
 {
 	static FTU32 frm = 0;
+#if !defined(CAL_NEEDED)
+    static FTU8 tick = 0;
+#endif
 
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(255, 255, 255));
@@ -115,8 +128,14 @@ FTVOID scan_2(FTU32 para)
 	HAL_BufToReg(RAM_CMD, 0);
     
     appGP.appIndex = 1;
-    
+
+#if !defined(CAL_NEEDED)
+    if (++tick == 2*COUNT) {
+        tick = 0;
+#else
     while (TOUCHED) {
+#endif
+
 	    appGP.appIndex = 0;
     }
 }
