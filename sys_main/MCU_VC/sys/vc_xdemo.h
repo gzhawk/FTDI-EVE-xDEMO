@@ -6,12 +6,12 @@
 
 #if defined(VC_MPSSE)
 #include "libMPSSE_spi.h"
-FT_HANDLE ftHandle;
 #endif
 
 #if defined(VC_EMULATOR)
 #include <direct.h>
 #include <io.h>
+#include "bt8xxemu_Emulator.h"
 #endif
 
 typedef const char     FTC8;
@@ -24,17 +24,6 @@ typedef unsigned int   FTU32;
 typedef signed long    FT64;
 typedef unsigned long  FTU64;
 #define FTVOID void
-
-#if defined(_MSC_VER) && defined(VC_EMULATOR)
-typedef unsigned __int8 uint8_t;
-typedef signed __int8 int8_t;
-typedef unsigned __int16 uint16_t;
-typedef signed __int16 int16_t;
-typedef unsigned __int32 uint32_t;
-typedef signed __int32 int32_t;
-typedef unsigned __int64 uint64_t;
-typedef signed __int64 int64_t;
-#endif
 
 #define USED_CMD_BUF
 
@@ -68,29 +57,35 @@ typedef signed __int64 int64_t;
 #define APPS_SYS vc_apps_sys_dummy
 
 #if defined(VC_MPSSE)
-#define SPI_CLK_15M 15000000
-#define SPI_L_TIMER 2
-#define SPI_INIDIR_IN 0x00000000
-#define SPI_INIDIR_OUT 0x00000001
-#define SPI_INIVAL_LOW 0x00000000
-#define SPI_INIVAL_HIGH 0x00000100
-#define SPI_ENDDIR_IN 0x00000000
-#define SPI_ENDDIR_OUT 0x00010000
-#define SPI_ENDVAL_LOW 0x00000000
-#define SPI_ENDDIR_HIGH 0x01000000
-#define SPI_TXCMD_LEN 3
-#define SPI_RXCMD_LEN 4
+#define SPI_CLK_15M    15000000
+#define SPI_L_TIMER    2
+#define SPI_INIDIR_IN  0
+#define SPI_INIVAL_LOW 0
+#define SPI_ENDDIR_IN  0
+#define SPI_ENDVAL_LOW 0
+#define SPI_TXCMD_LEN  3
+#define SPI_RXCMD_LEN  4
 
-
+FT_HANDLE ftHandle;
 #define FTMAIN FT32 main (FT32 argc,FT8 *argv[]) 
 #define FTDUMMY
 #define SYS_END    return 0
-
 #endif
 
 #if defined(VC_EMULATOR)
+
+#if defined(_MSC_VER)
+typedef unsigned __int8 uint8_t;
+typedef signed __int8 int8_t;
+typedef unsigned __int16 uint16_t;
+typedef signed __int16 int16_t;
+typedef unsigned __int32 uint32_t;
+typedef signed __int32 int32_t;
+typedef unsigned __int64 uint64_t;
+typedef signed __int64 int64_t;
+#endif
+
 typedef uint32_t argb8888;
-#include "bt8xxemu_Emulator.h"
 extern BT8XXEMU_Emulator *gEmulator;
 
 #define BTFLASH_DATA_FILE   L"..\\..\\res\\flash\\bt81X.flash"

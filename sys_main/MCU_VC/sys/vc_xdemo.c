@@ -2,6 +2,16 @@
 
 #if defined(VC_EMULATOR)
 BT8XXEMU_Emulator *gEmulator = NULL;
+
+FTVOID FT8XXEMU_cs(FT8 i)
+{
+	BT8XXEMU_chipSelect(gEmulator, i);
+}
+
+FTU32 FT8XXEMU_transfer(FTU32 data)
+{
+    return BT8XXEMU_transfer(gEmulator, data);
+}
 #endif
 
 FTVOID rdStart ( FTU32 addr )
@@ -71,17 +81,11 @@ FTVOID HAL_Cfg ( FTU8 cfg )
 FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
 {
 #if defined(VC_MPSSE)
-    FTU8 tmp[SPI_TXCMD_LEN+1] = {0};
     FTU32 send;
 
-    tmp[0] = (FTU8)(0x80 | (addr >> 16));
-    tmp[1] = (FTU8)(addr >> 8);
-    tmp[2] = (FTU8)addr;
-    tmp[3] = data;
-
-    SPI_Write(ftHandle,tmp,SPI_TXCMD_LEN+1,&send,
+    wrStart(addr);
+    SPI_Write(ftHandle,&data,1,&send,
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
-            SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 #elif defined(VC_EMULATOR)
     wrStart(addr);
@@ -115,18 +119,15 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
 FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
 {
 #if defined(VC_MPSSE)
-    FTU8 tmp[SPI_TXCMD_LEN+2] = {0};
+    FTU8 tmp[2] = {0};
     FTU32 send;
 
-    tmp[0] = (FTU8)(0x80 | (addr >> 16));
-    tmp[1] = (FTU8)(addr >> 8);
-    tmp[2] = (FTU8)addr;
-    tmp[3] = (FTU8)(data & 0xff);
-    tmp[4] = (FTU8)(data >> 8);
+    tmp[0] = (FTU8)(data & 0xff);
+    tmp[1] = (FTU8)(data >> 8);
 
-    SPI_Write(ftHandle,tmp,SPI_TXCMD_LEN+2,&send,
-            SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
-            SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
+    wrStart(addr);
+    SPI_Write(ftHandle,tmp,2,&send,
+            SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES |
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 #elif defined(VC_EMULATOR)
     wrStart(addr);
@@ -142,20 +143,17 @@ FTVOID HAL_Write16 ( FTU32 addr, FTU16 data )
 FTVOID HAL_Write32 ( FTU32 addr, FTU32 data )
 {
 #if defined(VC_MPSSE)
-    FTU8 tmp[SPI_TXCMD_LEN+4] = {0};
+    FTU8 tmp[4] = {0};
     FTU32 send;
 
-    tmp[0] = (FTU8)(0x80 | (addr >> 16));
-    tmp[1] = (FTU8)(addr >> 8);
-    tmp[2] = (FTU8)addr;
-    tmp[3] = (FTU8)data & 0xff;
-    tmp[4] = (FTU8)(data >> 8);
-    tmp[5] = (FTU8)(data >> 16);
-    tmp[6] = (FTU8)(data >> 24);
+    tmp[0] = (FTU8)data & 0xff;
+    tmp[1] = (FTU8)(data >> 8);
+    tmp[2] = (FTU8)(data >> 16);
+    tmp[3] = (FTU8)(data >> 24);
 
-    SPI_Write(ftHandle,tmp,SPI_TXCMD_LEN+4,&send,
-            SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
-            SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
+    wrStart(addr);
+    SPI_Write(ftHandle,tmp,4,&send,
+            SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES |
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 #elif defined(VC_EMULATOR)
     wrStart(addr);
@@ -285,18 +283,6 @@ FTU32 HAL_Read32 ( FTU32 addr )
 #endif
 }
 
-#if defined(VC_EMULATOR)
-FTVOID FT8XXEMU_cs(FT8 i)
-{
-	BT8XXEMU_chipSelect(gEmulator, i);
-}
-
-FTU32 FT8XXEMU_transfer(FTU32 data)
-{
-    return BT8XXEMU_transfer(gEmulator, data);
-}
-#endif
-
 FTVOID vc_apps_sys_dummy (FTU32 para)
 {
     /* do nothing */
@@ -333,11 +319,6 @@ FTVOID HAL_PwdCyc ( FTU8 OnOff )
 FTVOID HAL_SpiInit ( FTVOID )
 {
 #if defined(VC_MPSSE)
-    /* 
-       the SPI clock shall not exceed 11MHz before system clock is enabled. 
-       After system clock is properly enabled, 
-       the SPI clock is allowed to go up to 30MHz.	
-     */
 
     ChannelConfig cConf;
 	FT_DEVICE_LIST_INFO_NODE devList;
