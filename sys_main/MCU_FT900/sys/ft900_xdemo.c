@@ -4,7 +4,7 @@
 #include "ft900_xdemo_boms_hid.c" 
 #endif
 
-#if defined(DEF_TIMER)
+#if defined(UI_NJTOYO)
 extern FTVOID timerISR(FTVOID);
 #endif
 
@@ -300,7 +300,7 @@ FTVOID ft9xx_int_print (char *p)
 
 FTVOID ft9xx_int_timer (FTVOID)
 {
-#if defined(DEF_TIMER)
+#if defined(UI_NJTOYO)
 /* The Timer Prescaler will divide the 100MHz Master clock down to 2kHz */
 #define TIMER_PRESCALER (50000)
 #define TIMER_M_SEC     (100000/TIMER_PRESCALER)
