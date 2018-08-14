@@ -10,6 +10,7 @@
 
 /*TODO: define your selected UI_XXX here */
 #error "#define UI_XXX"
+
 /* 
     actually, nowhere using ARDUINO define
     only for demo platform compatable check
@@ -171,7 +172,8 @@
 
 #if ((defined(UI_NJTOYO) || \
       defined(UI_AVI)) && \
-      defined(FT9XXEV))
+      (defined(FT9XXEV) || \
+       defined(VC_FT4222)))
 #define DEF_TIMER
 #define EVE_SPI_TYPE 4
 #else
@@ -322,6 +324,9 @@
 #error "no display be selected"
 #endif
 
+#if defined(VC_MPSSE) || defined(VC_FT4222) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#define FILESYS_USED
+#endif
 /*---------------------------------------------------Universal platform define*/
 /*
  * Version: A.B.C.D
@@ -372,12 +377,13 @@
  * you may bypass the calibration phase, when no touch in your UI
  */
 #define CAL_NEEDED
+
 /* you need to carfully consider the size of the block
  * base on your system available memory and data transfer buffering space 
  * WINDOWS: consider it as unlimited memory
  * FT9xx  : totally got 64K memory
  */
-#if defined(VC_MPSSE) || defined(VC_FT4222) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(FILESYS_USED)
 #define MCU_BLOCK_SIZE      (10*1024)
 #else
 /* limited by sdcard sector size

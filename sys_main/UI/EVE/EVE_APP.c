@@ -984,17 +984,23 @@ STATIC FTVOID appUI_EVETchCfg ( FTVOID )
 }
 STATIC FTVOID appUI_EVESetSPI (FTU32 type)
 {
+    FTPRINT("\nSPI: ");
 #if defined(DEF_81X) || defined(DEF_BT81X)
     if (type == 4) {
         HAL_Write8(REG_SPI_WIDTH, EVE_QSPI | EVE_SPI_DUMMY);
+        FTPRINT("Quad");
     } else if (type == 2) {
         HAL_Write8(REG_SPI_WIDTH, EVE_DSPI | EVE_SPI_DUMMY);
+        FTPRINT("Dual");
     } else {
         HAL_Write8(REG_SPI_WIDTH, EVE_SSPI);
+        FTPRINT("Single");
     }
-#endif
 
     HAL_speed_up(type);
+#else
+    FTPRINT("Single");
+#endif
 }
 #if defined(CAL_NEEDED)
 #define VER_FONT 25
@@ -1297,16 +1303,16 @@ FTVOID UI_INIT (FTVOID)
 
     appUI_EVELCDCfg();
 
-    /* after use single SPI to config the EVE
-       set the SPI base on real HW: SPI/DSPI/QSPI */
-    appUI_EVESetSPI(EVE_SPI_TYPE); 
-   
     /* you may put some initial steps
        before launch here */
     appUI_EVEBeforeLaunch();
     
     appUI_WaitCal();
 
+    /* after use single SPI to config the EVE
+       set the SPI base on real HW: SPI/DSPI/QSPI */
+    appUI_EVESetSPI(EVE_SPI_TYPE); 
+    
     FTPRINT("\nDisplay inited");
 }
 /*
