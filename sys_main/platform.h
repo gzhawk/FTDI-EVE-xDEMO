@@ -113,68 +113,19 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-#if (defined(UI_DIAL) || \
-    defined(UI_BSH) || \
-    defined(UI_GRG) || \
-    defined(UI_PUZZLE) || \
-    defined(UI_MIDEA) || \
-    defined(UI_FVIDEO_INVENSYS) || \
-    defined(UI_AMICON) || \
-    defined(UI_XIZI_BKGND) || \
-    defined(UI_FVIDEO) || \
-    defined(UI_BKGND) || \
-    defined(UI_DXT1) || \
-    defined(UI_DISPRAW) || \
-    defined(UI_FONT) || \
-    defined(UI_WELLING) || \
-    defined(UI_COOBOT))
-#define DEF_81X
-#define LCD_WQVGA
-#define DEF_CAP_NONMULTI
-#define EVE_SPI_TYPE 1
-
-#if defined(STM32F4)
-#error "not supported"
-#endif
-#endif
-
-/*----------------------------------------------------------------------------*/
-#if defined(UI_LITTLESWAN)
-#define DEF_81X
-#define DEF_CAP_NONMULTI
-#define LCD_WVGA
-#define EVE_SPI_TYPE 1
-
-#if (defined(ARDUINO) || \
-     defined(STM32F4) || \
-     defined(DEF_80X))
-#error "not supported"
-#endif
-#endif
-
-/*----------------------------------------------------------------------------*/
-
 #if (defined(UI_AVI) || \
     defined(UI_BITMAP) || \
     defined(UI_LIERDA)) || \
-    defined(UI_CJ) || \
-    defined(UI_ALLYTECH) || \
     defined(UI_ALLY_MODEB) || \
     defined(UI_ALLY_SWAP) || \
     defined(UI_JPGDISP) || \
     defined(UI_SLIP_M) || \
     defined(UI_NJTOYO) || \
-    defined(UI_ALLY_ROTATE) || \
-	defined(UI_VJDZ) || \
     defined(UI_STELIGENT)
 #define DEF_81X
 
-#if ((defined(UI_NJTOYO) || \
-      defined(UI_AVI) || \
-      defined(UI_SLIP_M)) && \
-      (defined(FT9XXEV) || \
-       defined(VC_FT4222)))
-#define DEF_TIMER
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
 #define EVE_SPI_TYPE 4
 #else
 #define EVE_SPI_TYPE 1
@@ -191,26 +142,13 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-#if defined(UI_BOMS_HID)
-#define DEF_81X
-#define EVE_SPI_TYPE 1
-#define DEF_CAP_NONMULTI
-#define LCD_WVGA
-
-#ifndef VC_EMULATOR
-#error "not supported"
-#endif
-#endif
-/*----------------------------------------------------------------------------*/
-#if defined(UI_MIDEA_W)
+#if defined(UI_FONT)
 #define DEF_81X
 #define LCD_WQVGA
 #define DEF_CAP_NONMULTI
 #define EVE_SPI_TYPE 1
 
-#if (defined(ARDUINO) || \
-     defined(STM32F4) || \
-     defined(DEF_80X))
+#if defined(STM32F4)
 #error "not supported"
 #endif
 #endif
@@ -220,22 +158,6 @@
 #define DEF_81X
 #define LCD_HVGA
 #define DEF_CAP_NONMULTI
-#define EVE_SPI_TYPE 1
-
-#if (defined(FT9XXEV) || \
-     defined(ARDUINO) || \
-     defined(STM32F4) || \
-     defined(DEF_80X))
-#error "not supported"
-#endif
-#endif
-
-/*----------------------------------------------------------------------------*/
-#if defined(UI_RIPPLE) || \
-    defined(UI_ALLY_FONT)
-#define DEF_81X
-#define DEF_CAP_NONMULTI
-#define LCD_WVGA
 #define EVE_SPI_TYPE 1
 
 #if (defined(FT9XXEV) || \
@@ -264,7 +186,6 @@
 /*----------------------------------------------------------------------------*/
 #if defined(UI_EVEUI) || \
     defined(UI_AUDIO) || \
-    defined(UI_MEMOPT) || \
     defined(UI_DRAGICON)
 #define DEF_80X
 
@@ -272,30 +193,6 @@
 #define DEF_CAP_NONMULTI
 #define EVE_SPI_TYPE 1
 
-#endif
-
-/*----------------------------------------------------------------------------*/
-#if defined(UI_ALLY_LCDTST)
-#define DEF_81X
-#define DEF_CAP_NONMULTI
-#define LCD_WVGA
-#define EVE_SPI_TYPE 1
-
-#if (defined(DEF_80X))
-#error "not supported"
-#endif
-#endif
-
-/*----------------------------------------------------------------------------*/
-#if defined(UI_TOUCH)
-#define DEF_81X
-#define DEF_CAP_MULTI
-#define LCD_WVGA
-#define EVE_SPI_TYPE 1
-
-#if (defined(DEF_80X))
-#error "not supported"
-#endif
 #endif
 
 /*----------------------------------------------prevent undefined EVE setting */
