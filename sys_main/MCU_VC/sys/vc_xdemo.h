@@ -8,6 +8,11 @@
 #include "libMPSSE_spi.h"
 #endif
 
+#if defined(VC_FT4222)
+#include "ftd2xx.h"
+#include "libFT4222.h"
+#endif
+
 #if defined(VC_EMULATOR)
 #include <direct.h>
 #include <io.h>
@@ -67,6 +72,27 @@ typedef unsigned long  FTU64;
 #define SPI_RXCMD_LEN  4
 
 FT_HANDLE ftHandle;
+#endif
+
+#if defined(VC_FT4222)
+#define SPI_TIMEOUT_R  5000
+#define SPI_TIMEOUT_W  5000
+#define SPI_LATENCY    2
+
+#define SPI_SYSCLK     SYS_CLK_80
+#define SPI_SYSDIV     CLK_DIV_4
+#define SPI_PIN_CS     1
+
+#define SPI_TXADDR_LEN  3
+#define SPI_RXADDR_SLEN 4
+#define SPI_RXADDR_MLEN 5
+
+FT_HANDLE ftHdl_spi;
+FT_HANDLE ftHdl_gpio;
+FTU8 spi_type;
+#endif
+
+#if defined(VC_MPSSE) || defined(VC_FT4222)
 #define FTMAIN FT32 main (FT32 argc,FT8 *argv[]) 
 #define FTDUMMY
 #define SYS_END    return 0

@@ -17,6 +17,7 @@
 #if (!defined(FT9XXEV) && \
      !defined(STM32F4) && \
      !defined(VC_MPSSE) && \
+     !defined(VC_FT4222) && \
      !defined(VC_EMULATOR))
 #define ARDUINO
 #endif
@@ -340,7 +341,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.B.46.0"
+#define APPS_VER "5.C.46.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -376,7 +377,7 @@
  * WINDOWS: consider it as unlimited memory
  * FT9xx  : totally got 64K memory
  */
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(VC_MPSSE) || defined(VC_FT4222) || defined(VC_EMULATOR) || defined(FT9XXEV)
 #define MCU_BLOCK_SIZE      (10*1024)
 #else
 /* limited by sdcard sector size
@@ -391,8 +392,8 @@
 #define EVE_DEF_CHECK
 #endif
 
-/*--------------------------------------------------------VC_EMULATOR,VC_MPSSE*/
-#if defined(VC_MPSSE) || defined(VC_EMULATOR)
+/*----------------------------------------------VC_EMULATOR,VC_FT4222,VC_MPSSE*/
+#if defined(VC_MPSSE) || defined(VC_FT4222) || defined(VC_EMULATOR)
 #include "vc_xdemo.h"
 /*---------------------------------------------------------------------STM32F4*/
 #elif defined(STM32F4)
