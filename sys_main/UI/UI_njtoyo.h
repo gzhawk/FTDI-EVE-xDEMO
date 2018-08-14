@@ -65,7 +65,7 @@ jpeg_play_st jpeg_play_list[4] = {
 #define TAG_START  (10)
 FTU8 frame_rate[4] = {0};
 
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
+#if defined(FILESYS_USED) 
 #define FILE_INDEX 18
 #elif defined(FT9XXEV)
 #define FILE_INDEX 8

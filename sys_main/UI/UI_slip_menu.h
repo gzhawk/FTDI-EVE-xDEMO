@@ -58,7 +58,7 @@ FTU8 MENU_SUB_[] = ROOT_PATH"slip_m\\0_lut.bin";
 #define MENU_END_L     (-200)
 #define MENU_END_R     (MENU_END_L+(MENU_MAIN_NUM-1)*MENU_W)
 
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
+#if defined(FILESYS_USED) 
 #define UPDATE_PATH_INDEX 17
 #else
 #define UPDATE_PATH_INDEX 7

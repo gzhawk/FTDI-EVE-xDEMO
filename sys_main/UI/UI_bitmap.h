@@ -6,7 +6,7 @@
             2018/Jun - Add ASTC support
 */
 
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(FILESYS_USED)
 #define DISPBP_L1              ROOT_PATH"bitmap\\L1.raw"
 #define DISPBP_L8              ROOT_PATH"bitmap\\L8.raw"
 #define DISPBP_RGB332          ROOT_PATH"bitmap\\RGB332.raw"

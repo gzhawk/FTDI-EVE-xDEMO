@@ -39,7 +39,7 @@
 #define RGB_PLACE COLOR_RGB(170, 170, 170)
 #define RGB_BAR   COLOR_RGB(0xFF,0xFF,0)
 
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(FILESYS_USED)
 #define PATH_TRANS ROOT_PATH"dragicon\\trans.raw"
 #define PATH_PLACE ROOT_PATH"dragicon\\place.raw"
 #else
@@ -209,7 +209,7 @@ STATIC desktop_node_st * list_create (icon_st * p)
 
 STATIC FTVOID desktop_list_destory_tag (FTVOID)
 {
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(FILESYS_USED)
 
 #elif defined(STM32F4)
 
@@ -218,7 +218,7 @@ STATIC FTVOID desktop_list_destory_tag (FTVOID)
 #endif
 }
 
-#if !defined(VC_MPSSE) && !defined(VC_EMULATOR) && !defined(STM32F4) && !defined(FT9XXEV)
+#if defined(ARDUINO)
 STATIC FTU8 desktop_list_check_tag (FTVOID)
 {
 	FTU8 tag[] = DESKTOP_TAG_DATA;
@@ -253,7 +253,7 @@ STATIC desktop_node_st * desktop_list_search (icon_st *p, FTU8 *pindex)
 
 STATIC FTVOID desktop_list_save (FTVOID)
 {
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(FILESYS_USED)
 
 #elif defined(STM32F4)
 
@@ -368,7 +368,7 @@ STATIC FTU8 desktop_list_insert_end (icon_st * p, FTU8 save)
 
 STATIC FTU8 desktop_list_read (FTVOID)
 {
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(FILESYS_USED)
 	return 0;
 #elif defined(STM32F4)
 	return 0;
@@ -602,7 +602,7 @@ STATIC FTVOID displayBar (FTVOID)
 	HAL_CmdBufIn(TAG_MASK(0));
 }
 
-#if !defined(VC_MPSSE) && !defined(VC_EMULATOR) && !defined(FT9XXEV)
+#if !defined(FILESYS_USED)
 STATIC FTVOID displayToggle (FTU8 state)
 {
 	/*TODO: actuall, the deperator should be 0xFF "Unsave/xffSave"
@@ -678,7 +678,7 @@ STATIC FTU8 displayItems (icon_st *p, FTU8 Touch, FTU8 *pSave)
 	/* show icon on desktop */
 	displayDesktop(p, lastEvent, Touch);
 
-#if !defined(VC_MPSSE) && !defined(VC_EMULATOR) && !defined(FT9XXEV)
+#if !defined(FILESYS_USED)
 	/* show desktop toggle */
 	displayToggle(*pSave);
 #endif

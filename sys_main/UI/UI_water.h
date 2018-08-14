@@ -7,7 +7,7 @@
 
 #if defined(VC_EMULATOR)
 #error "copy res/water/bt81x.flash to res/flash, then comment this line"
-#elif defined(VC_MPSSE)
+#elif defined(VC_MPSSE) || defined(VC_FT4222)
 #error "program res/water/bt81x.flash to on-board flash, then comment this line"
 #endif
 

@@ -5,7 +5,7 @@
 	Date  : 2014/Jan
 */
 
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
+#if defined(FILESYS_USED) 
 #define PATH_SCN1_C0 ROOT_PATH"xizi\\1-background_c0.raw"
 #define PATH_SCN1_C1 ROOT_PATH"xizi\\1-background_c1.raw"
 #define PATH_SCN1_B0 ROOT_PATH"xizi\\1-background_b0.raw"
@@ -31,7 +31,7 @@
 #define PATH_SCN2_B1 ROOT_PATH"bk1_b1.raw"
 #endif
 
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) 
+#if defined(FILESYS_USED) 
 #define DXT1_PATH_LEN   (30+5)
 #define DXT1_PATH_INDEX_RUN (17+5)
 #else

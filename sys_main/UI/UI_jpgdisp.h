@@ -6,7 +6,7 @@
             2018/Jun (adding a fault report catch for BT81X)
 */
 
-#if defined(VC_MPSSE) || defined(VC_EMULATOR) || defined(FT9XXEV)
+#if defined(FILESYS_USED)
 #define PATH_JPG_A ROOT_PATH"jpgdisp\\a.jpg"
 #define PATH_JPG_B ROOT_PATH"jpgdisp\\b.jpg" /* higher compressed with smoothing effect */
 #define PATH_PNG_A ROOT_PATH"jpgdisp\\a.png"
