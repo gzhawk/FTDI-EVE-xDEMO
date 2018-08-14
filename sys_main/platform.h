@@ -32,8 +32,7 @@
  * LCD_HVGA         320x480 for FTDI ME8XXA_HV35R module
  * LCD_WQVGA        480x272
  * LCD_WVGA         800x480 only FT81X have WVGA
- * EVE_SPI_TYPE     SPI, DSPI or QSPI supported, only FT81X can set to 2 or 4
- *                  also, need to know if your MCU use what kind of SPI
+ * EVE_SPI_TYPE     SPI, DSPI or QSPI supported
  */
 
 /*------------------------------------------demo setting, platform limitation */
@@ -171,7 +170,8 @@
 #define DEF_81X
 
 #if ((defined(UI_NJTOYO) || \
-      defined(UI_AVI)) && \
+      defined(UI_AVI) || \
+      defined(UI_SLIP_M)) && \
       (defined(FT9XXEV) || \
        defined(VC_FT4222)))
 #define DEF_TIMER
