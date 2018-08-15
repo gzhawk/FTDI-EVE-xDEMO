@@ -118,6 +118,9 @@ FTVOID loop_frame(FTU32 *pframe, FTU32 max)
 FTVOID water_machine_sub(FTU32 para)
 {
     FTU8 go_back = 0;
+#if !defined(CAL_NEEDED)
+    static FTU8 tick = 0;
+#endif
 
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(255, 255, 255));
@@ -138,7 +141,12 @@ FTVOID water_machine_sub(FTU32 para)
 
 	HAL_BufToReg(RAM_CMD, 0);
 
+#if !defined(CAL_NEEDED)
+    if (++tick == 100) {
+        tick = 0;
+#else
     while (TOUCHED) {
+#endif
         go_back = 1;
         appGP.appPara = 0;
     }
@@ -150,6 +158,9 @@ FTVOID water_machine(FTU32 para)
 {
 	static FTU8 load = 1, slow_tub = 0, slow_up1 = 0, slow_down1 = 0;
 	static FTU32 anim_tub = 0, anim_up1 = 0, anim_down1 = 0;
+#if !defined(CAL_NEEDED)
+    static FTU8 tick1 = 0, tick2 = 0;
+#endif
     FTU8 tag = TOUCHED?HAL_Read8(REG_TOUCH_TAG):0;
 
 	if (load) {
@@ -158,7 +169,25 @@ FTVOID water_machine(FTU32 para)
         }
         load = 0;
 	}
-
+#if !defined(CAL_NEEDED)
+    if (tick1 == 100 ) {
+        tag = TAG_UP_1;
+        if (50 == ++tick2) {
+            tag = 0;
+            tick2 = 0;
+            tick1++;
+        }
+    } else if (tick1 == 200) {
+        tag = TAG_DOWN_1;
+        if (50 == ++tick2) {
+            tag = 0;
+            tick2 = 0;
+            tick1++;
+        }
+    } else {
+        tick1++;
+    }
+#endif
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(255, 255, 255));
 	HAL_CmdBufIn(CLEAR(1, 1, 1));
