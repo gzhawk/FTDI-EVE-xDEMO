@@ -18,17 +18,22 @@ echo you have to have a MPSSE cable and CCModule/BasicModule
 echo to play it.
 echo.
 echo 5: it's a PC based platform (VC2017) sample/demo codes, 
+echo you have to have a FT4222 on board CCModule/BasicModule
+echo to play it.
+echo.
+echo 6: it's a PC based platform (VC2017) sample/demo codes, 
 echo which you don't need hardware (cable/CCModule/BasicModule, 
 echo etc.), it can emulate a LCD window which show the final effect 
 echo of running result by EVE.
 echo.
-echo 6: quit
+echo 7: quit
 echo.
 
-choice /C:123456
+choice /C:1234567
 
-if errorlevel 6 goto SkipRunme
-if errorlevel 5 goto VC_Emulator
+if errorlevel 7 goto SkipRunme
+if errorlevel 6 goto VC_Emulator
+if errorlevel 5 goto VC_FT4222
 if errorlevel 4 goto VC_Mpsse
 if errorlevel 3 goto STM32
 if errorlevel 2 goto Arduino
@@ -112,6 +117,10 @@ goto SkipRunme
 
 :VC_Mpsse
 call sys_main\MCU_VC\vc_mpsse.vcxproj
+goto SkipRunme
+
+:VC_FT4222
+call sys_main\MCU_VC\vc_ft4222.vcxproj
 goto SkipRunme
 
 :VC_Emulator
