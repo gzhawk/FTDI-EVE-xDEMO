@@ -16,6 +16,17 @@
 #if defined(VC_EMULATOR)
 #include <direct.h>
 #include <io.h>
+#if defined(_MSC_VER)
+typedef unsigned __int8 uint8_t;
+typedef signed __int8 int8_t;
+typedef unsigned __int16 uint16_t;
+typedef signed __int16 int16_t;
+typedef unsigned __int32 uint32_t;
+typedef signed __int32 int32_t;
+typedef unsigned __int64 uint64_t;
+typedef signed __int64 int64_t;
+#endif
+typedef uint32_t argb8888;
 #include "bt8xxemu_Emulator.h"
 #endif
 
@@ -99,19 +110,6 @@ FTU8 spi_type;
 #endif
 
 #if defined(VC_EMULATOR)
-
-#if defined(_MSC_VER)
-typedef unsigned __int8 uint8_t;
-typedef signed __int8 int8_t;
-typedef unsigned __int16 uint16_t;
-typedef signed __int16 int16_t;
-typedef unsigned __int32 uint32_t;
-typedef signed __int32 int32_t;
-typedef unsigned __int64 uint64_t;
-typedef signed __int64 int64_t;
-#endif
-
-typedef uint32_t argb8888;
 extern BT8XXEMU_Emulator *gEmulator;
 
 #define BTFLASH_DATA_FILE   L"..\\..\\res\\flash\\bt81X.flash"
