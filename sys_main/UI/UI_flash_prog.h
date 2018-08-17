@@ -6,6 +6,23 @@
 	Date  : 2018/Jul
 */
 
+/* 
+   when set FLASH_ONESHORT to 1: 
+   1. no flash progress be reported
+ */
+#define FLASH_ONESHORT     0
+
+/* when set FLASH_SAFTY to 1: 
+    0. no whole Flash Erase action be taken
+    1. it would compare the contain before program
+       the action is 4KBytes a block
+    1.1 if the content are the same
+        no action in this block 
+    1.2 if not, erase 4KBytes when necessary,
+        program this 4KBytes
+ */
+#define FLASH_SAFTY        1
+
 #define FLASH_INFO_LEN     36
 
 #define FLASH_F            ROOT_PATH"flash\\bt81x.flash"
@@ -31,10 +48,15 @@ FTC8 prog_info[P_END][FLASH_INFO_LEN] = {
 "Check user file",
 "Check user file fail",
 "Erase Flash",
-"Write user file [%d]",
-"Write user file fail [%d]",
-"Verify user file",
-"Verify user file fail",
+#if FLASH_SAFTY
+"Update user file [%d/100]",
+"Update user file fail [%d/100]",
+#else
+"Write user file [%d/100]",
+"Write user file fail [%d/100]",
+#endif
+"Verify user file [%d/100]",
+"Verify user file fail [%d/100]",
 "Success",
 "Unknown error",
 };
@@ -48,8 +70,26 @@ FTVOID flash_ui (FTU32 para)
 {
     FTU32 i = EVE_LCD_HIGH / DISP_LINE;
     FTU8 state = appGP.appPara & 0xFF;
-    FTU8 percent = (appGP.appPara >> 8) & 0xFF;
+    FTU8 pro_w = (appGP.appPara >> 8) & 0xFF;
+    FTU8 pro_v = (appGP.appPara >> 16) & 0x7F;
 
+    switch (pro_v) {
+        case 3:
+            pro_v = 30;
+            break;
+        case 2:
+            pro_v = 60;
+            break;
+        case 1:
+            pro_v = 90;
+            break;
+        case 0:
+            pro_v = 100;
+            break;
+        default:
+            pro_v = 0xFF;
+            break;
+    }
 	HAL_CmdBufIn(CMD_DLSTART);
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
 	HAL_CmdBufIn(CLEAR(1,1,1));
@@ -77,7 +117,11 @@ FTVOID flash_ui (FTU32 para)
     }
     
     if (state > P_ERASE) {
-        HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        if (FLASH_SAFTY) {
+            HAL_CmdBufIn(COLOR_RGB(128, 128, 128));
+        } else {
+            HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
+        }
         CoCmd_TEXT(DISP_X, i*3, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_ERASE][0]);
     } else if (state == P_ERASE) {
         HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
@@ -86,24 +130,24 @@ FTVOID flash_ui (FTU32 para)
 
     if (state == P_PG_RES_F) {
         HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
-        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES_F][0], percent);
+        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES_F][0], pro_w);
     } else if (state == P_PG_RES) {
         HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
-        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES][0], percent);
+        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES][0], pro_w);
     } else if (state > P_PG_RES) {
         HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
-        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES][0], percent);
+        CoCmd_TEXT(DISP_X, i*4, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_PG_RES][0], pro_w);
     }
 
     if (state == P_VR_RES_F) {
         HAL_CmdBufIn(COLOR_RGB(255, 0, 0));
-        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES_F][0]);
+        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES_F][0], pro_v);
     } else if (state == P_VR_RES) {
         HAL_CmdBufIn(COLOR_RGB(255, 255, 255));
-        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES][0]);
+        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES][0], pro_v);
     } else if (state > P_VR_RES) {
         HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
-        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES][0]);
+        CoCmd_TEXT(DISP_X, i*5, DISP_FONT, DISP_OPT , (FTC8 *)&prog_info[P_VR_RES][0], pro_v);
     }
 
     if (state == P_ERROR) {
@@ -144,7 +188,7 @@ FTVOID flash_ui (FTU32 para)
 */
 FTVOID flash_prog (FTU32 para)
 {
-    static FTU32 percent = 0;
+    static FTU32 pro_w = 0, pro_v = 0;
 	FTU8 state = appGP.appPara & 0xFF;
 
     switch (state) {
@@ -157,7 +201,7 @@ FTVOID flash_prog (FTU32 para)
             break;
         case P_CK_FILE:
             if(appFileExist((FTC8 *)FLASH_F)) {
-				state = P_ERASE;
+				state = FLASH_SAFTY?P_PG_RES:P_ERASE;
             } else {
 				state = P_CK_FILE_F;
             }
@@ -165,30 +209,35 @@ FTVOID flash_prog (FTU32 para)
         case P_ERASE:
             appFlashErase();
 			state = P_PG_RES;
-			percent = 0;
+			pro_w = 0;
             break;
         case P_PG_RES:
-            percent = appFlashProgProgress((FTU8 *)FLASH_F, 0);
-            if (percent == 100) {
-				state = P_VR_RES;
-            } else if (percent == 0) {
-				state = P_PG_RES_F;
+            pro_w = appFlashProgProgress((FTU8 *)FLASH_F, 0, 
+                                           FLASH_ONESHORT?0:EVE_FLHBLOCK_LEN,
+                                           FLASH_SAFTY);
+            if (pro_w == 100) {
+                state = P_VR_RES;
+            } else if (pro_w == 0) {
+                state = P_PG_RES_F;
             } else {
-				state = P_PG_RES;
+                state = P_PG_RES;
             }
             break;
         case P_VR_RES:
-            if (appFlashVerify((FTU8 *)FLASH_F, 0)) {
+            pro_v = appFlashVerify((FTU8 *)FLASH_F, 0);
+            if (!pro_v) {
 				state = P_SUCC;
-            } else {
+            } else if (pro_v & 0x80){
 				state = P_VR_RES_F;
+            } else {
+                state = P_VR_RES;
             }
             break;
         default:
 			state = P_ERROR;
             break;
     }
-	appGP.appPara = (percent << 8 | state);
+	appGP.appPara = (pro_v << 16 | pro_w << 8 | state);
     appGP.appIndex = 0;
     return;
 }

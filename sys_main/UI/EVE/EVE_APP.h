@@ -31,6 +31,10 @@
 #define FLH_LEN               (0xFFFFFFFC)
 #if defined(DEF_BT81X)
 #define EVE_DBG_BUF_LEN       (128)
+#define EVE_FLHUPDATE_LEN     (4*1024)
+#define EVE_FLHBLOCK_LEN      (10*EVE_FLHUPDATE_LEN)
+/* user may need to modify it base on it's own RAM partition */
+#define EVE_FLHUPDATE_ADDR    (EVE_RAMG_SIZE - EVE_FLHUPDATE_LEN)
 #else
 #define EVE_DBG_BUF_LEN       (50)
 #endif
@@ -81,9 +85,9 @@ FTVOID resWrFlash (FTU32 para);
 FTU8 appFlashSetFull(FTVOID);
 FTVOID appFlashErase(FTVOID);
 FTU8 appFlashToEVE(FTU32 flash_addr, FTU32 eve_addr, FTU32 len);
+FTU8 appFlashUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len);
 FTU32 appFlashVerify(FTU8 *golden_file, FTU32 flash_addr);
-FTU32 appFlashProgOneShort(FTU8 *f_file, FTU32 f_addr);
-FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr);
+FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update);
 FTU32 appFlashAddr(FTC8 *path);
 FTVOID appFlashUnzip(FTC8 *path, FTU32 src);
 #endif

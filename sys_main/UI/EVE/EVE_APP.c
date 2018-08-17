@@ -483,16 +483,34 @@ FTU8 appFlashPath (FTC8 *path, FTU32 *len)
     return 0;
 }
 #if defined(DEF_BT81X)
-FTU32 appFlashSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
+FTU32 appFlashSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 update)
 {
-    /* make sure command buffer clean */
-    HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
-    
-    /* then start sending the command */
-    HAL_CmdToReg(CMD_FLASHWRITE);
-    HAL_CmdToReg(des);
-    HAL_CmdToReg(len);
-    SegmentOperation(handle, src, des, len, 1);
+    FTU32 file_index = src, flash_addr = des, block, l = len;
+
+    if (update) {
+        while (l) {
+            block = (l > EVE_FLHUPDATE_LEN)?EVE_FLHUPDATE_LEN:l;
+
+            /* read the file into EVE GRAM */
+            SegmentOperation(handle, file_index, EVE_FLHUPDATE_ADDR, block, 0);
+            
+            /* then start update the flash */
+            appFlashUpdate(flash_addr, EVE_FLHUPDATE_ADDR, EVE_FLHUPDATE_LEN);
+
+            l -= block;
+            file_index += block;
+            flash_addr += block;
+        }
+    } else {
+        /* make sure command buffer clean */
+        HAL_CmdWait((FTU16)HAL_Read32(REG_CMD_WRITE));
+
+        /* then start sending the command */
+        HAL_CmdToReg(CMD_FLASHWRITE);
+        HAL_CmdToReg(des);
+        HAL_CmdToReg(len);
+        SegmentOperation(handle, src, des, len, 1);
+    }
     return len;
 }
 FTU32 appFlashAddr(FTC8 *path)
@@ -589,118 +607,110 @@ FTVOID appFlashErase(FTVOID)
 
     HAL_CmdExeNow(&cmd, 1);
 }
+FTU8 appFlashUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len)
+{
+	FTU32 cmd[4];
+
+    if (f_addr % EVE_FLHUPDATE_LEN || e_addr % 4 || len % EVE_FLHUPDATE_LEN) {
+        FTPRINT("\nappFlashUpdate: input error");
+        return 1;
+    }
+
+    cmd[0] = CMD_FLASHUPDATE;
+    cmd[1] = f_addr;
+    cmd[2] = e_addr;
+    cmd[3] = len;
+    
+    HAL_CmdExeNow(cmd, 4);
+
+	return 0;
+}
 FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
 {
 #define CHECK_NUM   3 //head, middle, tail
 #define CHECK_LEN   256
 #define CHECK_EVE_TMP  (EVE_RAMG_SIZE - CHECK_LEN)
     FTU8 buf[CHECK_LEN] = {0};
-    FTU32 Len, block, resHDL, point, count, crc;
+    FTU32 crc;
+    static FTU8 count;
+    static FTU32 resHDL, point, block, Len;
 
-    resHDL = HAL_SegFileOpen(golden_file);
-    if (resHDL == 0) {
-        FTPRINT("\nappFlashVerify: file open error");
-        return 0;
+    if (!resHDL) {
+        resHDL = HAL_SegFileOpen(golden_file);
+        if (resHDL == 0) {
+            FTPRINT("\nappFlashVerify: file open error");
+            return CHECK_NUM|0x80;
+        }
+
+        if (f_addr%64) {
+            FTPRINT("\nappFlashVerify: flash addr error");
+            HAL_SegFileClose(resHDL);
+            return CHECK_NUM|0x80;
+        }
+
+        Len = HAL_SegFileSize(resHDL);
+        /* if too small, don't have to pick check point
+           just check the first CHECK_LEN*/
+        if (Len <= CHECK_NUM*CHECK_LEN) {
+            count = 1;
+            block = (Len < CHECK_LEN)?(Len - Len%4):Len;
+        } else {
+            count = CHECK_NUM;
+            block = CHECK_LEN;
+        }
+
+        point = 0;
     }
-    
-    if (f_addr%64) {
-        FTPRINT("\nappFlashVerify: flash addr error");
+
+    /* read a piece of file to a block */
+    if (HAL_WriteSrcToDes(resHDL,point,(FTU32)buf,block) != block) {
+        FTPRINT("\nappFlashVerify: file read error");
         HAL_SegFileClose(resHDL);
-        return 0;
+        return count|0x80;
+    }
+    /* if there is a way to calulate the crc32
+       in MCU the same way as EVE (zlib) does
+       it would be even better than sending data to eve
+       then do the crc32, but I don't found any
+       convenience way to do so...
+
+       send that piece of file to EVE for CRC
+     */
+    HAL_Write8Src(CHECK_EVE_TMP, buf, block);
+    crc = appEveCRC(CHECK_EVE_TMP, block);
+    /* clear the temp space in EVE */
+    appEveZERO(CHECK_EVE_TMP, block);
+
+    /* read a piece of flash to EVE */
+    if (appFlashToEVE(f_addr+point, CHECK_EVE_TMP, block)) {
+        FTPRINT("\nappFlashVerify: fail to write to eve");
+        return count|0x80;
     }
 
-    Len = HAL_SegFileSize(resHDL);
-    /* if too small, don't have to pick check point
-       just check the first CHECK_LEN*/
-    if (Len <= CHECK_NUM*CHECK_LEN) {
-        count = 1;
-        block = (Len < CHECK_LEN)?(Len - Len%4):Len;
+    /* do CRC in EVE and compare the CRC with file piece*/
+    if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
+        FTPRINT("\nappFlashVerify: crc not match");
+        HAL_SegFileClose(resHDL);
+        return count|0x80;
+    }
+
+    count--;
+
+    if (count == 2) {
+        /* check the middle of the body, skip the none 64 align part */
+        point = (Len - CHECK_LEN)/2 - ((Len - CHECK_LEN)/2)%64;
+    } else if (count == 1) {
+        /* check the tail of the body, skip the none 64 align part */
+        point = (Len - CHECK_LEN) - (Len - CHECK_LEN)%64;
     } else {
-        count = 3;
-        block = CHECK_LEN;
-    }
-    point = 0;
-    
-    while (count) {
-        /* read a piece of file to a block */
-        if (HAL_WriteSrcToDes(resHDL,point,(FTU32)buf,block) != block) {
-            FTPRINT("\nappFlashVerify: file read error");
-            HAL_SegFileClose(resHDL);
-            return 0;
-        }
-        /* if there is a way to calulate the crc32
-           in MCU the same way as EVE (zlib) does
-           it would be even better than sending data to eve
-           then do the crc32, but I don't found any
-           convenience way to do so...
-
-           send that piece of file to EVE for CRC
-        */
-        HAL_Write8Src(CHECK_EVE_TMP, buf, block);
-        crc = appEveCRC(CHECK_EVE_TMP, block);
-        /* clear the temp space in EVE */
-		appEveZERO(CHECK_EVE_TMP, block);
-
-        /* read a piece of flash to EVE */
-		if (appFlashToEVE(f_addr+point, CHECK_EVE_TMP, block)) {
-			FTPRINT("\nappFlashVerify: fail to write to eve");
-			return 0;
-		}
-
-        /* do CRC in EVE and compare the CRC with file piece*/
-        if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
-            FTPRINT("\nappFlashVerify: crc not match");
-            HAL_SegFileClose(resHDL);
-            return 0;
-        }
-
-		count--;
-
-        if (count == 2) {
-            /* check the middle of the body, skip the none 64 align part */
-            point = (Len - CHECK_LEN)/2 - ((Len - CHECK_LEN)/2)%64;
-        } else if (count == 1) {
-            /* check the tail of the body, skip the none 64 align part */
-            point = (Len - CHECK_LEN) - (Len - CHECK_LEN)%64;
-        }
+        HAL_SegFileClose(resHDL);
+        resHDL = 0;
     }
 
-    HAL_SegFileClose(resHDL);
-
-    return 1;
+    return count;
 }
 
-FTU32 appFlashProgOneShort(FTU8 *f_file, FTU32 f_addr)
-{
-    FTU32 resHDL, Len;
-
-    resHDL = HAL_SegFileOpen(f_file);
-    if (resHDL == 0) {
-        FTPRINT("\nappFlashProgOneShort: file open error");
-        return 0;
-    }
-    
-    /* if the original file length not 256 byte align
-       it would pad some extra bytes at the tail*/
-    Len = HAL_SegFileSize(resHDL);
-    Len += Len%256?(256 - Len%256):0;
-    
-    if (f_addr%256) {
-        FTPRINT("\nappFlashProgOneShort: file addr error");
-        HAL_SegFileClose(resHDL);
-        return 0;
-    }
-
-    if (appFlashSrcToDes(resHDL,0, f_addr, Len) != Len) {
-        FTPRINT("\nappFlashProgOneShort: file program error");
-        HAL_SegFileClose(resHDL);
-        return 0;
-    }
-
-	HAL_SegFileClose(resHDL);
-    return Len;
-}
-FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr)
+FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update)
 {
     static FTU32 resHDL = 0, Len = 0, f_addr_index = 0;
     FTU32 piece = 0;
@@ -717,26 +727,38 @@ FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr)
         /* if the original file length not 256 byte align
            it would pad some extra bytes at the tail*/
         Len = HAL_SegFileSize(resHDL);
-        Len += Len%256?(256 - Len%256):0;
+        
+        if (update) {
+            if (f_addr%EVE_FLHUPDATE_LEN) {
+                FTPRINT("\nappFlashProgProgress: file addr error");
+                HAL_SegFileClose(resHDL);
+                return 0;
+            }
+        } else {
+            if (f_addr%256) {
+                FTPRINT("\nappFlashProgProgress: file addr error");
+                HAL_SegFileClose(resHDL);
+                resHDL = 0;
+                Len = 0;
+                return 0;
+            }
 
-        if (f_addr%256) {
-            FTPRINT("\nappFlashProgProgress: file addr error");
-            HAL_SegFileClose(resHDL);
-            resHDL = 0;
-            Len = 0;
-            return 0;
+            Len += Len%256?(256 - Len%256):0;
         }
 
         f_addr_index = f_addr;
     }
 
+    if (!block) {
+        block = Len;
+    }
     piece = f_addr_index - f_addr;
     piece = Len - piece;
-    if (piece > 100*CMDBUF_SIZE) {
-        piece = 100*CMDBUF_SIZE;
+    if (piece > block) {
+        piece = block;
     }
 
-    if (appFlashSrcToDes(resHDL,0, f_addr_index, piece) != piece) {
+    if (appFlashSrcToDes(resHDL,0, f_addr_index, piece, update) != piece) {
         FTPRINT("\nappFlashProgProgress: file program error");
         HAL_SegFileClose(resHDL);
         resHDL = 0;
