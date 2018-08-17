@@ -40,7 +40,13 @@
 #define DEF_BT81X
 #define LCD_WQVGA
 #define DEF_CAP_NONMULTI
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
 #define EVE_SPI_TYPE 1
+#endif
 
 #if (defined(ARDUINO) || \
      defined(STM32F4) || \
@@ -56,7 +62,13 @@
 #define DEF_BT81X
 #define LCD_WQVGA
 #define DEF_CAP_NONMULTI
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
 #define EVE_SPI_TYPE 1
+#endif
 
 #if (defined(ARDUINO) || \
      defined(STM32F4) || \
@@ -72,7 +84,13 @@
 #define DEF_BT81X
 #define LCD_WQVGA
 #define DEF_CAP_NONMULTI
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
 #define EVE_SPI_TYPE 1
+#endif
 
 #if (defined(ARDUINO) || \
      defined(STM32F4) || \
@@ -87,7 +105,13 @@
 #define DEF_BT81X
 #define LCD_WVGA
 #define DEF_CAP_MULTI
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
 #define EVE_SPI_TYPE 1
+#endif
 
 #if (defined(ARDUINO) || \
      defined(STM32F4) || \
@@ -102,7 +126,14 @@
 #define DEF_BT81X
 #define LCD_WVGA
 #define DEF_CAP_NONMULTI
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
 #define EVE_SPI_TYPE 1
+#endif
+
 
 #if (defined(ARDUINO) || \
      defined(STM32F4) || \
@@ -146,7 +177,13 @@
 #define DEF_81X
 #define LCD_WQVGA
 #define DEF_CAP_NONMULTI
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
 #define EVE_SPI_TYPE 1
+#endif
 
 #if defined(STM32F4)
 #error "not supported"
@@ -158,10 +195,15 @@
 #define DEF_81X
 #define LCD_HVGA
 #define DEF_CAP_NONMULTI
-#define EVE_SPI_TYPE 1
 
 #if (defined(FT9XXEV) || \
-     defined(ARDUINO) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
+#define EVE_SPI_TYPE 1
+#endif
+
+#if (defined(ARDUINO) || \
      defined(STM32F4) || \
      defined(DEF_80X))
 #error "not supported"
@@ -173,11 +215,10 @@
 #define DEF_80X 
 
 #define LCD_WQVGA
-#define EVE_SPI_TYPE 1
 #define DEF_CAP_NONMULTI
+#define EVE_SPI_TYPE 1
 
-#if (defined(FT9XXEV) || \
-     defined(ARDUINO) || \
+#if (defined(ARDUINO) || \
      defined(STM32F4))
 #error "not supported"
 #endif
