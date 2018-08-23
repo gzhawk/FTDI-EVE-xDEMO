@@ -263,28 +263,26 @@ STATIC FTVOID cmdbufAviWrite (FTU32 resHDL, FTU32 file_len, FTU32 opt)
 		/* copy it into CMD buffer in EVE */
 		SegmentOperation(resHDL, i, REG_CMDB_WRITE, l, 0);
 		i += l;
-/* 
-it's doable to stop the CMD_PLAYVIDEO in following way
-but it would case the co-processor triger some popup
-noice in audio playing next time
-*/
-#if 0
-		if (TOUCHED) {
+        /* 
+           it's doable to stop the CMD_PLAYVIDEO in following way
+           but based on my trying, it would case the co-processor triger
+           some popup noice in audio playing next time
+         */
+        if (TOUCHED) {
             CLICK;
-			while (TOUCHED) {
-				/* hold till touch released then go next */;
+            while (TOUCHED) {
+                /* hold till touch released then go next */;
                 FTDELAY(50);
-			}
-			/* Once cmd_playvideo is issued, the co processor expects the whole file to be streamed to it
-			 * as the AVI parser is also part of the firmware. 
-			 * There is no support for pause, stop, fast forward/fast rewind player commands. 
-			 * So the only way to stop the playvideo in between is by co processor reset. */
+            }
+            /* Once cmd_playvideo is issued, the co processor expects the whole file to be streamed to it
+             * as the AVI parser is also part of the firmware. 
+             * There is no support for pause, stop, fast forward/fast rewind player commands. 
+             * So the only way to stop the playvideo in between is by co processor reset. */
 
-			HAL_CoReset();
-			break;
-		}
-#endif
-	}
+            HAL_CoReset();
+            break;
+        }
+    }
 }
 
 STATIC FTU32 AVIToRamG(FTU8 *path, FTU32 ramgAddr, FTU32 flagAddr, FTU32 fifoAddr, FTU32 fifoSize, FTU32 opt)
