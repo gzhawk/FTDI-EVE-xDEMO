@@ -654,7 +654,7 @@ FTU32 HAL_SegFileOpen (FTU8 *path)
         return 0;
     }
 
-    return 1;
+    return (FTU32)&FT9xxFile;
 }
 
 FTU32 HAL_SegFileSize (FTU32 handle)
