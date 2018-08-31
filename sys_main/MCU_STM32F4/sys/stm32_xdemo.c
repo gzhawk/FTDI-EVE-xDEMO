@@ -477,6 +477,9 @@ FTU32 HAL_WriteSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
 
 FTU8 * HAL_LoopMemMalloc (FTU32 handle, FTU32 src, FTU32 len)
 {
+    if (MCU_BLOCK_SIZE < len) {
+        FTPRINT("\nHAL_LoopMemMalloc: malloc exceeded");
+    }
     return (FTU8 *)handle+src;
 }
 

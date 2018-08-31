@@ -1,5 +1,10 @@
 #include "platform.h"
 
+/* the extra 3 is for SPI address, 
+   it's a trick in FT4222 platform
+   go HAL_Write8Src for more detail*/
+FTU8 file_buff[MCU_BLOCK_SIZE+3] = {0};
+
 #if defined(VC_EMULATOR)
 BT8XXEMU_Emulator *gEmulator = NULL;
 
@@ -15,6 +20,7 @@ FTU32 FT8XXEMU_transfer(FTU32 data)
 #endif
 
 #if defined(VC_FT4222)
+
 FTVOID FT4222_CloseAll ( FTVOID )
 {
     if (ftHdl_spi) {
@@ -174,23 +180,21 @@ FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len )
             SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
             SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
 #elif defined(VC_FT4222)
-    FTU8 *p = NULL;
-
-    /* this is the most stupid way to do so
-       the reason is, the QSPI read write API
+    /* 
+       the QSPI read/write API
        do not have holding CS option
        it can only send the addree + data once
-       fortunately, 
-       FT4222 only be used under the VC*/
-    p = (FTU8 *)malloc(SPI_TXADDR_LEN+len);
+       the malloc space for src already shift 3 byte
+       while doing the malloc, check HAL_LoopMemMalloc
+       for detail
+     */
+    FTU8 *p = src - 3;
+
     p[0] = (FTU8)(0x80 | (addr >> 16));
     p[1] = (FTU8)(addr >> 8);
     p[2] = (FTU8)addr;
-    memcpy(p+3, src, len);
 
     ft4222_spi_wt(p, len);
-
-    free(p);
 #elif defined(VC_EMULATOR)
     FTU32 i;
 
@@ -701,7 +705,11 @@ FTU32 HAL_WriteSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
 
 FTU8 * HAL_LoopMemMalloc (FTU32 handle, FTU32 src, FTU32 len)
 {
-    return (FTU8 *)malloc(len);
+    if (len > MCU_BLOCK_SIZE) {
+		FTPRINT("\nHAL_LoopMemMalloc: malloc exceeded");
+    }
+    /* check HAL_Write8Src for the reason of offset 3 */
+    return file_buff+3;
 }
 
 FTVOID HAL_LoopMemRead (FTU32 handle, FTU8 **ppbuf, FTU32 len)
@@ -711,7 +719,7 @@ FTVOID HAL_LoopMemRead (FTU32 handle, FTU8 **ppbuf, FTU32 len)
 
 FTVOID HAL_LoopMemFree (FTU32 buf)
 {
-    free((FTVOID *)buf);
+    /* do nothing */
 }
 
 FTU32 HAL_SegFileOpen (FTU8 *path)
