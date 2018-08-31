@@ -630,7 +630,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
 #define CHECK_NUM   3 //head, middle, tail
 #define CHECK_LEN   256
 #define CHECK_EVE_TMP  (EVE_RAMG_SIZE - CHECK_LEN)
-    FTU8 buf[CHECK_LEN] = {0};
+    FTU8 * pbuf;
     FTU32 crc;
     static FTU8 count;
     static FTU32 resHDL, point, block, Len;
@@ -663,7 +663,8 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     }
 
     /* read a piece of file to a block */
-    if (HAL_WriteSrcToDes(resHDL,point,(FTU32)buf,block) != block) {
+    pbuf = HAL_LoopMemMalloc(0,0,CHECK_LEN);
+    if (HAL_WriteSrcToDes(resHDL,point,(FTU32)pbuf,block) != block) {
         FTPRINT("\nappFlashVerify: file read error");
         HAL_SegFileClose(resHDL);
         return count|0x80;
@@ -676,7 +677,8 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
 
        send that piece of file to EVE for CRC
      */
-    HAL_Write8Src(CHECK_EVE_TMP, buf, block);
+    HAL_Write8Src(CHECK_EVE_TMP, pbuf, block);
+    HAL_LoopMemFree((FTU32)pbuf);
     crc = appEveCRC(CHECK_EVE_TMP, block);
     /* clear the temp space in EVE */
     appEveZERO(CHECK_EVE_TMP, block);
