@@ -11,7 +11,7 @@
 #error "program res/diehl/bt81x.flash to on-board flash, then comment this line"
 #endif
 
-#define ANIM_ADDR  2052928
+#define ANIM_ADDR  1454400
 #define ANIM_FRAME 480
 
 FTVOID loop_frame(FTU32 *pframe, FTU32 max)
@@ -41,10 +41,7 @@ FTVOID flash_anim(FTU32 para)
 	HAL_CmdBufIn(CLEAR_COLOR_RGB(255, 255, 255));
 	HAL_CmdBufIn(CLEAR(1, 1, 1));
 
-    /* display one frame, at this point, 
-       ANIMFRAME would have some shifted
-       instead of perfect centrol of the image*/
-    CoCmd_ANIMFRAME(EVE_LCD_WIDTH/2+8, EVE_LCD_HIGH/2+12, addr, index);
+    CoCmd_ANIMFRAME(EVE_LCD_WIDTH/2, EVE_LCD_HIGH/2, addr, index);
     
     /* change the frame index to make it 'animation' */
     loop_frame(&index, max);
