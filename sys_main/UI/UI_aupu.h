@@ -328,13 +328,13 @@ STATIC FTVOID dispDateTime (FTVOID)
 #define SHOW_TIME_HOUR_X 100
 #define SHOW_TIME_W      8
     CoCmd_NUMBER(SHOW_TIME_YEAR_X,0,26,0,stDateTime.year);
-    CoCmd_TEXT(SHOW_TIME_YEAR_X+4*SHOW_TIME_W+5,0,26,OPT_RIGHTX,".");
-    CoCmd_NUMBER(SHOW_TIME_YEAR_X+5*SHOW_TIME_W,0,26,0,stDateTime.month);
-    CoCmd_TEXT(SHOW_TIME_YEAR_X+6*SHOW_TIME_W+5,0,26,OPT_RIGHTX,".");
-    CoCmd_NUMBER(SHOW_TIME_YEAR_X+7*SHOW_TIME_W,0,26,0,stDateTime.day);
-    CoCmd_NUMBER(SHOW_TIME_HOUR_X,0,26,0,stDateTime.hour);
+    CoCmd_TEXT(SHOW_TIME_YEAR_X+4*SHOW_TIME_W+5,0,26,OPT_RIGHTX,"/");
+    CoCmd_NUMBER(SHOW_TIME_YEAR_X+5*SHOW_TIME_W,0,26,2,stDateTime.month);
+    CoCmd_TEXT(SHOW_TIME_YEAR_X+7*SHOW_TIME_W+5,0,26,OPT_RIGHTX,"/");
+    CoCmd_NUMBER(SHOW_TIME_YEAR_X+8*SHOW_TIME_W,0,26,2,stDateTime.day);
+    CoCmd_NUMBER(SHOW_TIME_HOUR_X,0,26,2,stDateTime.hour);
     CoCmd_TEXT(SHOW_TIME_HOUR_X+2*SHOW_TIME_W+5,0,26,OPT_RIGHTX,":");
-    CoCmd_NUMBER(SHOW_TIME_HOUR_X+3*SHOW_TIME_W,0,26,0,stDateTime.minute);
+    CoCmd_NUMBER(SHOW_TIME_HOUR_X+3*SHOW_TIME_W,0,26,2,stDateTime.minute);
 }
 
 /* HomeOK:0-Home, 1-OK; Pressed: 0-unpress, 1-press */
@@ -501,7 +501,7 @@ STATIC FTVOID dispClockTxt (FTU32 tag)
 #define TXT_OPEN_X    64
 #define TXT_OPEN_Y    232
 #define TXT_CLOSE_X   354
-    FTU8 txtSetClock[] = {5,6,1,2,0},
+    FTC8 txtSetClock[] = {5,6,1,2,0},
          txtOpen[]     = {5,6,3,0},
          txtClose[]    = {5,6,4,0};
 
@@ -946,7 +946,7 @@ STATIC FTVOID dispDateTxt (FTVOID)
 #define DATETXT_YEAR_Y 246
 #define DATETXT_MONTH_X  234
 #define DATETXT_DAY_X    330
-    FTU8 txtDate[]   = {7,8,1,2,0},
+    FTC8 txtDate[]   = {7,8,1,2,0},
          txtYear[]   = {9,0},
          txtMonth[]  = {10,0},
          txtDay[]    = {11,0};
@@ -1099,12 +1099,12 @@ FTVOID aupu_main_ui (FTU32 para)
 
     CoCmd_NUMBER(TEST_X-8*(TEST_W),TEST_H,HDL_MP_F,0,stDateTime.year);
     CoCmd_TEXT(TEST_X-4*(TEST_W),TEST_H,HDL_MP_F,0,"/");
-    CoCmd_NUMBER(TEST_X-3*TEST_W,TEST_H,HDL_MP_F,0,stDateTime.month);
-    CoCmd_TEXT(TEST_X-2*TEST_W,TEST_H,HDL_MP_F,0,"/");
-    CoCmd_NUMBER(TEST_X-TEST_W,TEST_H,HDL_MP_F,0,stDateTime.day);
-    CoCmd_NUMBER(TEST_X+3*TEST_W,TEST_H,HDL_MP_F,0,stDateTime.hour);
+    CoCmd_NUMBER(TEST_X-3*TEST_W,TEST_H,HDL_MP_F,2,stDateTime.month);
+    CoCmd_TEXT(TEST_X-TEST_W,TEST_H,HDL_MP_F,0,"/");
+    CoCmd_NUMBER(TEST_X,TEST_H,HDL_MP_F,2,stDateTime.day);
+    CoCmd_NUMBER(TEST_X+3*TEST_W,TEST_H,HDL_MP_F,2,stDateTime.hour);
     CoCmd_TEXT(TEST_X+5*TEST_W,TEST_H,HDL_MP_F,0,":");
-    CoCmd_NUMBER(TEST_X+6*TEST_W,TEST_H,HDL_MP_F,0,stDateTime.minute);
+    CoCmd_NUMBER(TEST_X+6*TEST_W,TEST_H,HDL_MP_F,2,stDateTime.minute);
     if (stDateTime.open) {
         CoCmd_TEXT(TEST_X,LCD_H-TEST_H,HDL_MP_F,OPT_CENTER,"System ON");
     } else {
