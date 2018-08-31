@@ -11,7 +11,6 @@
 #define DISPBP_L8              ROOT_PATH"bitmap\\L8.raw"
 #define DISPBP_RGB332          ROOT_PATH"bitmap\\RGB332.raw"
 #define DISPBP_RGB565          ROOT_PATH"bitmap\\RGB565.raw"
-#define DISPBP_ARGB4           ROOT_PATH"bitmap\\ARGB4.raw"
 /* use zlib compressed file to test the INFLATE function */
 #define DISPBP_ARGB1555        ROOT_PATH"bitmap\\ARGB1555.bin"
 
@@ -25,10 +24,6 @@
 #define DISPBP_PALETTE4444_LUT ROOT_PATH"bitmap\\Pal4444_lut.raw"
 /* use zlib compressed file to test the INFLATE function*/
 #define DISPBP_ASTC4X4_RAM     ROOT_PATH"bitmap\\ASTC4x4.bin"
-/* use zlib compressed file to test the INFLATE function from Flash*/
-#define DISPBP_ASTC4X4_ZFLH    "ZFLASH:2217216"
-/* use raw Flash file to test the display function from Flash*/
-#define DISPBP_ASTC4X4_FLH     "FLASH:2225344"
 
 #else
 #define DISPBP_PALETTE         ROOT_PATH"bitmap\\Pal_inx.raw"
@@ -41,7 +36,6 @@
 #define DISPBP_L8              ROOT_PATH"L8.raw"
 #define DISPBP_RGB332          ROOT_PATH"RGB332.raw"
 #define DISPBP_RGB565          ROOT_PATH"RGB565.raw"
-#define DISPBP_ARGB4           ROOT_PATH"ARGB4.raw"
 #define DISPBP_ARGB1555        ROOT_PATH"ARGB1555.raw"
 
 #if defined(DEF_81X) || defined(DEF_BT81X)
@@ -51,9 +45,8 @@
 #define DISPBP_PALETTE565_LUT  ROOT_PATH"Pal565_lut.raw"
 #define DISPBP_PALETTE4444     ROOT_PATH"Pal4444_inx.raw"
 #define DISPBP_PALETTE4444_LUT ROOT_PATH"Pal4444_lut.raw"
+/* use zlib compressed file to test the INFLATE function*/
 #define DISPBP_ASTC4X4_RAM     ROOT_PATH"ASTC4x4.bin"
-#define DISPBP_ASTC4X4_ZFLH    "ZFLASH:2217216"
-#define DISPBP_ASTC4X4_FLH     "FLASH:2225344"
 
 #else
 #define DISPBP_PALETTE         ROOT_PATH"Pal_inx.raw"
@@ -61,6 +54,13 @@
 #endif
 
 #endif
+
+/* zlib compressed file in flash, DEINFLATE in RAM_G and display*/
+#define DISPBP_ASTC4X4_ZFLH    "Z_FLASH@2249984"
+/* raw file in Flash, display from RAM_G */
+#define DISPBP_ARGB4_FLH       "FLASH@2217216:32768"
+/* raw file in Flash, direct display from Flash*/
+#define DISPBP_ASTC12X12_AFLH  "ASTC_FLASH@2257856"
 
 #define HDL_START 0
 #define FNT_WIDE  30
@@ -72,21 +72,19 @@ bmpHDR_st bmp_header[] = {
     {DISPBP_PALETTE8,   DISPBP_PALETTE8_LUT,   0,PALETTED8,   0,0,128,128},
     {DISPBP_PALETTE4444,DISPBP_PALETTE4444_LUT,0,PALETTED4444,0,0,128,128},
     {DISPBP_PALETTE565, DISPBP_PALETTE565_LUT, 0,PALETTED565, 0,0,128,128},
-
 #if defined(DEF_BT81X)
     {DISPBP_ASTC4X4_RAM, 0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,    0,0,128,128},
+    {DISPBP_ASTC12X12_AFLH,0,0,COMPRESSED_RGBA_ASTC_12x12_KHR,0,0,132,132},
     {DISPBP_ASTC4X4_ZFLH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,    0,0,128,128},
-    {DISPBP_ASTC4X4_FLH, 0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,    0,0,128,128},
+    {DISPBP_ARGB4_FLH,   0,                     0,ARGB4,      0,0,128,128},
 #endif
-
 #else
     {DISPBP_PALETTE,    DISPBP_PALETTE_LUT,    0,PALETTED,    0,0,128,128},
 #endif
     {DISPBP_L1,         0,                     0,L1,          0,0,128,128},
     {DISPBP_L8,         0,                     0,L8,          0,0,128,128},
-    {DISPBP_ARGB1555,   0,                     0,ARGB1555,    0,0,128,128},
-    {DISPBP_ARGB4,      0,                     0,ARGB4,       0,0,128,128},
     {DISPBP_RGB565,     0,                     0,RGB565,      0,0,128,128},
+    {DISPBP_ARGB1555,   0,                     0,ARGB1555,    0,0,128,128},
     {DISPBP_RGB332,     0,                     0,RGB332,      0,0,128,128},
 };
 
@@ -113,7 +111,10 @@ FTVOID dispTEXT (FTU32 format, FTU32 X, FTU32 Y)
             break;
 #if defined(DEF_BT81X)
         case COMPRESSED_RGBA_ASTC_4x4_KHR:
-            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"ASTC4x4");
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"4x4");
+            break;
+        case COMPRESSED_RGBA_ASTC_12x12_KHR:
+            CoCmd_TEXT(X,Y,FNT_NUM,FNT_OPT,"12x12");
             break;
 #endif
 #if defined(DEF_81X) || defined(DEF_BT81X)

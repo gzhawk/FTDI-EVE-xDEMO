@@ -26,9 +26,22 @@
 #define EVE_PIC_MEM_ADDR    RAM_G
 #define EVE_FONT_INTERNAL   (16)
 
-#define ZLIB_LEN              (0xFFFFFFFF)
-#define ZFLH_LEN              (0xFFFFFFFE)
-#define FLH_LEN               (0xFFFFFFFC)
+#define TYPE_ZLIB           (0xFFFFFFFF)
+/* 
+there would be three kinds of flash file location mark:
+"Z_FLASH:addr:len"      all kinds of compressed format
+"ASTC_FLASH:addr:len"   original ASTC format
+"FLASH:addr:len"        all other none ASTC format
+*/
+#define TYPE_Z_FLASH          (0xFFFFFFFE)
+#define TYPE_ASTC_FLASH       (0xFFFFFFFD)
+#define TYPE_FLASH            (0xFFFFFFFC)
+#define L_Z_FLASH             7
+#define L_ASTC_FLASH          10
+#define L_FLASH               5
+#define MARK_ADDR             '@'
+#define MARK_LEN              ':'
+
 #if defined(DEF_BT81X)
 #define EVE_DBG_BUF_LEN       (128)
 #define EVE_FLHUPDATE_LEN     (4*1024)
@@ -89,6 +102,7 @@ FTU8 appFlashUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len);
 FTU32 appFlashVerify(FTU8 *golden_file, FTU32 flash_addr);
 FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update);
 FTU32 appFlashAddr(FTC8 *path);
+FTU32 appFlashLen(FTC8 *path);
 FTVOID appFlashUnzip(FTC8 *path, FTU32 src);
 #endif
 

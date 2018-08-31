@@ -226,7 +226,7 @@ FTU32 FileProcess(FTU32 handle, FTU32 src, FTU32 des, FTU32 len)
            give a special length for the return routine
            to do some special handle for zlib file
          */
-        return ZLIB_LEN;
+        return TYPE_ZLIB;
     } else {
         SegmentOperation(handle, src, des, len, 0);
         
@@ -260,9 +260,11 @@ FTU32 appGetNumFromStr(FTU8 *str)
         if (str[i] >= '0' && str[i] <= '9') {
             tmp *= 10;
             tmp += (FTU32)(str[i] - '0');
-        } else {
-            return 0;
-        }
+        } else if (str[i] == MARK_LEN) {
+            break;
+		} else {
+			return 0;
+		}
         if (++i >= 10) {
             return 0;
         }
@@ -318,11 +320,11 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
                the return value of appFileToRamG
                so calculate the output (decompressed) size by image format
              */
-            if (ZLIB_LEN == pbmpHD[i].len) {
+            if (TYPE_ZLIB == pbmpHD[i].len) {
                 pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
             } 
 #if defined(DEF_BT81X)            
-            else if (FLH_LEN == pbmpHD[i].len) {
+            else if (TYPE_ASTC_FLASH == pbmpHD[i].len) {
                 /* 
                 reuse the len_lut for the flash address in setbitmap command use
                 when using flash to display raw (only for ASTC)
@@ -330,9 +332,14 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
                 */
                 pbmpHD[i].len_lut = appFlashAddr(pbmpHD[i].path);
                 pbmpHD[i].len = 0;
-            } else if (ZFLH_LEN == pbmpHD[i].len) {
+            } else if (TYPE_Z_FLASH == pbmpHD[i].len) {
                 appFlashUnzip(pbmpHD[i].path, src);
                 pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
+            } else if (TYPE_FLASH == pbmpHD[i].len) {
+                pbmpHD[i].len = appFlashLen(pbmpHD[i].path);
+                if (appFlashToEVE(appFlashAddr(pbmpHD[i].path), src, pbmpHD[i].len)) {
+                    FTPRINT("\nappLoadBmp: flash to eve fail");
+                }
             }
 #endif
         } else {
@@ -355,7 +362,7 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
             }
             if (l) {
                 /* same reason as above, lookup table alway less than 1K */
-                if (ZLIB_LEN == pbmpHD[i].len_lut) {
+                if (TYPE_ZLIB == pbmpHD[i].len_lut) {
                     pbmpHD[i].len_lut = 1024;
                 }
             } else {
@@ -374,7 +381,7 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
             }
             if (pbmpHD[i].len_lut) {
                 /* same reason as above, lookup table alway less than 1K */
-                if (ZLIB_LEN == pbmpHD[i].len_lut) {
+                if (TYPE_ZLIB == pbmpHD[i].len_lut) {
                     pbmpHD[i].len_lut = 1024;
                 }
             } else {
@@ -466,17 +473,21 @@ FTVOID appEveZERO(FTU32 eve_addr, FTU32 len)
 FTU8 appFlashPath (FTC8 *path, FTU32 *len)
 {
 #if defined(DEF_BT81X)
-    FTU8 tmp[] = "ZFLASH:";
-
-    if (!memcmp(path, tmp, 7)) {
+    if (!memcmp(path, "ASTC_FLASH", L_ASTC_FLASH)) {
         appFlashSetFull();
-        *len = ZFLH_LEN;
+        *len = TYPE_ASTC_FLASH;
         return 1;
     }
     
-    if (!memcmp(path, &tmp[1], 6)) {
+    if (!memcmp(path, "Z_FLASH", L_Z_FLASH)) {
         appFlashSetFull();
-        *len = FLH_LEN;
+        *len = TYPE_Z_FLASH;
+        return 1;
+    }
+
+    if (!memcmp(path, "FLASH", L_FLASH)) {
+        appFlashSetFull();
+        *len = TYPE_FLASH;
         return 1;
     }
 #endif
@@ -517,14 +528,40 @@ FTU32 appFlashAddr(FTC8 *path)
 {
     FTU8 *p = (FTU8 *)path;
 
-    /* either 'ZFLASH:' or 'FLASH:', others all wrong */
-    if (p[6] == ':') {
-        return appGetNumFromStr(&p[7]);
-    } else if (p[5] == ':') {
-        return appGetNumFromStr(&p[6]);
+    if (p[L_Z_FLASH] == MARK_ADDR) {
+        return appGetNumFromStr(&p[L_Z_FLASH+1]);
+    } else if (p[L_ASTC_FLASH] == MARK_ADDR) {
+        return appGetNumFromStr(&p[L_ASTC_FLASH+1]);
+    } else if (p[L_FLASH] == MARK_ADDR) {
+        return appGetNumFromStr(&p[L_FLASH+1]);
+    } else {
+        FTPRINT("\nappFlashAddr: addr mark not found");
+        return 0;
+    }
+}
+FTU32 appFlashLen(FTC8 *path)
+{
+    FTU8 *p = (FTU8 *)path;
+
+    if (p[L_Z_FLASH] == MARK_ADDR) {
+        p += L_Z_FLASH+1;
+    } else if (p[L_ASTC_FLASH] == MARK_ADDR) {
+        p += L_ASTC_FLASH+1;
+    } else if (p[L_FLASH] == MARK_ADDR) {
+        p += L_FLASH+1;
+    } else {
+        FTPRINT("\nappFlashLen: addr mark not found");
+        return 0;
     }
 
-    return 0;
+    /* it's a internal function
+       skip the endless loop check */
+    while (*p != MARK_LEN) {
+        p++;
+    }
+    p++;
+
+    return appGetNumFromStr(p);
 }
 FTVOID appFlashUnzip(FTC8 *path, FTU32 src)
 {
