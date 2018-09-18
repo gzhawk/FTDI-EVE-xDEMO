@@ -86,7 +86,7 @@ appRet_en appWaitCal (FTVOID);
 FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
-FTU32 appGetLinestride(bmpHDR_st bmpHD);
+FTU32 appGetLinestride(bmpHDR_st *bmpHD);
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
 FTU32 appEveCRC(FTU32 eve_addr, FTU32 len);
 FTVOID appEveZERO(FTU32 eve_addr, FTU32 len);

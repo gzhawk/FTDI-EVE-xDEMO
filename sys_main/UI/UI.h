@@ -116,6 +116,8 @@ app_para_t appGP = {0};
 #include "UI_scan.h"
 #elif defined(UI_DIEHL)
 #include "UI_diehl.h"
+#elif defined(UI_D_BITMAP)
+#include "UI_diehl_bitmap.h"
 #else
 #error "no UI be selected"
 #endif

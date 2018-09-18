@@ -99,19 +99,19 @@ STATIC appRet_en appCal (FTU8 force, FTC8 *dPath)
 }
 #endif
 
-FTU32 appGetLinestride(bmpHDR_st bmpHD)
+FTU32 appGetLinestride(bmpHDR_st *bmpHD)
 {
     FTU32 linestride = 0;
 
-    switch (bmpHD.format) {
+    switch (bmpHD->format) {
         case L1:
-            linestride = bmpHD.wide/8;
+            linestride = (bmpHD->wide)/8;
             break;
         case L2:
-            linestride = bmpHD.wide/4;
+            linestride = (bmpHD->wide)/4;
             break;
         case L4:
-            linestride = bmpHD.wide/2;
+            linestride = (bmpHD->wide)/2;
             break;
         case L8:
         case ARGB2:
@@ -123,57 +123,57 @@ FTU32 appGetLinestride(bmpHDR_st bmpHD)
 #else
         case PALETTED:
 #endif 
-            linestride = bmpHD.wide;
+            linestride = (bmpHD->wide);
             break;
 #if defined(DEF_BT81X)
         case COMPRESSED_RGBA_ASTC_10x10_KHR:
-            linestride = bmpHD.wide*128/800;
+            linestride = (bmpHD->wide)*128/800;
             break;
         case COMPRESSED_RGBA_ASTC_10x5_KHR:
-            linestride = bmpHD.wide*213/800;
+            linestride = (bmpHD->wide)*213/800;
             break;
         case COMPRESSED_RGBA_ASTC_10x6_KHR:
-            linestride = bmpHD.wide*200/800;
+            linestride = (bmpHD->wide)*200/800;
             break;
         case COMPRESSED_RGBA_ASTC_10x8_KHR:
-            linestride = bmpHD.wide*160/800;
+            linestride = (bmpHD->wide)*160/800;
             break;
         case COMPRESSED_RGBA_ASTC_12x10_KHR:
-            linestride = bmpHD.wide*107/800;
+            linestride = (bmpHD->wide)*107/800;
             break;
         case COMPRESSED_RGBA_ASTC_12x12_KHR:
-            linestride = bmpHD.wide*89/800;
+            linestride = (bmpHD->wide)*89/800;
             break;
         case COMPRESSED_RGBA_ASTC_4x4_KHR:
-            linestride = bmpHD.wide;
+            linestride = (bmpHD->wide);
             break;
         case COMPRESSED_RGBA_ASTC_5x4_KHR:
-            linestride = bmpHD.wide*640/800;
+            linestride = (bmpHD->wide)*640/800;
             break;
         case COMPRESSED_RGBA_ASTC_5x5_KHR:
-            linestride = bmpHD.wide*512/800;
+            linestride = (bmpHD->wide)*512/800;
             break;
         case COMPRESSED_RGBA_ASTC_6x5_KHR:
-            linestride = bmpHD.wide*427/800;
+            linestride = (bmpHD->wide)*427/800;
             break;
         case COMPRESSED_RGBA_ASTC_6x6_KHR:
-            linestride = bmpHD.wide*356/800;
+            linestride = (bmpHD->wide)*356/800;
             break;
         case COMPRESSED_RGBA_ASTC_8x5_KHR:
-            linestride = bmpHD.wide*320/800;
+            linestride = (bmpHD->wide)*320/800;
             break;
         case COMPRESSED_RGBA_ASTC_8x6_KHR:
-            linestride = bmpHD.wide*267/800;
+            linestride = (bmpHD->wide)*267/800;
             break;
         case COMPRESSED_RGBA_ASTC_8x8_KHR:
-            linestride = bmpHD.wide*256/800;
+            linestride = (bmpHD->wide)*256/800;
             break;
 #endif
         case ARGB4:
         case RGB565:
         case ARGB1555:
         default:
-            linestride = bmpHD.wide*2;
+            linestride = (bmpHD->wide)*2;
             break;
     }
 
@@ -300,50 +300,74 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 
         HAL_SegFileClose(resHDL);
     }
+
     return Len;
+}
+
+FTU8 appLenTricks(bmpHDR_st *pbmpHD, FTU8 Pal, FTU32 addr)
+{
+    FTU32 type;
+    /* 
+       when using zlib compressed file (*.bin)
+       the actual decompressed size would not
+       the return value of appFileToRamG
+       so calculate the output (decompressed) size by image format
+     */
+    if (Pal) {
+        type = pbmpHD->len_lut;
+
+        if (TYPE_ZLIB == type) {
+            pbmpHD->len_lut = 1024;
+        } else if (TYPE_Z_FLASH == type) {
+            appFlashUnzip(pbmpHD->path_lut, addr);
+            pbmpHD->len_lut = 1024;
+        } else if (TYPE_FLASH == type) {
+            pbmpHD->len_lut = appFlashLen(pbmpHD->path_lut);
+            if (appFlashToEVE(appFlashAddr(pbmpHD->path_lut), addr, pbmpHD->len_lut)) {
+                FTPRINT("\nappLenTricks: pal flash to eve fail");
+            }
+        } else if (!type) {
+            FTPRINT("\nappLenTricks: pal type len error");
+            return 1;
+        }
+    } else {
+        type = pbmpHD->len;
+
+        if (TYPE_ZLIB == type) {
+            pbmpHD->len = appGetLinestride(pbmpHD)*pbmpHD->high;
+        } else if (TYPE_ASTC_FLASH == type) {
+            /* 
+               reuse the len_lut for the flash address in setbitmap command use
+               when using flash to display raw (only for ASTC)
+               no RAM is needed, EVE render directly from Flash
+             */
+            pbmpHD->len_lut = appFlashAddr(pbmpHD->path);
+            pbmpHD->len = 0;
+        } else if (TYPE_Z_FLASH == type) {
+            appFlashUnzip(pbmpHD->path, addr);
+            pbmpHD->len = appGetLinestride(pbmpHD)*pbmpHD->high;
+        } else if (TYPE_FLASH == type) {
+            pbmpHD->len = appFlashLen(pbmpHD->path);
+            if (appFlashToEVE(appFlashAddr(pbmpHD->path), addr, pbmpHD->len)) {
+                FTPRINT("\nappLenTricks: flash to eve fail");
+            }
+        } else if (!type) {
+            FTPRINT("\nappLenTricks: type len error");
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-    FTU32 i, src, l;
+    FTU32 i, src;
 
     for (i = 0, src = ramgAddr; i < nums; i++) {
-        l = appFileToRamG(pbmpHD[i].path,src,1,0,0);
-        if (pbmpHD[i].len == 0) {
-            /* only when input length == 0, set the real length */
-            pbmpHD[i].len = l;
-        }
-        if (l) {
-            /* 
-               when using zlib compressed file (*.bin)
-               the actual decompressed size would not
-               the return value of appFileToRamG
-               so calculate the output (decompressed) size by image format
-             */
-            if (TYPE_ZLIB == pbmpHD[i].len) {
-                pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
-            } 
-#if defined(DEF_BT81X)            
-            else if (TYPE_ASTC_FLASH == pbmpHD[i].len) {
-                /* 
-                reuse the len_lut for the flash address in setbitmap command use
-                when using flash to display raw (only for ASTC)
-                no RAM is needed, EVE render directly from Flash
-                */
-                pbmpHD[i].len_lut = appFlashAddr(pbmpHD[i].path);
-                pbmpHD[i].len = 0;
-            } else if (TYPE_Z_FLASH == pbmpHD[i].len) {
-                appFlashUnzip(pbmpHD[i].path, src);
-                pbmpHD[i].len = appGetLinestride(pbmpHD[i])*pbmpHD[i].high;
-            } else if (TYPE_FLASH == pbmpHD[i].len) {
-                pbmpHD[i].len = appFlashLen(pbmpHD[i].path);
-                if (appFlashToEVE(appFlashAddr(pbmpHD[i].path), src, pbmpHD[i].len)) {
-                    FTPRINT("\nappLoadBmp: flash to eve fail");
-                }
-            }
-#endif
-        } else {
-            FTPRINT("\nappLoadBmp: Len 0");
+        pbmpHD[i].len = appFileToRamG(pbmpHD[i].path,src,1,0,0);
+        if (appLenTricks(&pbmpHD[i], 0, src)){
+            FTPRINT("\nappLoadBmp: Len error");
             return APP_ERR_LEN;
         }
         src += pbmpHD[i].len;
@@ -351,22 +375,10 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
         if (PALETTED8 == pbmpHD[i].format || 
             PALETTED565 == pbmpHD[i].format || 
             PALETTED4444 == pbmpHD[i].format) {
-            /* only when lut_src == 0, set the src */
-            if (pbmpHD[i].lut_src == 0) {
-                pbmpHD[i].lut_src = src;
-            }
-            l = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
-            if (pbmpHD[i].len_lut == 0) {
-                /* only when input length == 0, set the real length */
-                pbmpHD[i].len_lut = l;
-            }
-            if (l) {
-                /* same reason as above, lookup table alway less than 1K */
-                if (TYPE_ZLIB == pbmpHD[i].len_lut) {
-                    pbmpHD[i].len_lut = 1024;
-                }
-            } else {
-                FTPRINT("\nappLoadBmp: 81X Lut 0");
+            pbmpHD[i].lut_src = src;
+            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
+            if (appLenTricks(&pbmpHD[i], 1, pbmpHD[i].lut_src)) {
+                FTPRINT("\nappLoadBmp: 81X Lut error");
                 return APP_ERR_LEN;
             }
 
@@ -375,19 +387,12 @@ appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 #else
         if (PALETTED == pbmpHD[i].format) {
             pbmpHD[i].lut_src = RAM_PAL;
-            /* only when length == 0, set the real length */
-            if (pbmpHD[i].len_lut == 0) {
-                pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
-            }
-            if (pbmpHD[i].len_lut) {
-                /* same reason as above, lookup table alway less than 1K */
-                if (TYPE_ZLIB == pbmpHD[i].len_lut) {
-                    pbmpHD[i].len_lut = 1024;
-                }
-            } else {
-                FTPRINT("\nappLoadBmp: 80X Lut 0");
+            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
+            
+            if (appLenTricks(&pbmpHD[i], 1, pbmpHD[i].lut_src)){
+                FTPRINT("\nappLoadBmp: 80X Lut error");
                 return APP_ERR_LEN;
-            }    
+            }
         }
 #endif
     }
@@ -832,7 +837,7 @@ FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
         HAL_CmdBufIn(BITMAP_HANDLE(i+bmpHdl));
         if (!appUseSetBitmp(src, pbmpHD+i)) {
             HAL_CmdBufIn(BITMAP_SOURCE(src));
-            HAL_CmdBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(pbmpHD[i]),pbmpHD[i].high));
+            HAL_CmdBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(&pbmpHD[i]),pbmpHD[i].high));
             /* 
              * select NEAREST or BILINEAR base on your image and requirement
              * NEAREST: make the image shap clear
@@ -1189,9 +1194,11 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
         /* 
         this setting seems better than right side
         in real pratice of AllyTech project
+        1058,40,0,20,
+        525,25,0,10,
          */
-        1058,40,0,20,//928,88,0,48, 
-        525,25,0,10,//525,32,0,3, 
+        928,88,0,48, 
+        525,32,0,3, 
         2,0,1,0,1};
 #elif defined(LCD_QVGA)
         408,70,0,10, 
@@ -1236,8 +1243,8 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
         B:2,1,0
         default: 6x6x6
         0: 8x8x8
-    HAL_Write32(REG_OUTBITS,0);
      */
+    HAL_Write32(REG_OUTBITS,0x1B6);
 
 #if defined(LCD_HVGA)
     HAL_ili9488();
