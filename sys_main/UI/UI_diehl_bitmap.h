@@ -117,9 +117,13 @@ FTVOID clear_screen(FTVOID)
     HAL_BufToReg(RAM_CMD,0);
 }
 
+//#define TST
 FTVOID diehl_3 (FTU32 para)
 {
 	static FTU8 flag = 0, i = 0, t = 0;
+#ifdef TST
+    FTU32 n = 9;
+#else
     FTU32 n = sizeof(bmp_header)/sizeof(bmpHDR_st);
 
 	/* only load each bitmap file once */
@@ -132,17 +136,56 @@ FTVOID diehl_3 (FTU32 para)
 		}
 		flag = 1;
 	}
+#endif
 
 	HAL_CmdBufIn(CMD_DLSTART);
-	HAL_CmdBufIn(CLEAR_COLOR_RGB(255,255,255));
+	HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
 	HAL_CmdBufIn(CLEAR(1,1,1));
-	
+#ifdef TST
+    switch (i) {
+        case 1:
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-ALPHA");
+            CoCmd_GRADIENTA(0,0,0xff00ff00,800,0,0x0000ff00);
+            break;
+        case 2:
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-ALPHA");
+            CoCmd_GRADIENTA(0,0,0xffff0000,800,0,0x00ff0000);
+            break;
+        case 3:
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-ALPHA");
+            CoCmd_GRADIENTA(0,0,0xff0000ff,800,0,0x000000ff);
+            break;
+        case 4:
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-ALPHA");
+            CoCmd_GRADIENTA(0,0,0xffA0A0A0,800,0,0x00a0a0a0);
+            break;
+        case 5:
+            CoCmd_GRADIENT(0,0,0x000000,800,0,0xff0000);
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-NO-ALPHA");
+            break;
+        case 6:
+            CoCmd_GRADIENT(0,0,0x000000,800,0,0x00ff00);
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-NO-ALPHA");
+            break;
+        case 7:
+            CoCmd_GRADIENT(0,0,0x000000,800,0,0x0000ff);
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-NO-ALPHA");
+            break;
+        case 8:
+            CoCmd_GRADIENT(0,0,0x000000,800,0,0xa0a0a0);
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"TEST FOR THE GRADIENT-NO-ALPHA");
+            break;
+        default:
+	        CoCmd_TEXT(EVE_LCD_WIDTH/2,EVE_LCD_HIGH/2,28,OPT_CENTER,"PRESS TO START");
+            break;
+    }
+#else
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_START));
     HAL_CmdBufIn(CELL(0));
     Image(i,0,0);
     Title(i,0,0);
-
+#endif
     HAL_CmdBufIn(END());
     HAL_CmdBufIn(DISPLAY());
 	HAL_CmdBufIn(CMD_SWAP);

@@ -1241,8 +1241,11 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
         R:8,7,6
         G:5,4,3
         B:2,1,0
-        default: 6x6x6
-        0: 8x8x8
+        0x000 stands for 8x8x8x
+        default:
+        FT810/1: 0x1B6(6x6x6)
+        FT812/3: 0    (8x8x8)
+        BT815/6: 0    (8x8x8)
      */
     HAL_Write32(REG_OUTBITS,0x1B6);
 

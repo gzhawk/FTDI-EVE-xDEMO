@@ -176,6 +176,13 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
                                     HAL_CmdBufIn((FTU32)(y1)<<16|(FTU32)(x1)); \
                                     HAL_CmdBufIn((FTU32)(rgb1))
 
+#define CoCmd_GRADIENTA(x0, y0, argb0, x1, y1, argb1) HAL_CmdBufIn(CMD_GRADIENTA); \
+                                    HAL_CmdBufIn((FTU32)(y0)<<16|(FTU32)(x0)); \
+                                    HAL_CmdBufIn((FTU32)(argb0)); \
+                                    HAL_CmdBufIn((FTU32)(y1)<<16|(FTU32)(x1)); \
+                                    HAL_CmdBufIn((FTU32)(argb1))
+
+
 #define CoCmd_VIDEOSTART            HAL_CmdBufIn(CMD_VIDEOSTART)
 
 #define CoCmd_VIDEOFRAME(disp, flag)         HAL_CmdBufIn(CMD_VIDEOFRAME); \
