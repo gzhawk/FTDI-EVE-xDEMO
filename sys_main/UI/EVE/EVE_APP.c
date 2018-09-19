@@ -318,6 +318,7 @@ FTU8 appLenTricks(bmpHDR_st *pbmpHD, FTU8 Pal, FTU32 addr)
 
         if (TYPE_ZLIB == type) {
             pbmpHD->len_lut = 1024;
+#if defined(DEF_BT81X)
         } else if (TYPE_Z_FLASH == type) {
             appFlashUnzip(pbmpHD->path_lut, addr);
             pbmpHD->len_lut = 1024;
@@ -326,6 +327,7 @@ FTU8 appLenTricks(bmpHDR_st *pbmpHD, FTU8 Pal, FTU32 addr)
             if (appFlashToEVE(appFlashAddr(pbmpHD->path_lut), addr, pbmpHD->len_lut)) {
                 FTPRINT("\nappLenTricks: pal flash to eve fail");
             }
+#endif
         } else if (!type) {
             FTPRINT("\nappLenTricks: pal type len error");
             return 1;
@@ -335,6 +337,7 @@ FTU8 appLenTricks(bmpHDR_st *pbmpHD, FTU8 Pal, FTU32 addr)
 
         if (TYPE_ZLIB == type) {
             pbmpHD->len = appGetLinestride(pbmpHD)*pbmpHD->high;
+#if defined(DEF_BT81X)
         } else if (TYPE_ASTC_FLASH == type) {
             /* 
                reuse the len_lut for the flash address in setbitmap command use
@@ -351,6 +354,7 @@ FTU8 appLenTricks(bmpHDR_st *pbmpHD, FTU8 Pal, FTU32 addr)
             if (appFlashToEVE(appFlashAddr(pbmpHD->path), addr, pbmpHD->len)) {
                 FTPRINT("\nappLenTricks: flash to eve fail");
             }
+#endif
         } else if (!type) {
             FTPRINT("\nappLenTricks: type len error");
             return 1;
