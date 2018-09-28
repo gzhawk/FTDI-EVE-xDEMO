@@ -80,6 +80,15 @@ FTVOID HAL_Cfg ( FTU8 cfg )
     digitalWrite(EVE_SPI_CS, HIGH);
 }
 
+FTVOID HAL_Cfg3 ( FTU32 cfg3 )
+{
+    digitalWrite(EVE_SPI_CS, LOW);
+    SPI.transfer(cfg3);
+    SPI.transfer((cfg3 >> 8) && 0xFF);
+    SPI.transfer((cfg3 >> 16) && 0xFF);
+    digitalWrite(EVE_SPI_CS, HIGH);
+}
+
 FTU8 HAL_Read8 ( FTU32 addr )
 {
     FTU8 tmp;

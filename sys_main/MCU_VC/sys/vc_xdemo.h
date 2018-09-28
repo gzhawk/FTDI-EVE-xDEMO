@@ -180,6 +180,7 @@ FTU8 HAL_ZlibCompressed (FTU32 handle, FTU32 src);
 
 
 FTVOID HAL_Cfg ( FTU8 cfg );
+FTVOID HAL_Cfg3 ( FTU32 cfg3 );
 FTVOID HAL_Write8 ( FTU32 addr, FTU8 data );
 FTVOID HAL_Write8Src ( FTU32 addr, FTU8 *src, FTU32 len );
 FTVOID HAL_Write16 ( FTU32 addr, FTU16 data );

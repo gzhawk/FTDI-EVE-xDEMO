@@ -85,6 +85,18 @@ FTVOID HAL_Cfg ( FTU8 cfg )
     FT9XX_CS_HIGH;
 }
 
+FTVOID HAL_Cfg3 ( FTU32 cfg3 )
+{
+    FTU8 tmp[FT9XX_SPI_TXLEN] = {0};
+    tmp[0] = cfg3;
+    tmp[1] = cfg3>>8;
+    tmp[2] = cfg3>>16;
+
+    FT9XX_CS_LOW;
+    spi_writen(SPIM,tmp,FT9XX_SPI_TXLEN);
+    FT9XX_CS_HIGH;
+}
+
 FTU8 HAL_Read8 ( FTU32 addr )
 {
     FTU8 tmp[4] = {0};

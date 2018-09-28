@@ -106,6 +106,20 @@ FTVOID HAL_Cfg ( FTU8 cfg )
     EVE_CS_HIGH;
 }
 
+FTVOID HAL_Cfg3 ( FTU32 cfg3 )
+{
+    EVE_CS_LOW;
+
+    STM32_SPISend(cfg3);
+
+    STM32_SPISend(cfg3>>8);
+
+    STM32_SPISend(cfg3>>16);
+
+    while( SPI_GetFlagStatus(EVE_SPI, SPI_I2S_FLAG_BSY));
+    EVE_CS_HIGH;
+}
+
 FTU8 HAL_Read8 ( FTU32 addr )
 {
     FTU8 tmp;

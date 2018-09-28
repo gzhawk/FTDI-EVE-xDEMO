@@ -326,7 +326,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.C.48.1"
+#define APPS_VER "5.C.48.2"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
@@ -344,6 +344,12 @@
  * may enable the print for debug purpose
  */
 #define DBG_PRINT
+
+/* 
+ * default consider using 8x8x8 (24bits) LCD 
+ * if your LCD is 6x6x6 (18bits) define it 
+#define LCD_18BITS
+ */
 
 /* 
  * when not using external OSC, recommend to do the clock trimming

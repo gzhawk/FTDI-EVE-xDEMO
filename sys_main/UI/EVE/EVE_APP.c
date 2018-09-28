@@ -965,6 +965,15 @@ STATIC FTVOID appUI_EVEClk ( FTVOID )
     /* default 48MHz, no need to config
     HAL_Cfg(FT_GPU_PLL_48M);  
     */
+
+    /* for BT81X, you may select EVE system clock
+    HAL_Cfg(FT_GPU_SLEEP_M); 
+    FTDELAY(50);
+    HAL_Cfg3(GPU_SYSCLK_72M);
+    FTDELAY(50);
+    HAL_Cfg(FT_GPU_ACTIVE_M);
+    FTDELAY(50);
+    */
 #endif
     FTDELAY(CLK_DELAY);
 }
@@ -1196,8 +1205,8 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
            some smaller number (set to 1), may case under run issue 
            while too much commands needs to be executed*/
         /* 
-        this setting seems better than right side
-        in real pratice of AllyTech project
+        this setting seems better than SampleApp (below)
+        setting in some project
         1058,40,0,20,
         525,25,0,10,
          */
@@ -1211,7 +1220,6 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
 #elif defined(LCD_HVGA)
         400,40,0,10, 
         500,10,0, 5, 
-        //4,2,1,1,1};
         5,2,1,1,1}; //for ME810A_HV35R pclk is 5
 #elif defined(LCD_WQVGA)
         548,43,0,41, 
@@ -1251,7 +1259,11 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
         FT812/3: 0    (8x8x8)
         BT815/6: 0    (8x8x8)
      */
+#if defined(LCD_18BITS)
     HAL_Write32(REG_OUTBITS,0x1B6);
+#else 
+    HAL_Write32(REG_OUTBITS,0);
+#endif
 
 #if defined(LCD_HVGA)
     HAL_ili9488();

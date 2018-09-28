@@ -33,13 +33,13 @@
 bmpHDR_st bmp_header[] = {
     //{IMG1_INX,  IMG1_LUT, 0,PALETTED8, 0, 0, 800, 480},
     {IMG1_ASTC, 0,        0, COMPRESSED_RGBA_ASTC_4x4_KHR, 0, 0, 800, 480},
-    {IMG1_RGB565,      0, 0,RGB565,    0, 0, 800, 480},
+    //{IMG1_RGB565,      0, 0,RGB565,    0, 0, 800, 480},
     //{IMG2_INX,  IMG2_LUT, 0,PALETTED8, 0, 0, 800, 480},
     {IMG2_ASTC, 0,        0, COMPRESSED_RGBA_ASTC_4x4_KHR, 0, 0, 800, 480},
-    {IMG2_RGB565,      0, 0,RGB565,    0, 0, 800, 480},
+    //{IMG2_RGB565,      0, 0,RGB565,    0, 0, 800, 480},
     //{IMG3_INX,  IMG3_LUT, 0,PALETTED8, 0, 0, 800, 480},
     {IMG3_ASTC, 0,        0, COMPRESSED_RGBA_ASTC_4x4_KHR, 0, 0, 800, 480},
-    {IMG3_RGB565,      0, 0,RGB565,    0, 0, 800, 480},
+    //{IMG3_RGB565,      0, 0,RGB565,    0, 0, 800, 480},
 };
 
 FTVOID dispTEXT (FTU32 format, FTU32 X, FTU32 Y)
@@ -118,9 +118,14 @@ FTVOID clear_screen(FTVOID)
 }
 
 //#define TST
+#define TICK_DELAY 200
 FTVOID diehl_3 (FTU32 para)
 {
 	static FTU8 flag = 0, i = 0, t = 0;
+#if !defined(CAL_NEEDED)
+    static FTU8 tick = 0;
+#endif
+
 #ifdef TST
     FTU32 n = 9;
 #else
@@ -193,6 +198,12 @@ FTVOID diehl_3 (FTU32 para)
     HAL_BufToReg(RAM_CMD,0);
 	appGP.appIndex = 0;
 
+#if !defined(CAL_NEEDED)
+    if (++tick == TICK_DELAY) {
+        tick = 0;
+        t = 1;
+    }
+#else
     /* hang if no touch */
     while (!TOUCHED);
 
@@ -200,6 +211,7 @@ FTVOID diehl_3 (FTU32 para)
     while (TOUCHED) {
         t = 1;
     };
+#endif
 
     /* switch image if release from touching */
     if (t) {

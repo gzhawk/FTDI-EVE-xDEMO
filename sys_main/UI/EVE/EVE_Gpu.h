@@ -702,13 +702,61 @@ typedef enum {
 }FT_GPU_PLL_FREQ_T;
 
 typedef enum {
-    FT_GPU_ACTIVE_M =  0x00,  
-    FT_GPU_STANDBY_M = 0x41,//default
-    FT_GPU_SLEEP_M =   0x42,
+    FT_GPU_ACTIVE_M =    0x00,  
+    FT_GPU_STANDBY_M =   0x41,//default
+    FT_GPU_SLEEP_M =     0x42,
     FT_GPU_POWERDOWN_M = 0x50,
 }FT_GPU_POWER_MODE_T;
 
-#define FT_GPU_CORE_RESET   0x68
+typedef enum {
+    GPU_SYSCLK_DEFAULT = 0x61,  //default 60mhz
+    GPU_SYSCLK_72M = (0x61 | (0x40 << 8) | (0x06 << 8)), 
+    GPU_SYSCLK_60M = (0x61 | (0x40 << 8) | (0x05 << 8)),  
+    GPU_SYSCLK_48M = (0x61 | (0x40 << 8) | (0x04 << 8)),  
+    GPU_SYSCLK_36M = (0x61 | (0x03 << 8)),
+    GPU_SYSCLK_24M = (0x61 | (0x02 << 8)),
+}GPU_81X_PLL_FREQ_T;
+
+typedef enum{
+    GPU_MAIN_ROM =     0x80, //main graphicas ROM used 
+    GPU_RCOSATAN_ROM = 0x40, //line slope table used for 
+    GPU_SAMPLE_ROM =   0x20, //JA samples
+    GPU_JABOOT_ROM =   0x10, //JA microcode
+    GPU_J1BOOT_ROM =   0x08, //J1 microcode
+    GPU_ADC =          0x01, //
+    GPU_POWER_ON_ROM_AND_ADC = 0x00,  //specify this element to power on all ROMs and ADCs
+}GPU_81X_ROM_AND_ADC_T;
+
+typedef enum{
+    GPU_5MA =  0x00,  //default current
+    GPU_10MA = 0x01,
+    GPU_15MA = 0x02,
+    GPU_20MA = 0x03,
+}GPU_81X_GPIO_DRIVE_STRENGTH_T;
+
+typedef enum{
+    GPU_GPIO0 = 0x00,
+    GPU_GPIO1 = 0x04,
+    GPU_GPIO2 = 0x08,
+    GPU_GPIO3 = 0x0C,
+    GPU_GPIO4 = 0x10,
+    GPU_DISP =  0x20,
+    GPU_DE =    0x24,
+    GPU_VSYNC_HSYNC = 0x28,
+    GPU_PCLK =  0x2C,
+    GPU_BACKLIGHT =   0x30,
+    GPU_R_G_B = 0x34,
+    GPU_AUDIO_L =     0x38,
+    GPU_INT_N = 0x3C,
+    GPU_TOUCHWAKE =   0x40,
+    GPU_SCL =   0x44,
+    GPU_SDA =   0x48,
+    GPU_SPI_MISO_MOSI_IO2_IO3 = 0x4C,
+}GPU_81X_GPIO_GROUP_T;
+
+#define GPU_81X_RESET_ACTIVE  0x000268
+#define GPU_81X_RESET_REMOVAL 0x002068
+#define FT_GPU_CORE_RESET     0x68
 
 typedef struct FT_Gpu_Fonts
 {

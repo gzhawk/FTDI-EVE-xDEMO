@@ -144,6 +144,36 @@ FTVOID HAL_Cfg ( FTU8 cfg )
 #endif
 }
 
+FTVOID HAL_Cfg3 ( FTU32 cfg3 )
+{
+#if defined(VC_MPSSE)
+    FTU32 send;
+    FTU8 tmp[SPI_TXCMD_LEN] = {0};
+
+    tmp[0] = cfg3;
+    tmp[1] = cfg3>>8;
+    tmp[2] = cfg3>>16;
+
+    SPI_Write(ftHandle,tmp,SPI_TXCMD_LEN,&send, 
+            SPI_TRANSFER_OPTIONS_SIZE_IN_BYTES | 
+            SPI_TRANSFER_OPTIONS_CHIPSELECT_ENABLE | 
+            SPI_TRANSFER_OPTIONS_CHIPSELECT_DISABLE);
+#elif defined(VC_FT4222)
+    FTU8 tmp[SPI_TXADDR_LEN] = {0};
+
+    tmp[0] = cfg3;
+    tmp[1] = cfg3>>8;
+    tmp[2] = cfg3>>16;
+
+    ft4222_spi_wt(tmp, 0);
+#elif defined(VC_EMULATOR)
+    FT8XXEMU_transfer(cfg3);
+    FT8XXEMU_transfer(cfg3>>8);
+    FT8XXEMU_transfer(cfg3>>16);
+#else
+#endif
+}
+
 FTVOID HAL_Write8 ( FTU32 addr, FTU8 data )
 {
 #if defined(VC_MPSSE)
