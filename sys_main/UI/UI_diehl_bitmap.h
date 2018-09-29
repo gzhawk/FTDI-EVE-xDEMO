@@ -105,7 +105,6 @@ FTVOID Image(FTU32 index, FTU32 X, FTU32 Y)
         HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
     }
 
-    Title(index,X,Y);
 }
 
 FTVOID clear_screen(FTVOID)
@@ -190,6 +189,7 @@ FTVOID diehl_3 (FTU32 para)
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_START));
     HAL_CmdBufIn(CELL(0));
     Image(i,0,0);
+    Title(i,0,0);
 #endif
     HAL_CmdBufIn(END());
     HAL_CmdBufIn(DISPLAY());

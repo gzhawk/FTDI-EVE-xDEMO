@@ -9,7 +9,7 @@
 #define _PLATFORM_H_
 
 /*TODO: define your selected UI_XXX here */
-#define UI_D_BITMAP
+#error "#define UI_XXX"
 
 /* 
     actually, nowhere using ARDUINO define
