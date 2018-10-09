@@ -1192,18 +1192,23 @@ STATIC FTVOID appUI_EVEClkTrim ( FTVOID )
 }
 STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
 {
-    /*
-       Width Height 
-       HCycle HOffset HSync0 HSync1 
-       VCycle VOffset VSync0 VSync1 
-       PCLK Swizzle PCLKPol Cspread Dither
+    /* 
+       PCLK is critical,
+       sometime it may need to set to larger number (2,3)
+       some smaller number (set to 1), may case under run issue 
+       while too much commands needs to be executed
      */
     EVE_LCD lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
-#if defined(LCD_WVGA)
-        /* PCLK is critical,
-           sometime it may need to set to larger number (2,3)
-           some smaller number (set to 1), may case under run issue 
-           while too much commands needs to be executed*/
+        /*
+           HCycle HOffset HSync0 HSync1 
+           VCycle VOffset VSync0 VSync1 
+           PCLK Swizzle PCLKPol Cspread Dither
+         */
+#if defined(LCD_WXGA)
+        1440,38,0,16,
+        838,8,0,2,
+        1,0,0,0,0};
+#elif defined(LCD_WVGA)
         /* 
         this setting seems better than SampleApp (below)
         setting in some project

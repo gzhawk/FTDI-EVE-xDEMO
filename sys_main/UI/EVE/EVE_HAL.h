@@ -7,6 +7,8 @@
 
 #ifndef _EVE_HAL_H_
 #define _EVE_HAL_H_
+#define WXGA_WIDTH  1280
+#define WXGA_HIGH   800
 
 #define WVGA_WIDTH  800
 #define WVGA_HIGH   480
@@ -20,7 +22,10 @@
 #define HVGA_WIDTH  320
 #define HVGA_HIGH   480
 
-#if defined(LCD_WVGA)
+#if defined(LCD_WXGA)
+#define EVE_LCD_WIDTH WXGA_WIDTH
+#define EVE_LCD_HIGH  WXGA_HIGH
+#elif defined(LCD_WVGA)
 #define EVE_LCD_WIDTH WVGA_WIDTH
 #define EVE_LCD_HIGH  WVGA_HIGH
 #elif defined(LCD_QVGA)
