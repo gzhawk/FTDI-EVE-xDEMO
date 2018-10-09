@@ -1039,7 +1039,12 @@ STATIC FTVOID appUI_EVETchCfg ( FTVOID )
     FTDELAY(300);
     HAL_Write8(REG_CPURESET, 2);
     FTDELAY(300);
+#ifdef DEF_GOODIX
+    /* for Goodix touch panel, I don't know why */
+    HAL_Write16(REG_CYA_TOUCH,0x05D0);
+#else
     HAL_Write16(REG_CYA_TOUCH,(HAL_Read16(REG_CYA_TOUCH) & 0x7fff));
+#endif
     FTDELAY(300);
     HAL_Write8(REG_CPURESET, 0);
     FTDELAY(300);
@@ -1276,6 +1281,12 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
 
     /* start to display */
     HAL_Write8(REG_PCLK,lcd.PCLK);
+
+#if defined(DEF_BT81X)
+    /* if you want to enable adaptive frame rate 
+    set it to 1*/
+    HAL_Write8(REG_ADAPTIVE_FRAMERATE, 0);
+#endif
 }
 
 STATIC FTU8 appUI_EVEVerify (FTVOID)

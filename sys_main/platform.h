@@ -39,7 +39,8 @@
 #if defined(UI_WXGA)
 #define DEF_BT81X
 #define LCD_WXGA
-#define DEF_CAP_MULTI
+#define DEF_CAP_NONMULTI
+#define DEF_GOODIX
 
 #if (defined(FT9XXEV) || \
      defined(VC_FT4222))
@@ -348,7 +349,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.C.49.0"
+#define APPS_VER "5.C.49.1"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
