@@ -200,37 +200,6 @@ STATIC FTVOID ally_disp_dxt1 (FTU32 X, FTU32 Y, FTU32 addr, FTU32 hdl)
 	HAL_BufToReg(RAM_CMD,0);
 }
 
-FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
-{
-    HAL_CmdBufIn(SAVE_CONTEXT());
-    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
-    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
-    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-    HAL_CmdBufIn(RESTORE_CONTEXT());
-}
-
 FTVOID ally_disp_pal8(FTU8 mode)
 {
     HAL_CmdBufIn(CMD_DLSTART);
@@ -239,7 +208,7 @@ FTVOID ally_disp_pal8(FTU8 mode)
 
     HAL_CmdBufIn(BEGIN(BITMAPS));
 
-    dispPal8(0,0,GRAM_ADDR_PAL8_LUT, HDL_PAL8, 0);
+    appDispPalette8(0,0,GRAM_ADDR_PAL8_LUT, HDL_PAL8, 0);
 
     HAL_CmdBufIn(END());
     HAL_CmdBufIn(DISPLAY());

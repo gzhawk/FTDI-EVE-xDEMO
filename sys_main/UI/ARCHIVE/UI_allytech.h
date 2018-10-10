@@ -40,39 +40,6 @@ FTU32 needle_cut[81] = {
 0,0,0,0,598,452,0,0,0,0,
 0,0,0,0,0,0,0,0,0,534,598};
 
-FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
-{
-    /* every thing after this commands would not display
-       if not use save/restore context */
-    HAL_CmdBufIn(SAVE_CONTEXT());
-    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
-    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
-    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-    HAL_CmdBufIn(RESTORE_CONTEXT());
-}
-
 FTVOID allytech_speed (FTU32 para)
 {
 #define SPEED_START 0
@@ -146,7 +113,7 @@ FTVOID allytech_bitmap (FTU32 para)
 
     HAL_CmdBufIn(BEGIN(BITMAPS));
 	/* meter background */
-	dispPal8(0,0,bmp_header[0].lut_src,0,0);
+	appDispPalette8(0,0,bmp_header[0].lut_src,0,0);
 
 	/* shadow cutted area: load full shadow, blue or red */
     if (speed <= NUM_BLUE) {
@@ -159,7 +126,7 @@ FTVOID allytech_bitmap (FTU32 para)
     HAL_CmdBufIn(SAVE_CONTEXT());
     HAL_CmdBufIn(SCISSOR_XY(SHADOW_X,0));
     HAL_CmdBufIn(SCISSOR_SIZE(needle_cut[speed],bmp_header[i_shadow].high));
-    dispPal8(SHADOW_X,0,bmp_header[i_shadow].lut_src,i_shadow,0);
+    appDispPalette8(SHADOW_X,0,bmp_header[i_shadow].lut_src,i_shadow,0);
     HAL_CmdBufIn(RESTORE_CONTEXT());
 
 	/* needle cutted area */
@@ -176,7 +143,7 @@ FTVOID allytech_bitmap (FTU32 para)
         if (APP_OK != appLoadBmp(bmp_header[i_needle].lut_src-bmp_header[i_needle].len,&bmp_header[i_needle],1) ) {
             return;
         }
-		dispPal8(SHADOW_X+needle_cut[speed],0,bmp_header[i_needle].lut_src,i_needle,0);
+		appDispPalette8(SHADOW_X+needle_cut[speed],0,bmp_header[i_needle].lut_src,i_needle,0);
 	}
 
     HAL_CmdBufIn(END());

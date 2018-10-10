@@ -221,39 +221,6 @@ STATIC FTU32 loadResources (FTVOID)
     return 0;
 }
 
-FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
-{
-    /* every thing after this commands would not display
-       if not use save/restore context */
-    HAL_CmdBufIn(SAVE_CONTEXT());
-    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
-    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
-    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-    HAL_CmdBufIn(RESTORE_CONTEXT());
-}
-
 STATIC FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
 {
 #define DXT1_BLOCK_NUMS (4)
@@ -933,8 +900,8 @@ STATIC FTVOID dispDate (FTVOID)
 	CoCmd_LOADIDENTITY;
     CoCmd_SCALE(MASK_ENLARGE*EVE_TRANSFORM_MAX,EVE_TRANSFORM_MAX);
 	CoCmd_SETMATRIX;
-    dispPal8(DATEYEAR_X,DATE_NUM_UP_2_Y,imgHeader[HDL_MASK].lut_src,HDL_MASK,0);
-    dispPal8(DATEYEAR_X,DATE_NUM_DOWN_2_Y+15,imgHeader[HDL_MASK_D].lut_src,HDL_MASK_D,0);
+    appDispPalette8(DATEYEAR_X,DATE_NUM_UP_2_Y,imgHeader[HDL_MASK].lut_src,HDL_MASK,0);
+    appDispPalette8(DATEYEAR_X,DATE_NUM_DOWN_2_Y+15,imgHeader[HDL_MASK_D].lut_src,HDL_MASK_D,0);
 	HAL_CmdBufIn(RESTORE_CONTEXT());
    
     HAL_CmdBufIn(END());

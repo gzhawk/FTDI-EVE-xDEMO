@@ -95,39 +95,6 @@ FTVOID getXYfrmCenter(FT16 Angle, FT16 *pX, FT16 *pY)
 #endif
 }
 
-FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
-{
-    /* every thing after this commands would not display
-       if not use save/restore context */
-    HAL_CmdBufIn(SAVE_CONTEXT());
-    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
-    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
-    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-    HAL_CmdBufIn(RESTORE_CONTEXT());
-}
-
 FTVOID ally_modeb (FTU32 para)
 {
     static FTU8 flag = 0;
@@ -160,7 +127,7 @@ FTVOID ally_modeb (FTU32 para)
     HAL_CmdBufIn(BEGIN(BITMAPS));
 
     /* display background */
-    dispPal8(0,0,bmp_header[1].lut_src, 1, 0);
+    appDispPalette8(0,0,bmp_header[1].lut_src, 1, 0);
 
     /* display rotated needle */
     HAL_CmdBufIn(SAVE_CONTEXT());
@@ -174,7 +141,7 @@ FTVOID ally_modeb (FTU32 para)
     getXYfrmCenter(i,&Nx,&Ny);
     Nx -= bmp_header[0].high;
     Ny -= bmp_header[0].high;
-    dispPal8(Nx,Ny,bmp_header[0].lut_src, 0, 0);
+    appDispPalette8(Nx,Ny,bmp_header[0].lut_src, 0, 0);
     HAL_CmdBufIn(RESTORE_CONTEXT()); 
 
     HAL_CmdBufIn(END());

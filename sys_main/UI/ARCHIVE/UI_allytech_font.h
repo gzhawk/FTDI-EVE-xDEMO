@@ -34,39 +34,6 @@ bmpHDR_st bmp_header[PIC_NUM] = {
 FTU8 screen_title[FONT_NUM] = {1,2,3,4,5,6,7,8,9,10,0}; 
 FT_Gpu_Fonts_t stFontBlock;
 
-FTVOID dispPal8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
-{
-    /* every thing after this commands would not display
-       if not use save/restore context */
-    HAL_CmdBufIn(SAVE_CONTEXT());
-    HAL_CmdBufIn(BLEND_FUNC(ONE, ZERO));
-    HAL_CmdBufIn(COLOR_MASK(0,0,0,1));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 3));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA, ONE_MINUS_DST_ALPHA));
-    HAL_CmdBufIn(COLOR_MASK(1,0,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 2));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,1,0,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 1));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(COLOR_MASK(0,0,1,0));
-    HAL_CmdBufIn(PALETTE_SOURCE(PalSrc + 0));
-    HAL_CmdBufIn(BITMAP_HANDLE(hdl));
-    HAL_CmdBufIn(CELL(cell));
-    HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-    HAL_CmdBufIn(RESTORE_CONTEXT());
-}
 FTVOID ally_font_main (FTU32 para)
 {
 	static FTU8 init;
@@ -166,7 +133,7 @@ FTVOID ally_font_main (FTU32 para)
     
     /* Palette use different way to display */
     h += bmp_header[1].high;
-    dispPal8(100,h,bmp_header[I_PAL8].lut_src,I_PAL8,0);
+    appDispPalette8(100,h,bmp_header[I_PAL8].lut_src,I_PAL8,0);
     HAL_CmdBufIn(END());
 
     /* font display */
