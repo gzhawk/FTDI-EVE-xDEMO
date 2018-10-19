@@ -212,7 +212,6 @@
     defined(UI_BITMAP) || \
     defined(UI_LIERDA)) || \
     defined(UI_ALLY_MODEB) || \
-    defined(UI_ALLY_SWAP) || \
     defined(UI_JPGDISP) || \
     defined(UI_SLIP_M) || \
     defined(UI_NJTOYO) || \
