@@ -64,8 +64,8 @@ app_para_t appGP = {0};
 #include "UI_welling.h"
 #elif defined(UI_COOBOT)
 #include "UI_coobot.h"
-#elif defined(UI_STELIGENT)
-#include "UI_steligent.h"
+#elif defined(UI_METER)
+#include "UI_meter.h"
 #elif defined(UI_BITMAP)
 #include "UI_bitmap.h"
 #elif defined(UI_DISPRAW)

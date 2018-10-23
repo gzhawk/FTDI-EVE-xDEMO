@@ -11,9 +11,9 @@ FTU8 pre_tag = 0;
 FTU32 key_data = 0;
 
 #if defined(FILESYS_USED)
-#define LOGO1_PATH ROOT_PATH"steligent\\logo1.raw"
-#define LOGO2_PATH ROOT_PATH"steligent\\logo2.raw"
-#define TRI_PATH ROOT_PATH"steligent\\tri.raw"
+#define LOGO1_PATH ROOT_PATH"meter\\logo1.raw"
+#define LOGO2_PATH ROOT_PATH"meter\\logo2.raw"
+#define TRI_PATH ROOT_PATH"meter\\tri.raw"
 #else
 #define LOGO1_PATH ROOT_PATH"logo1.raw"
 #define LOGO2_PATH ROOT_PATH"logo2.raw"

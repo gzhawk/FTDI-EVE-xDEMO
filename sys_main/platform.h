@@ -193,7 +193,7 @@
     defined(UI_BITMAP) || \
     defined(UI_DASHBOARD) || \
     defined(UI_JPGDISP) || \
-    defined(UI_STELIGENT))
+    defined(UI_METER))
 #define DEF_81X
 
 #if (defined(FT9XXEV) || \
@@ -303,7 +303,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.2"
+#define APPS_VER "5.D.3"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
