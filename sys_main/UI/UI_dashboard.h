@@ -5,10 +5,10 @@
 	Date  : 2016/May
 */
 
-#define DISPBP_XNDL ROOT_PATH"allymodeb\\sNdl_inx.bin"
-#define DISPBP_XNDL_LUT ROOT_PATH"allymodeb\\sNdl_lut.bin"
-#define DISPBP_PALETTE8 ROOT_PATH"allymodeb\\BG_inx.bin"
-#define DISPBP_PALETTE8_LUT ROOT_PATH"allymodeb\\BG_lut.bin"
+#define DISPBP_XNDL ROOT_PATH"dashboard\\sNdl_inx.bin"
+#define DISPBP_XNDL_LUT ROOT_PATH"dashboard\\sNdl_lut.bin"
+#define DISPBP_PALETTE8 ROOT_PATH"dashboard\\BG_inx.bin"
+#define DISPBP_PALETTE8_LUT ROOT_PATH"dashboard\\BG_lut.bin"
 
 typedef enum hdl_ {
     HDL_NEEDLE  = 0,
@@ -102,7 +102,7 @@ FTVOID getXYfrmCenter(FT16 Angle, FT16 *pX, FT16 *pY)
 #endif
 }
 
-FTVOID ally_modeb (FTU32 para)
+FTVOID dashboard (FTU32 para)
 {
     static FTU8 flag = 0;
     static FTU32 i=NDL_START;
@@ -175,6 +175,6 @@ FTVOID ally_modeb (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-    ally_modeb
+    dashboard
 };
 

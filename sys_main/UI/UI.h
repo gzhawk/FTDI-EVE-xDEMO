@@ -86,8 +86,8 @@ app_para_t appGP = {0};
 #include "UI_allytech_rotate.h"
 #elif defined(UI_NJTOYO)
 #include "UI_njtoyo.h"
-#elif defined(UI_ALLY_MODEB)
-#include "UI_ally_modeb.h"
+#elif defined(UI_DASHBOARD)
+#include "UI_dashboard.h"
 #elif defined(UI_ALLY_LCDTST)
 #include "UI_ally_lcdtst.h"
 #elif defined(UI_TOUCH)

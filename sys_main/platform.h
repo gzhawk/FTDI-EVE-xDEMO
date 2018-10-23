@@ -59,26 +59,6 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-#if defined(UI_D_BITMAP)
-#define DEF_BT81X
-#define LCD_WVGA
-#define DEF_CAP_NONMULTI
-
-#if (defined(FT9XXEV) || \
-     defined(VC_FT4222))
-#define EVE_SPI_TYPE 4
-#else
-#define EVE_SPI_TYPE 1
-#endif
-
-#if (defined(ARDUINO) || \
-     defined(STM32F4) || \
-     defined(DEF_80X))
-#error "not supported"
-#endif
-#endif
-
-/*----------------------------------------------------------------------------*/
 
 #if defined(UI_DIEHL)
 #define DEF_BT81X
@@ -211,7 +191,7 @@
 /*----------------------------------------------------------------------------*/
 #if (defined(UI_AVI) || \
     defined(UI_BITMAP) || \
-    defined(UI_ALLY_MODEB) || \
+    defined(UI_DASHBOARD) || \
     defined(UI_JPGDISP) || \
     defined(UI_STELIGENT))
 #define DEF_81X
@@ -337,7 +317,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.0"
+#define APPS_VER "5.D.1"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
