@@ -1,30 +1,30 @@
 /* 
-    Demo for AUPU
+    Demo on HVGA, use all kind of bitmap
     Author: Hawk
 	Email : hawk.gao@ftdichip.com
 	Date  : 2017/Aug
 */
 #define ROTATE_VALUE  2
-#define PATH_BKG_C0   ROOT_PATH"aupu\\bg_c0.raw"
-#define PATH_BKG_C1   ROOT_PATH"aupu\\bg_c1.raw"
-#define PATH_BKG_B0   ROOT_PATH"aupu\\bg_b0.raw"
-#define PATH_BKG_B1   ROOT_PATH"aupu\\bg_b1.raw"
+#define PATH_BKG_C0   ROOT_PATH"hvga\\bg_c0.raw"
+#define PATH_BKG_C1   ROOT_PATH"hvga\\bg_c1.raw"
+#define PATH_BKG_B0   ROOT_PATH"hvga\\bg_b0.raw"
+#define PATH_BKG_B1   ROOT_PATH"hvga\\bg_b1.raw"
 
-#define PATH_TXT_F    ROOT_PATH"aupu\\txt.raw"
+#define PATH_TXT_F    ROOT_PATH"hvga\\txt.raw"
 
-#define PATH_NUMBER   ROOT_PATH"aupu\\num.raw"
-#define PATH_LEFT_I   ROOT_PATH"aupu\\left_index.bin"
-#define PATH_LEFT_L   ROOT_PATH"aupu\\left_lut.bin"
-#define PATH_HOME_I   ROOT_PATH"aupu\\home_index.bin"
-#define PATH_HOME_L   ROOT_PATH"aupu\\home_lut.bin"
-#define PATH_OK_I     ROOT_PATH"aupu\\ok_index.bin"
-#define PATH_OK_L     ROOT_PATH"aupu\\ok_lut.bin"
-#define PATH_CLOCK_I  ROOT_PATH"aupu\\clock_index.bin"
-#define PATH_CLOCK_L  ROOT_PATH"aupu\\clock_lut.bin"
-#define PATH_MASK_I   ROOT_PATH"aupu\\mask_index.bin"
-#define PATH_MASK_L   ROOT_PATH"aupu\\mask_lut.bin"
-#define PATH_MASKD_I   ROOT_PATH"aupu\\mask_d_index.bin"
-#define PATH_MASKD_L   ROOT_PATH"aupu\\mask_d_lut.bin"
+#define PATH_NUMBER   ROOT_PATH"hvga\\num.raw"
+#define PATH_LEFT_I   ROOT_PATH"hvga\\left_index.bin"
+#define PATH_LEFT_L   ROOT_PATH"hvga\\left_lut.bin"
+#define PATH_HOME_I   ROOT_PATH"hvga\\home_index.bin"
+#define PATH_HOME_L   ROOT_PATH"hvga\\home_lut.bin"
+#define PATH_OK_I     ROOT_PATH"hvga\\ok_index.bin"
+#define PATH_OK_L     ROOT_PATH"hvga\\ok_lut.bin"
+#define PATH_CLOCK_I  ROOT_PATH"hvga\\clock_index.bin"
+#define PATH_CLOCK_L  ROOT_PATH"hvga\\clock_lut.bin"
+#define PATH_MASK_I   ROOT_PATH"hvga\\mask_index.bin"
+#define PATH_MASK_L   ROOT_PATH"hvga\\mask_lut.bin"
+#define PATH_MASKD_I   ROOT_PATH"hvga\\mask_d_index.bin"
+#define PATH_MASKD_L   ROOT_PATH"hvga\\mask_d_lut.bin"
 
 #define LCD_W         480
 #define LCD_H         320
@@ -921,17 +921,17 @@ STATIC FTVOID subUI (FTU32 uiIndex)
     HAL_BufToReg(RAM_CMD,0);
 }
 
-FTVOID aupu_time_ui (FTU32 para)
+FTVOID hvga_time_ui (FTU32 para)
 {
     subUI(1);
 }
 
-FTVOID aupu_date_ui (FTU32 para)
+FTVOID hvga_date_ui (FTU32 para)
 {
     subUI(2);
 }
 
-FTVOID aupu_main_ui (FTU32 para)
+FTVOID hvga_main_ui (FTU32 para)
 {
 #define TEST_H (40)
 #define TEST_X (LCD_W/2)
@@ -1006,7 +1006,7 @@ FTVOID aupu_main_ui (FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	aupu_main_ui,
-    aupu_time_ui,
-    aupu_date_ui
+	hvga_main_ui,
+    hvga_time_ui,
+    hvga_date_ui
 };

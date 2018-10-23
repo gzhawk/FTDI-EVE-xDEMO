@@ -232,7 +232,7 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-#if defined(UI_AUPU)
+#if defined(UI_HVGA)
 #define DEF_81X
 #define LCD_HVGA
 /* using RTP, no need to define DEF_CAP_... */
@@ -317,7 +317,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.1"
+#define APPS_VER "5.D.2"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
