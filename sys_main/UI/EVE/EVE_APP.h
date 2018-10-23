@@ -52,15 +52,41 @@ there would be three kinds of flash file location mark:
 #define EVE_DBG_BUF_LEN       (50)
 #endif
 typedef struct bmpHDR_ {
-    FTC8  *path;
-    FTC8  *path_lut; //for palette only
-    FTU32 lut_src;   //for palette only
     FTU32 format;
-    FTU32 len;
-    FTU32 len_lut;   //for palette only
     FTU32 wide;
     FTU32 high;
+    FTU32 info; /*address to memory which store more information
+                  of image such as file path, file length, etc.*/
 }bmpHDR_st;
+typedef struct ImgInfo_ {
+    FTC8  *path;
+    FTU32 handle;
+    FTU32 len;
+    FTU32 addr; /* address in EVE or Flash */
+}ImgInfo_st;
+typedef struct ImgInfoPal_ {
+    FTC8  *path_inx;
+    FTC8  *path_lut;
+    FTU32 handle;
+    FTU32 len_inx;
+    FTU32 len_lut;
+    FTU32 addr_inx; /* address in EVE or Flash */
+    FTU32 addr_lut; /* address in EVE or Flash */
+}ImgInfoPal_st;
+typedef struct ImgInfoDXT1_ {
+    FTU32 addr; /* address in EVE or Flash, 
+                   consider b0,b1,c0,c1 should
+                   be continuous stored */
+    FTU32 handle;
+    FTC8  *path_c0; /* the memory sequence should be */
+    FTU32 len_c0;   /* c0,c1,b0,b1                   */
+    FTC8  *path_c1;
+    FTU32 len_c1;
+    FTC8  *path_b0;
+    FTU32 len_b0;
+    FTC8  *path_b1;
+    FTU32 len_b1;
+}ImgInfoDXT1_st;
 typedef struct audio_hd_st {
     FTU8 * path;
     FTU32 index;
@@ -83,7 +109,7 @@ typedef FTVOID (* AppFunc) (FTU32);
 FTU8 appFileExist (FTC8 *path);
 FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FTU32 outLen);
 appRet_en appWaitCal (FTVOID);
-FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
+FTVOID appUI_FillBmpDL(FTU32 bmpHdl, bmpHDR_st *pbmpHD, FTU32 nums);
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums);
 FTU32 appGetLinestride(bmpHDR_st *bmpHD);
@@ -92,6 +118,7 @@ FTU32 appEveCRC(FTU32 eve_addr, FTU32 len);
 FTVOID appEveZERO(FTU32 eve_addr, FTU32 len);
 FTU8 appFlashPath (FTC8 *path, FTU32 *len);
 FTVOID SegmentOperation (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 toCoPro);
+FTVOID appDispDXT1 (FTU8 startHdl, FT16 X, FT16 Y);
 #if defined(DEF_81X) || defined(DEF_BT81X)
 FTVOID appDispPalette8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell);
 #endif

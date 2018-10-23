@@ -796,10 +796,16 @@ FTU8 bootup_show (FTVOID)
 FTVOID bootup_ui (FTU32 para)
 {
 #define LOGO_HOLD 800
+    ImgInfo_st info_header[] = {
+        {LOGO1_PATH,0,0,0},
+        {LOGO2_PATH,0,0,0},
+        {TRI_PATH,0,0,0},
+    };
+
 	bmpHDR_st bmp_header[LOGO_NUM+1] = {
-		{LOGO1_PATH,0,0,ARGB4,0,0,LOGO1_W,LOGO1_H},
-		{LOGO2_PATH,0,0,ARGB4,0,0,LOGO2_W,LOGO2_H},
-		{TRI_PATH,  0,0,ARGB4,0,0,TRI_W,  TRI_H}
+		{ARGB4,LOGO1_W,LOGO1_H,(FTU32)&info_header[0]},
+		{ARGB4,LOGO2_W,LOGO2_H,(FTU32)&info_header[1]},
+		{ARGB4,TRI_W,  TRI_H,(FTU32)&info_header[2]}
 	};
 	static FTU8 flag = 0;
 	FTU8 ret = 0;

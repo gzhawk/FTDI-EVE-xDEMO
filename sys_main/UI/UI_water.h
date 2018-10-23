@@ -6,20 +6,20 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "copy res/water/bt81x.flash to res/flash, then comment this line"
+//#error "copy res/water/bt81x.flash to res/flash, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
 #error "program res/water/bt81x.flash to on-board flash, then comment this line"
 #endif
 
-#define BKGRD_PATH         "FLASH:30976"
+#define BKGRD_PATH         "ASTC_FLASH@30976"
 #define BKGRD_X            0
 #define BKGRD_Y            0
 
-#define BAR_PATH           "FLASH:4096"
+#define BAR_PATH           "ASTC_FLASH@4096"
 #define BAR_X              0
 #define BAR_Y              0
 
-#define NUM_PATH           "FLASH:219776"
+#define NUM_PATH           "ASTC_FLASH@219776"
 #define NUM_X              13
 #define NUM_Y              69
 
@@ -32,7 +32,7 @@
 
 #define DOWN_W             128
 #define DOWN_H             64
-#define DOWN_1_PATH        "FLASH:211584"
+#define DOWN_1_PATH        "ASTC_FLASH@211584"
 #define DOWN_1_ANIM_ADDR   211456
 #define DOWN_1_ANIM_FRAM   10
 #define DOWN_1_X           34
@@ -40,14 +40,14 @@
 
 #define UP_W               48
 #define UP_H               52
-#define UP_1_PATH          "FLASH:860352"
+#define UP_1_PATH          "ASTC_FLASH@860352"
 #define UP_1_ANIM_ADDR     860224
 #define UP_1_ANIM_FRAM     10
 #define UP_1_X             144
 #define UP_1_Y             0
 
-#define SUB_UP_PATH        "FLASH:379904"
-#define SUB_DOWN_PATH      "FLASH:249344"
+#define SUB_UP_PATH        "ASTC_FLASH@379904"
+#define SUB_DOWN_PATH      "ASTC_FLASH@249344"
 
 /* I don't have 480x272 screen on my hand now,
    so use 800x480 screen to demonstrate it
@@ -61,15 +61,23 @@
 #define EVE_LCD_HIGH 272
 #endif
 */
-
+ImgInfo_st info_hdr[] = {
+    {BKGRD_PATH,   0,0,0},
+    {BAR_PATH,    0,0,0},
+    {NUM_PATH,    0,0,0},
+    {DOWN_1_PATH, 0,0,0},
+    {UP_1_PATH,   0,0,0},
+    {SUB_UP_PATH, 0,0,0},
+    {SUB_DOWN_PATH,0,0,0},
+};
 bmpHDR_st bmp_hdr_main[] = {
-    {BKGRD_PATH,  0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
-    {BAR_PATH,    0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,56},
-    {NUM_PATH,    0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,224,132},
-    {DOWN_1_PATH, 0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,DOWN_W,DOWN_H},
-    {UP_1_PATH,   0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,UP_W,UP_H},
-    {SUB_UP_PATH, 0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
-    {SUB_DOWN_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,EVE_LCD_HIGH,(FTU32)&info_hdr[0]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,56,          (FTU32)&info_hdr[1]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,224,132,                   (FTU32)&info_hdr[2]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,DOWN_W,DOWN_H,             (FTU32)&info_hdr[3]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,UP_W,UP_H,                 (FTU32)&info_hdr[4]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,EVE_LCD_HIGH,(FTU32)&info_hdr[5]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,EVE_LCD_HIGH,(FTU32)&info_hdr[6]},
 };
 
 #define HDL_START   0

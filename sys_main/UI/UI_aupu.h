@@ -81,14 +81,13 @@
 #define TRACK_MAX   65536
 
 typedef enum HDL_ {
-    HDL_NUMBER = 0, 
-    HDL_LEFT, 
+    HDL_LEFT = 0, 
     HDL_HOME, 
     HDL_OK,
     HDL_CLOCK,
     HDL_MASK,
     HDL_MASK_D,
-    /* same order in imgHeader */
+    HDL_NUMBER, 
     HDL_BKG_START,
     /* font and bitmap share the same handle,
        and DXT1 need to use two handle */
@@ -96,7 +95,7 @@ typedef enum HDL_ {
     HDL_MP_F, 
 } HDL_e;
 
-#define IMG_NUMBER    HDL_BKG_START
+#define IMG_NUMBER    HDL_BKG_START+1
 
 typedef enum TAG_ {
     TAG_HOME       = 1,
@@ -111,16 +110,38 @@ typedef enum TAG_ {
     TAG_DAY
 } TAG_e;
 
+ImgInfoPal_st iHDR[] = {
+    {PATH_LEFT_I, PATH_LEFT_L, 0,0,0,0,0},
+    {PATH_HOME_I, PATH_HOME_L, 0,0,0,0,0},
+    {PATH_OK_I,   PATH_OK_L,   0,0,0,0,0},
+    {PATH_CLOCK_I,PATH_CLOCK_L,0,0,0,0,0},
+    {PATH_MASK_I, PATH_MASK_L, 0,0,0,0,0},
+    {PATH_MASKD_I,PATH_MASKD_L,0,0,0,0,0},
+};
+
+ImgInfo_st iHDR_number = {
+    PATH_NUMBER,0,0,0
+};
+
+ImgInfoDXT1_st iHDR_bkg = {
+    0,0,
+    PATH_BKG_C0,0,
+    PATH_BKG_C1,0,
+    PATH_BKG_B0,0,
+    PATH_BKG_B1,0
+};
+
 /* !!!Attention: the items order MUST be the same as HDL_e */
 bmpHDR_st imgHeader[IMG_NUMBER] = {
-    {PATH_NUMBER,0,0,L8,      0,0,NUMBER_W,NUMBER_H},
-    {PATH_LEFT_I,PATH_LEFT_L,0,PALETTED4444,0,0,LEFT_W,LEFT_H},
-    {PATH_HOME_I,PATH_HOME_L,0,PALETTED4444,0,0,HOME_W,HOME_H},
-    {PATH_OK_I,PATH_OK_L,0,PALETTED4444,0,0,OK_W,OK_H},
-    {PATH_CLOCK_I,PATH_CLOCK_L,0,PALETTED4444,0,0,CLOCK_W,CLOCK_H},
-    {PATH_MASK_I,PATH_MASK_L,0,PALETTED8,0,0,MASK_W,MASK_H},
-    {PATH_MASKD_I,PATH_MASKD_L,0,PALETTED8,0,0,MASK_W,MASK_H},
-    };
+    {PALETTED4444,LEFT_W,  LEFT_H,  (FTU32)&iHDR[HDL_LEFT]},
+    {PALETTED4444,HOME_W,  HOME_H,  (FTU32)&iHDR[HDL_HOME]},
+    {PALETTED4444,OK_W,    OK_H,    (FTU32)&iHDR[HDL_OK]},
+    {PALETTED4444,CLOCK_W, CLOCK_H, (FTU32)&iHDR[HDL_CLOCK]},
+    {PALETTED8,   MASK_W,  MASK_H,  (FTU32)&iHDR[HDL_MASK]},
+    {PALETTED8,   MASK_W,  MASK_H,  (FTU32)&iHDR[HDL_MASK_D]},
+    {L8,          NUMBER_W,NUMBER_H,(FTU32)&iHDR_number},
+    {FORMAT_DXT1, LCD_W,   LCD_H,   (FTU32)&iHDR_bkg},
+};
 
 typedef struct DateTime_  {
     FTU32 year;
@@ -143,16 +164,15 @@ FTU32          DatSetValue = 2017*10000+8*100+24;
 DateDisp_st    stYear[DATE_POS_NUM] = {0};
 DateDisp_st    stMonth[DATE_POS_NUM] = {0};
 DateDisp_st    stDay[DATE_POS_NUM] = {0};
-/* background image location */
-FTU32          bg_start_addr  = 0;
 /* record the last setting UI index, for re-entry use */
 FTU32          last_index     = 1;
-STATIC FTU32 loadTxtFont (FTVOID)
+#define ADDR_FNT RAM_G
+STATIC FTU32 loadTxtFont (FTU32 Addr)
 {
 	FTU32 len;
 
 	/* load the font resources into EVE, get related info out to variable */
-	len = appFileToRamG((FTC8 *)PATH_TXT_F,RAM_G,0,(FTU8 *)&stTxtFnt,sizeof(FT_Gpu_Fonts_t));
+	len = appFileToRamG((FTC8 *)PATH_TXT_F,Addr,0,(FTU8 *)&stTxtFnt,sizeof(FT_Gpu_Fonts_t));
 	if (len == 0) {
 		DBGPRINT;
 	}
@@ -163,130 +183,23 @@ STATIC FTU32 loadTxtFont (FTVOID)
 STATIC FTU32 loadImg (FTU32 startAddr)
 {
     /* load bitmap resources data into EVE, and set some parameter */
-    if(APP_OK != appBmpToRamG(HDL_NUMBER, startAddr, imgHeader, IMG_NUMBER)){
+    if(APP_OK != appBmpToRamG(HDL_LEFT, startAddr, imgHeader, IMG_NUMBER)){
         DBGPRINT;
         return 0;
     }
 	return 1;
 }
 
-STATIC FTU32 loadBackground (FTU32 startAddr)
-{
-	FTU32 len, addr = startAddr;
-
-    /* load the 4 necessary file to background photo */
-	len = appFileToRamG((FTC8 *)PATH_BKG_C0,addr,0,0,0);
-	if (len == 0) {
-		DBGPRINT;
-		return len;
-	}
-	addr += len;
-	len = appFileToRamG((FTC8 *)PATH_BKG_C1,addr,0,0,0);
-	if (len == 0) {
-		DBGPRINT;
-		return len;
-	}
-	addr += len;
-	len = appFileToRamG((FTC8 *)PATH_BKG_B0,addr,0,0,0);
-	if (len == 0) {
-		DBGPRINT;
-		return len;
-	}
-	addr += len;
-	len = appFileToRamG((FTC8 *)PATH_BKG_B1,addr,0,0,0);
-	if (len == 0) {
-		DBGPRINT;
-		return len;
-	}
-	addr += len;
-
-	return addr;
-}
-
 STATIC FTU32 loadResources (FTVOID)
 {
     FTU32 l = 0;
 
-    l = loadTxtFont();
+    l = loadTxtFont(ADDR_FNT);
     if (l) {
-        bg_start_addr = l;
-        l += loadBackground(bg_start_addr);
-        if (l > bg_start_addr) {
-            return loadImg(l);
-        }
-        DBGPRINT;
-        return 0;
+        return loadImg(l);
     }
     DBGPRINT;
     return 0;
-}
-
-STATIC FTVOID dxt1BitmapInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
-{
-#define DXT1_BLOCK_NUMS (4)
-	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
-	HAL_CmdBufIn(BITMAP_SOURCE(startAddr));
-	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, W/DXT1_BLOCK_NUMS*2, H/DXT1_BLOCK_NUMS));
-    HAL_CmdBufIn(BITMAP_LAYOUT_H(W/DXT1_BLOCK_NUMS*2 >> 10, H/DXT1_BLOCK_NUMS >> 9));
-	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, W, H));
-    HAL_CmdBufIn(BITMAP_SIZE_H(W>>9, H>>9));
-
-	HAL_CmdBufIn(BITMAP_HANDLE(startHdl));
-	HAL_CmdBufIn(BITMAP_SOURCE(startAddr + 2*(W/DXT1_BLOCK_NUMS*2*H/DXT1_BLOCK_NUMS)));
-	HAL_CmdBufIn(BITMAP_LAYOUT(L1, W/DXT1_BLOCK_NUMS/2, H));
-    HAL_CmdBufIn(BITMAP_LAYOUT_H(W/DXT1_BLOCK_NUMS/2 >> 10, H >> 9));
-	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, W, H));
-    HAL_CmdBufIn(BITMAP_SIZE_H(W>>9, H>>9));
-}
-
-STATIC FTVOID dxt1FormatInfo (FTU8 startHdl, FT16 X, FT16 Y)
-{
-	HAL_CmdBufIn(BLEND_FUNC(ONE,ZERO));
-	HAL_CmdBufIn(COLOR_A(0x55));
-	HAL_CmdBufIn(BITMAP_HANDLE(startHdl));
-	HAL_CmdBufIn(CELL(0));
-	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-	HAL_CmdBufIn(BLEND_FUNC(ONE,ONE));
-	HAL_CmdBufIn(COLOR_A(0xAA));
-	HAL_CmdBufIn(BITMAP_HANDLE(startHdl));
-	HAL_CmdBufIn(CELL(1));
-	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-	HAL_CmdBufIn(COLOR_MASK(1,1,1,0));
-
-	CoCmd_LOADIDENTITY;
-	CoCmd_SCALE(4*EVE_TRANSFORM_MAX, 4*EVE_TRANSFORM_MAX);
-	CoCmd_SETMATRIX;
-
-	HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA,ZERO));
-	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
-	HAL_CmdBufIn(CELL(1));
-	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-	HAL_CmdBufIn(BLEND_FUNC(ONE_MINUS_DST_ALPHA,ONE));
-	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
-	HAL_CmdBufIn(CELL(0));
-	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
-
-}
-
-STATIC FTVOID dxt1Info (FTU8 startHdl, FTU32 startAddr, FT16 X, FT16 Y, FTU16 W, FTU16 H)
-{
-	HAL_CmdBufIn(SAVE_CONTEXT());
-	dxt1BitmapInfo(startHdl, startAddr, W, H);
-
-	HAL_CmdBufIn(BEGIN(BITMAPS));
-
-	dxt1FormatInfo(startHdl,X,Y);
-	HAL_CmdBufIn(RESTORE_CONTEXT());
-	
-	HAL_CmdBufIn(END());
-}
-
-STATIC FTVOID dispBKG (FT32 addr)
-{
-    dxt1Info(HDL_BKG_START,addr,0,0,LCD_W,LCD_H);
 }
 
 STATIC FTVOID dispDateTime (FTVOID)
@@ -331,9 +244,8 @@ STATIC FTVOID dispButm (FTU8 HomeOK, FTU8 Pressed)
     HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
     
 	HAL_CmdBufIn(TAG(TAG_HOME));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_HOME));
-    HAL_CmdBufIn(CELL(0));
-    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_HOME].lut_src));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR[HDL_HOME].handle));
+    HAL_CmdBufIn(PALETTE_SOURCE(iHDR[HDL_HOME].addr_lut));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(HOME_W/2*EVE_TRANSFORM_MAX, HOME_H/2*EVE_TRANSFORM_MAX);
@@ -345,9 +257,8 @@ STATIC FTVOID dispButm (FTU8 HomeOK, FTU8 Pressed)
     HAL_CmdBufIn(RESTORE_CONTEXT());
 	
 	HAL_CmdBufIn(TAG(TAG_OK));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_OK));
-    HAL_CmdBufIn(CELL(0));
-    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_OK].lut_src));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR[HDL_OK].handle));
+    HAL_CmdBufIn(PALETTE_SOURCE(iHDR[HDL_OK].addr_lut));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(HOME_W/2*EVE_TRANSFORM_MAX, HOME_H/2*EVE_TRANSFORM_MAX);
@@ -378,9 +289,8 @@ STATIC FTVOID dispArrow (FTU8 LeftRight, FTU8 Pressed)
     HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
     
 	HAL_CmdBufIn(TAG(TAG_LEFT));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_LEFT));
-    HAL_CmdBufIn(CELL(0));
-    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_LEFT].lut_src));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR[HDL_LEFT].handle));
+    HAL_CmdBufIn(PALETTE_SOURCE(iHDR[HDL_LEFT].addr_lut));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(LEFT_W/2*EVE_TRANSFORM_MAX, LEFT_H/2*EVE_TRANSFORM_MAX);
@@ -392,9 +302,8 @@ STATIC FTVOID dispArrow (FTU8 LeftRight, FTU8 Pressed)
 	HAL_CmdBufIn(RESTORE_CONTEXT());
 
 	HAL_CmdBufIn(TAG(TAG_RIGHT));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_LEFT));
-    HAL_CmdBufIn(CELL(0));
-    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_LEFT].lut_src));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR[HDL_LEFT].handle));
+    HAL_CmdBufIn(PALETTE_SOURCE(iHDR[HDL_LEFT].addr_lut));
     HAL_CmdBufIn(SAVE_CONTEXT());
 	CoCmd_LOADIDENTITY;
     CoCmd_TRANSLATE(LEFT_W/2*EVE_TRANSFORM_MAX, LEFT_H/2*EVE_TRANSFORM_MAX);
@@ -414,9 +323,8 @@ STATIC FTVOID dispClockBkg (FTVOID)
 
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_CLOCK));
-    HAL_CmdBufIn(CELL(0));
-    HAL_CmdBufIn(PALETTE_SOURCE(imgHeader[HDL_CLOCK].lut_src));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR[HDL_CLOCK].handle));
+    HAL_CmdBufIn(PALETTE_SOURCE(iHDR[HDL_CLOCK].addr_lut));
 	HAL_CmdBufIn(VERTEX2F(((LCD_W-CLOCK_W)/2)*EVE_PIXEL_UNIT,
                           ((LCD_H-CLOCK_H)/2)*EVE_PIXEL_UNIT));
     HAL_CmdBufIn(END());
@@ -881,7 +789,7 @@ STATIC FTVOID dispDate (FTVOID)
 
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(COLOR_RGB(0xFF,0xFF,0xFF));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_NUMBER));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR_number.handle));
     for (i = 0;i < DATE_POS_NUM;i++) {
         dispDateNumber(DATEYEAR_X,stYear[i].Y,stYear[i].data,getNumRatio(stYear[i].Y));
         dispDateNumber(DATEMONTH_X,stMonth[i].Y,stMonth[i].data,getNumRatio(stMonth[i].Y));
@@ -889,10 +797,10 @@ STATIC FTVOID dispDate (FTVOID)
     }
 
     /* use a mask bitmap to give an effect */
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_MASK));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR[HDL_MASK].handle));
     HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,MASK_ENLARGE*imgHeader[HDL_MASK].wide,imgHeader[HDL_MASK].high));
     HAL_CmdBufIn(BITMAP_SIZE_H(MASK_ENLARGE*imgHeader[HDL_MASK].wide >> 9,imgHeader[HDL_MASK].high>>9));
-    HAL_CmdBufIn(BITMAP_HANDLE(HDL_MASK_D));
+    HAL_CmdBufIn(BITMAP_HANDLE(iHDR[HDL_MASK_D].handle));
     HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,MASK_ENLARGE*imgHeader[HDL_MASK_D].wide,imgHeader[HDL_MASK_D].high));
     HAL_CmdBufIn(BITMAP_SIZE_H(MASK_ENLARGE*imgHeader[HDL_MASK_D].wide >> 9,imgHeader[HDL_MASK_D].high>>9));
 
@@ -900,8 +808,8 @@ STATIC FTVOID dispDate (FTVOID)
 	CoCmd_LOADIDENTITY;
     CoCmd_SCALE(MASK_ENLARGE*EVE_TRANSFORM_MAX,EVE_TRANSFORM_MAX);
 	CoCmd_SETMATRIX;
-    appDispPalette8(DATEYEAR_X,DATE_NUM_UP_2_Y,imgHeader[HDL_MASK].lut_src,HDL_MASK,0);
-    appDispPalette8(DATEYEAR_X,DATE_NUM_DOWN_2_Y+15,imgHeader[HDL_MASK_D].lut_src,HDL_MASK_D,0);
+    appDispPalette8(DATEYEAR_X,DATE_NUM_UP_2_Y,iHDR[HDL_MASK].addr_lut,HDL_MASK,0);
+    appDispPalette8(DATEYEAR_X,DATE_NUM_DOWN_2_Y+15,iHDR[HDL_MASK_D].addr_lut,HDL_MASK_D,0);
 	HAL_CmdBufIn(RESTORE_CONTEXT());
    
     HAL_CmdBufIn(END());
@@ -1055,10 +963,11 @@ FTVOID aupu_main_ui (FTU32 para)
 	CoCmd_SETROTATE(ROTATE_VALUE);
 
     /* set the user font */
-	CoCmd_SETFONT(HDL_FONT, RAM_G, &stTxtFnt);
+	CoCmd_SETFONT(HDL_FONT, ADDR_FNT, &stTxtFnt);
     
     /* display the background */
-    dispBKG(bg_start_addr);
+    HAL_CmdBufIn(BEGIN(BITMAPS));
+    appDispDXT1(iHDR_bkg.handle, 0, 0);
 
     /* just for setting result display */
     HAL_CmdBufIn(COLOR_RGB(0,0xFF,0));

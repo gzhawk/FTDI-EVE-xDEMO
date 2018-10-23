@@ -11,10 +11,10 @@
 #error "program res/bean/bt81x.flash to on-board flash, then comment this line"
 #endif
 
-#define UI_1_PATH     "FLASH:4096"
-#define UI_2_PATH     "FLASH:134656"
-#define UI_3_PATH     "FLASH:265216"
-#define UI_4_PATH     "FLASH:395776"
+#define UI_1_PATH     "ASTC_FLASH@4096"
+#define UI_2_PATH     "ASTC_FLASH@134656"
+#define UI_3_PATH     "ASTC_FLASH@265216"
+#define UI_4_PATH     "ASTC_FLASH@395776"
 
 #define ANIM_ADDR     1942336
 #define ANIM_FRAM     284
@@ -36,19 +36,26 @@
 #endif
 */
 
-bmpHDR_st bmp_hdr[] = {
-    {UI_1_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
-    {UI_2_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
-    {UI_3_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
-    {UI_4_PATH,0,0,COMPRESSED_RGBA_ASTC_4x4_KHR,0,0,EVE_LCD_WIDTH,EVE_LCD_HIGH},
-};
-
 typedef enum UI_HDL_ {
     HDL_UI1 = 0,
     HDL_UI2,
     HDL_UI3,
     HDL_UI4,
 } UI_HDL_ENUM;
+
+ImgInfo_st info_hdr[] = {
+    {UI_1_PATH,   0,0,0},
+    {UI_2_PATH,   0,0,0},
+    {UI_3_PATH,   0,0,0},
+    {UI_4_PATH,   0,0,0},
+};
+
+bmpHDR_st bmp_hdr[] = {
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,EVE_LCD_HIGH,(FTU32)&info_hdr[HDL_UI1]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,EVE_LCD_HIGH,(FTU32)&info_hdr[HDL_UI2]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,EVE_LCD_HIGH,(FTU32)&info_hdr[HDL_UI3]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR,EVE_LCD_WIDTH,EVE_LCD_HIGH,(FTU32)&info_hdr[HDL_UI4]},
+};
 
 FTU8 load_resources(bmpHDR_st *p_res, FTU8 num)
 {
@@ -100,15 +107,12 @@ FTVOID bean_machine(FTU32 para)
 
     HAL_CmdBufIn(BEGIN(BITMAPS));
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_UI1));
-    HAL_CmdBufIn(CELL(0));
     HAL_CmdBufIn(VERTEX2F(x1*EVE_PIXEL_UNIT,0));
 
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_UI4));
-    HAL_CmdBufIn(CELL(0));
     HAL_CmdBufIn(VERTEX2F(x2*EVE_PIXEL_UNIT,0));
 
     HAL_CmdBufIn(BITMAP_HANDLE(HDL_UI2));
-    HAL_CmdBufIn(CELL(0));
     HAL_CmdBufIn(VERTEX2F(x3*EVE_PIXEL_UNIT,0));
 
     HAL_CmdBufIn(END());

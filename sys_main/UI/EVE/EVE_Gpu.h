@@ -280,13 +280,15 @@
 #define RECTS                9UL
 #define REG_BIST_CMD         1058124UL
 #define REG_BIST_RESULT      1058128UL
+#define RAM_G                0UL
+#define RAM_PAL              1056768UL
+#define FORMAT_DXT1          65534UL//0xFFFE
 
 #if defined(DEF_81X)||defined(DEF_BT81X)
 #define ROM_FONT_ADDR        3145724UL
 #define RAM_CMD              3178496UL
 #define RAM_DL               3145728UL
 #define RAM_ERR_REPORT       3184640UL
-#define RAM_G                0UL
 #define RAM_J1RAM            3182592UL
 #define RAM_JTBOOT           3190784UL
 #define RAM_REG              3153920UL
@@ -458,8 +460,6 @@
 #define FLASH_ADDR_HEAD      8388608UL
 #else
 #define ROM_FONT_ADDR        1048572UL
-#define RAM_G                0UL
-#define RAM_PAL              1056768UL
 #define RAM_CMD              1081344UL
 #define RAM_DL               1048576UL
 #define RAM_REG              1057792UL

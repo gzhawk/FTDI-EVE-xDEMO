@@ -27,7 +27,8 @@
  * DEF_81X          when using FT81X
  * DEF_BT81X        when using BT81X
  * DEF_CAP_MULTI    Cap touch with multiple touch control
- * DEF_CAP_NONMULTI Res touch or Cap Touch with single touch control
+ * DEF_CAP_NONMULTI Cap touch with single touch control
+ * no DEF_CAP_...   Res touch
  * LCD_QVGA         320x240
  * LCD_HVGA         320x480 for FTDI ME8XXA_HV35R module
  * LCD_WQVGA        480x272
@@ -210,12 +211,9 @@
 /*----------------------------------------------------------------------------*/
 #if (defined(UI_AVI) || \
     defined(UI_BITMAP) || \
-    defined(UI_LIERDA)) || \
     defined(UI_ALLY_MODEB) || \
     defined(UI_JPGDISP) || \
-    defined(UI_SLIP_M) || \
-    defined(UI_NJTOYO) || \
-    defined(UI_STELIGENT)
+    defined(UI_STELIGENT))
 #define DEF_81X
 
 #if (defined(FT9XXEV) || \
@@ -257,7 +255,7 @@
 #if defined(UI_AUPU)
 #define DEF_81X
 #define LCD_HVGA
-#define DEF_CAP_NONMULTI
+/* using RTP, no need to define DEF_CAP_... */
 
 #if (defined(FT9XXEV) || \
      defined(VC_FT4222))
@@ -311,12 +309,6 @@
 #error "no SPI be selected"
 #endif
 
-/*--------------------------------------------prevent undefined TOUCH setting */
-#if (!defined(DEF_CAP_NONMULTI) && \
-     !defined(DEF_CAP_MULTI))
-#error "no touch be selected"
-#endif
-
 /*----------------------------------------------prevent undefined LCD setting */
 #if (!defined(LCD_QVGA) && \
     !defined(LCD_HVGA) && \
@@ -331,24 +323,21 @@
 #endif
 /*---------------------------------------------------Universal platform define*/
 /*
- * Version: A.B.C.D
+ * Version: A.B.C
  * A: Basic version number, increase it when modify happen on core function
  (EVE chip, APP, HAL, etc.), or add a new MCU platform, 
  leave 'B' part unchange and clear the 'C' part when 'A' part change.
  * B: significant structure change version number, 
  increase it when significant changed
- * C: Demo version number, increase it when new demo be added in
- * D: Modify tracking number, each modify in code should increase the number, 
- it should be clear to 0 when 'B' change
+ * C: Modify tracking number
  * 
- *    for example: 3.X.11.5, 
+ *    for example: 3.X.5, 
  3  - support 3 MCU platform
  X  - from A ~ Z, software structure change
- 11 - it has 11 demos
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.C.49.2"
+#define APPS_VER "5.D.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

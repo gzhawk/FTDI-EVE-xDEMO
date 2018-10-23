@@ -61,17 +61,21 @@
 
 #endif
 
-bmpHDR_st bmpHD[ICON_CLASS] = {
-	{PATH_TRANS,	0,0,ARGB4,	0,0,	ICON_W,	ICON_H},
-	{PATH_PLACE,	0,0,ARGB4,	0,0,	ICON_W,	ICON_H}
-};
-
 typedef enum actHDL_ {
 	HDL_NONE = 0,
 	HDL_TRANS,
 	HDL_PLACE
 	/* no more than 15 */
 } actHDL_e;
+
+ImgInfo_st infoHD[] = {
+    {PATH_TRANS,0,0,0},
+    {PATH_PLACE,0,0,0},
+};
+bmpHDR_st bmpHD[ICON_CLASS] = {
+	{ARGB4,	ICON_W,	ICON_H, (FTU32)&infoHD[0]},
+	{ARGB4,	ICON_W,	ICON_H, (FTU32)&infoHD[1]}
+};
 
 typedef enum tEvent_ {
 	T_NON = 100, /* no event on screen */

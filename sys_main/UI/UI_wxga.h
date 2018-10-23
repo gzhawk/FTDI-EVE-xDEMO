@@ -6,7 +6,7 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "copy res/wxga/bt81x.flash to res/flash, then comment this line"
+//#error "copy res/wxga/bt81x.flash to res/flash, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
 #error "program res/wxga/bt81x.flash to on-board flash, then comment this line"
 #endif
@@ -19,11 +19,15 @@
 #define HDL_START      0
 #define FNT_NUM        24
 #define FNT_OPT        0
-
+ImgInfo_st info_header[] = {
+    {IMG_1,0,0,0},
+    {IMG_2,0,0,0},
+    {IMG_3,0,0,0},
+};
 bmpHDR_st bmp_header[] = {
-    {IMG_1, 0, 0, COMPRESSED_RGBA_ASTC_5x4_KHR, 0, 0, 1280,800},
-    {IMG_2, 0, 0, COMPRESSED_RGBA_ASTC_5x4_KHR, 0, 0, 1280,800},
-    {IMG_3, 0, 0, COMPRESSED_RGBA_ASTC_5x4_KHR, 0, 0, 1280,800},
+    {COMPRESSED_RGBA_ASTC_5x4_KHR,1280,800,(FTU32)&info_header[0]},
+    {COMPRESSED_RGBA_ASTC_5x4_KHR,1280,800,(FTU32)&info_header[1]},
+    {COMPRESSED_RGBA_ASTC_5x4_KHR,1280,800,(FTU32)&info_header[2]},
 };
 
 

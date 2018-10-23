@@ -15,18 +15,23 @@
 #define ANIM_MAX     180 
 #define ANIM_W       512
 #define ANIM_H       512
-#define QR_PATH      "FLASH:785024"
+#define QR_PATH      "ASTC_FLASH@785024"
 #define QR_W         200
 #define QR_H         200
-#define QR_TXT_PATH  "FLASH:825024"
+#define QR_TXT_PATH  "ASTC_FLASH@825024"
 #define QR_TXT_W     172
 #define QR_TXT_H     24
 #define COUNT        100
 #define HDL_START    0
 
+ImgInfo_st info_hdr[] = {
+    {QR_PATH,    0,0,0},
+    {QR_TXT_PATH,0,0,0},
+};
+
 bmpHDR_st bmp_hdr[] = {
-    {QR_PATH,     0, 0, COMPRESSED_RGBA_ASTC_4x4_KHR, 0, 0, QR_W,     QR_H},
-    {QR_TXT_PATH, 0, 0, COMPRESSED_RGBA_ASTC_4x4_KHR, 0, 0, QR_TXT_W, QR_TXT_H},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR, QR_W,     QR_H,     (FTU32)&info_hdr[0]},
+    {COMPRESSED_RGBA_ASTC_4x4_KHR, QR_TXT_W, QR_TXT_H, (FTU32)&info_hdr[1]},
 };
 
 FTVOID loop_frame(FTU32 *pframe, FTU32 max)

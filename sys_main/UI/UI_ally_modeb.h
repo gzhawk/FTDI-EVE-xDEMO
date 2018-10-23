@@ -10,8 +10,11 @@
 #define DISPBP_PALETTE8 ROOT_PATH"allymodeb\\BG_inx.bin"
 #define DISPBP_PALETTE8_LUT ROOT_PATH"allymodeb\\BG_lut.bin"
 
-#define RAW_NUM   (2)
-#define HDL_START 0
+typedef enum hdl_ {
+    HDL_NEEDLE  = 0,
+    HDL_BKGND,
+    RAW_NUM = HDL_BKGND + 1,
+} hdl_enum;
 
 #define NDL_START 73
 #define NDL_END   264
@@ -21,9 +24,13 @@
 
 #define FAST_SIN
 
+ImgInfoPal_st img_info[] = {
+    {DISPBP_XNDL,     DISPBP_XNDL_LUT,    0,0,0,0,0},
+    {DISPBP_PALETTE8, DISPBP_PALETTE8_LUT,0,0,0,0,0},
+};
 bmpHDR_st bmp_header[RAW_NUM] = {
-    {DISPBP_XNDL,       DISPBP_XNDL_LUT,       0,PALETTED8,   0,0,23,112},
-    {DISPBP_PALETTE8,   DISPBP_PALETTE8_LUT,   0,PALETTED8,   0,0,800,480},
+    {PALETTED8,23,112 ,(FTU32)&img_info[HDL_NEEDLE]},
+    {PALETTED8,800,480,(FTU32)&img_info[HDL_BKGND]},
 };
 FTU16 sintbl[] = 
 {
@@ -104,15 +111,15 @@ FTVOID ally_modeb (FTU32 para)
     /* only load the file once */
     if (flag == 0) {
         /* load bitmap resources data into EVE */
-        if(APP_OK != appBmpToRamG(HDL_START, RAM_G, bmp_header, RAW_NUM)){
+        if(APP_OK != appBmpToRamG(HDL_NEEDLE, RAM_G, bmp_header, RAW_NUM)){
             DBGPRINT;
             return;
         }
 
         HAL_CmdBufIn(CMD_DLSTART);
-        HAL_CmdBufIn(BITMAP_HANDLE(0));
-        HAL_CmdBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,bmp_header[0].high*2,bmp_header[0].high*2));
-        HAL_CmdBufIn(BITMAP_SIZE_H((bmp_header[0].high*2)>>9,(bmp_header[0].high*2)>>9));
+        HAL_CmdBufIn(BITMAP_HANDLE(img_info[HDL_NEEDLE].handle));
+        HAL_CmdBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,bmp_header[HDL_NEEDLE].high*2,bmp_header[HDL_NEEDLE].high*2));
+        HAL_CmdBufIn(BITMAP_SIZE_H((bmp_header[HDL_NEEDLE].high*2)>>9,(bmp_header[HDL_NEEDLE].high*2)>>9));
         HAL_CmdBufIn(DISPLAY());
         HAL_CmdBufIn(CMD_SWAP);
         HAL_BufToReg(RAM_CMD,0);
@@ -127,21 +134,21 @@ FTVOID ally_modeb (FTU32 para)
     HAL_CmdBufIn(BEGIN(BITMAPS));
 
     /* display background */
-    appDispPalette8(0,0,bmp_header[1].lut_src, 1, 0);
+    appDispPalette8(0,0,img_info[HDL_BKGND].addr_lut, 1, 0);
 
     /* display rotated needle */
     HAL_CmdBufIn(SAVE_CONTEXT());
     CoCmd_LOADIDENTITY;
-    CoCmd_TRANSLATE((bmp_header[0].high)*EVE_TRANSFORM_MAX, 
-            (bmp_header[0].high)*EVE_TRANSFORM_MAX);
+    CoCmd_TRANSLATE((bmp_header[HDL_NEEDLE].high)*EVE_TRANSFORM_MAX, 
+            (bmp_header[HDL_NEEDLE].high)*EVE_TRANSFORM_MAX);
     CoCmd_ROTATE(i*EVE_TRANSFORM_MAX/360);
-    CoCmd_TRANSLATE((-1)*(bmp_header[0].wide/2)*EVE_TRANSFORM_MAX,0);
+    CoCmd_TRANSLATE((-1)*(bmp_header[HDL_NEEDLE].wide/2)*EVE_TRANSFORM_MAX,0);
     CoCmd_SETMATRIX;
 
     getXYfrmCenter(i,&Nx,&Ny);
-    Nx -= bmp_header[0].high;
-    Ny -= bmp_header[0].high;
-    appDispPalette8(Nx,Ny,bmp_header[0].lut_src, 0, 0);
+    Nx -= bmp_header[HDL_NEEDLE].high;
+    Ny -= bmp_header[HDL_NEEDLE].high;
+    appDispPalette8(Nx,Ny,img_info[HDL_NEEDLE].addr_lut, 0, 0);
     HAL_CmdBufIn(RESTORE_CONTEXT()); 
 
     HAL_CmdBufIn(END());

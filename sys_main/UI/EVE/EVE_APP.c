@@ -277,6 +277,13 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 {
     FTU32 Len, resHDL;
 
+    /* 
+      the reason why not handle the flash reading operation here is
+      during the flash reading operation, 
+      there would be some image realted info is needed, 
+      don't want to integrate too much function 
+      in one simple purpose routine.
+    */
     if (!appFlashPath(path, &Len)) {
         
         resHDL = HAL_SegFileOpen((FTU8 *)path);
@@ -295,6 +302,9 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
         Len = FileProcess(resHDL,0,inAddr,Len);
 
         if (outAddr) {
+            /* originally used for font application demo, 
+               to read the font block info into font structure variable
+               most of time are usless */
             HAL_WriteSrcToDes(resHDL,0,(FTU32)outAddr,outLen);
         }
 
@@ -303,108 +313,274 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
 
     return Len;
 }
-
-FTU8 appLenTricks(bmpHDR_st *pbmpHD, FTU8 Pal, FTU32 addr)
+FTU8 LenTricksPal(FTU32 *p_addr, bmpHDR_st *pbmpHD)
 {
-    FTU32 type;
-    /* 
-       when using zlib compressed file (*.bin)
-       the actual decompressed size would not
-       the return value of appFileToRamG
-       so calculate the output (decompressed) size by image format
-     */
-    if (Pal) {
-        type = pbmpHD->len_lut;
+    ImgInfoPal_st *p = (ImgInfoPal_st *)pbmpHD->info;
 
-        if (TYPE_ZLIB == type) {
-            pbmpHD->len_lut = 1024;
-#if defined(DEF_BT81X)
-        } else if (TYPE_Z_FLASH == type) {
-            appFlashUnzip(pbmpHD->path_lut, addr);
-            pbmpHD->len_lut = 1024;
-        } else if (TYPE_FLASH == type) {
-            pbmpHD->len_lut = appFlashLen(pbmpHD->path_lut);
-            if (appFlashToEVE(appFlashAddr(pbmpHD->path_lut), addr, pbmpHD->len_lut)) {
-                FTPRINT("\nappLenTricks: pal flash to eve fail");
-            }
-#endif
-        } else if (!type) {
-            FTPRINT("\nappLenTricks: pal type len error");
-            return 1;
-        }
-    } else {
-        type = pbmpHD->len;
+    p->addr_inx = *p_addr;
+    /* lookup table alwasy smaller than 1K */
+    p->len_lut = 1024;
 
-        if (TYPE_ZLIB == type) {
-            pbmpHD->len = appGetLinestride(pbmpHD)*pbmpHD->high;
-#if defined(DEF_BT81X)
-        } else if (TYPE_ASTC_FLASH == type) {
+    switch (p->len_inx) {
+        case TYPE_ZLIB:
             /* 
-               reuse the len_lut for the flash address in setbitmap command use
-               when using flash to display raw (only for ASTC)
-               no RAM is needed, EVE render directly from Flash
+               index file uncompress and forward to EVE action had been done
+               in FileProcess, only got the correct length
+               of uncompressed file, for the address offset
              */
-            pbmpHD->len_lut = appFlashAddr(pbmpHD->path);
-            pbmpHD->len = 0;
-        } else if (TYPE_Z_FLASH == type) {
-            appFlashUnzip(pbmpHD->path, addr);
-            pbmpHD->len = appGetLinestride(pbmpHD)*pbmpHD->high;
-        } else if (TYPE_FLASH == type) {
-            pbmpHD->len = appFlashLen(pbmpHD->path);
-            if (appFlashToEVE(appFlashAddr(pbmpHD->path), addr, pbmpHD->len)) {
-                FTPRINT("\nappLenTricks: flash to eve fail");
+            p->len_inx = appGetLinestride(pbmpHD)*pbmpHD->high;
+            /* break out to read the lookup table file later*/
+            break;
+#if defined(DEF_BT81X)
+        case TYPE_Z_FLASH:
+            appFlashUnzip(p->path_inx, p->addr_inx);
+            p->len_inx = appGetLinestride(pbmpHD)*pbmpHD->high;
+            p->addr_lut = p->addr_inx + p->len_inx;
+            
+            appFlashUnzip(p->path_lut, p->addr_lut);
+            
+            *p_addr = p->addr_lut + p->len_lut;
+            return 0;
+        case TYPE_FLASH:
+            p->len_inx = appFlashLen(p->path_inx);
+            if (appFlashToEVE(appFlashAddr(p->path_inx), p->addr_inx, p->len_inx)) {
+                FTPRINT("\nLenTricksPal: inx flash to eve fail");
+                return 1;
             }
+            
+            p->addr_lut = p->addr_inx + p->len_inx;
+            p->len_lut = appFlashLen(p->path_lut);
+            if (appFlashToEVE(appFlashAddr(p->path_lut), p->addr_lut, p->len_lut)) {
+                FTPRINT("\nLenTricksPal: lut flash to eve fail");
+                return 1;
+            }
+            *p_addr = p->addr_lut + p->len_lut;
+            return 0;
 #endif
-        } else if (!type) {
-            FTPRINT("\nappLenTricks: type len error");
+        case 0:
+            FTPRINT("\nLenTricksPal: len 0");
             return 1;
-        }
+        default:
+            /* normal length, break out to read the lookup table file later*/
+            break;
     }
 
+    if (PALETTED == pbmpHD->format) {
+        p->addr_lut = RAM_PAL;
+        *p_addr = p->addr_inx + p->len_inx;
+    } else {
+        p->addr_lut = p->addr_inx + p->len_inx;
+        *p_addr = p->addr_lut + p->len_lut;
+    }
+    /* 
+       whatever none Flash index file use compressed file or not, 
+       FilePrecess inside the FileToRamG would handle it,
+       no need to know the length
+     */
+    if (!appFileToRamG(p->path_lut,p->addr_lut,1,0,0)) {
+        FTPRINT("\nLenTricksPal: lut file error");
+        return 1;
+    } else {
+        return 0;
+    }
+}
+FTU8 LenTricksDXT1(FTU32 *p_addr, bmpHDR_st *pbmpHD)
+{
+    ImgInfoDXT1_st *p = (ImgInfoDXT1_st *)pbmpHD->info;
+
+    p->addr = *p_addr;
+
+    /* 
+       no TYPE_ZLIB,TYPE_Z_FLASH,TYPE_ASTC_FLASH for DXT1 
+       if one file is in Flash all consider all others in Flash
+       vice versa
+     */
+    switch (p->len_c0) {
+#if defined(DEF_BT81X)
+        case TYPE_FLASH:
+            p->len_c0 = appFlashLen(p->path_c0);
+            if (appFlashToEVE(appFlashAddr(p->path_c0), p->addr, p->len_c0)) {
+                FTPRINT("\nLenTricksDXT1: flash c0 to eve fail");
+                return 1;
+            }
+            p->len_c1 = appFlashLen(p->path_c1);
+            if (appFlashToEVE(appFlashAddr(p->path_c1), p->addr+p->len_c0, p->len_c1)) {
+                FTPRINT("\nLenTricksDXT1: flash c1 to eve fail");
+                return 1;
+            }
+            p->len_b0 = appFlashLen(p->path_b0);
+            if (appFlashToEVE(appFlashAddr(p->path_b0), p->addr+p->len_c0+p->len_b0, \
+                                           p->len_b0)) {
+                FTPRINT("\nLenTricksDXT1: flash b0 to eve fail");
+                return 1;
+            }
+            p->len_b1 = appFlashLen(p->path_b1);
+            if (appFlashToEVE(appFlashAddr(p->path_b1), p->addr+p->len_c0+p->len_b0+p->len_b1, \
+                                           p->len_b1)) {
+                FTPRINT("\nLenTricksDXT1: flash b1 to eve fail");
+                return 1;
+            }
+            *p_addr += (p->len_c0+p->len_c1+p->len_b0+p->len_b1);
+            break;
+#endif
+        case 0:
+            FTPRINT("\nLenTricksDXT1: len 0");
+            return 1;
+        default:
+            p->len_c1 = appFileToRamG(p->path_c1,*p_addr+p->len_c0,1,0,0);
+            if (p->len_c1 == 0) {
+                FTPRINT("\nLenTricksDXT1: c1 to eve fail");
+                return 1;
+            }
+            p->len_b0 = appFileToRamG(p->path_b0,*p_addr+p->len_c0+p->len_c1,1,0,0);
+            if (p->len_c1 == 0) {
+                FTPRINT("\nLenTricksDXT1: c1 to eve fail");
+                return 1;
+            }
+            p->len_b1 = appFileToRamG(p->path_b1,*p_addr+p->len_c0+p->len_c1+p->len_b0,1,0,0);
+            if (p->len_c1 == 0) {
+                FTPRINT("\nLenTricksDXT1: c1 to eve fail");
+                return 1;
+            }
+            break;
+    }
+    *p_addr += (p->len_c0+p->len_c1+p->len_b0+p->len_b1);
+	return 0;
+}
+
+FTU8 LenTricks(FTU32 *p_addr, bmpHDR_st *pbmpHD)
+{
+    ImgInfo_st *p = (ImgInfo_st *)pbmpHD->info;
+
+    p->addr = *p_addr;
+
+    switch (p->len) {
+        case TYPE_ZLIB:
+            /* 
+               file uncompress and forward to EVE action had been done
+               in FileProcess, only got the correct length
+               of uncompressed file, for the address offset
+             */
+            p->len = appGetLinestride(pbmpHD)*pbmpHD->high;
+            break;
+#if defined(DEF_BT81X)
+        case TYPE_ASTC_FLASH:
+            /* 
+               ONLY for ASTC: when using flash to display raw file
+               no RAM is needed, EVE render directly from Flash
+             */
+            p->len = 0;
+            p->addr = 0x800000 | appFlashAddr(p->path) / 32;
+            break;
+        case TYPE_Z_FLASH:
+            appFlashUnzip(p->path, *p_addr);
+            p->len = appGetLinestride(pbmpHD)*pbmpHD->high;
+            break;
+        case TYPE_FLASH:
+            p->len = appFlashLen(p->path);
+            if (appFlashToEVE(appFlashAddr(p->path), p->addr, p->len)) {
+                FTPRINT("\nLenTricks: flash to eve fail");
+                return 1;
+            }
+            break;
+#endif
+        case 0:
+            FTPRINT("\nLenTricks: len 0");
+            return 1;
+        default:
+            /* 
+               no trick for normal length, just do the address offset 
+             */
+            break;
+    }
+
+    *p_addr += p->len;
+    
     return 0;
+}
+FTU8 LoadImgFile(FTU32 *p_addr, bmpHDR_st *pbmpHD)
+{
+    ImgInfo_st *p = (ImgInfo_st *)pbmpHD->info;
+
+    p->len = appFileToRamG(p->path,*p_addr,1,0,0);
+
+    return LenTricks(p_addr, pbmpHD);
+}
+
+FTU8 LoadImgFilePal(FTU32 *p_addr, bmpHDR_st *pbmpHD)
+{
+    ImgInfoPal_st *p = (ImgInfoPal_st *)pbmpHD->info;
+
+    p->len_inx = appFileToRamG(p->path_inx,*p_addr,1,0,0);
+    
+    return LenTricksPal(p_addr, pbmpHD);
+}
+
+FTU8 LoadImgFileDXT1(FTU32 *p_addr, bmpHDR_st *pbmpHD)
+{
+    ImgInfoDXT1_st *p = (ImgInfoDXT1_st *)pbmpHD->info;
+
+    p->len_c0 = appFileToRamG(p->path_c0,*p_addr,1,0,0);
+    
+    return LenTricksDXT1(p_addr, pbmpHD);
 }
 
 appRet_en appLoadBmp(FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-    FTU32 i, src;
+    FTU32 i = 0, addr = ramgAddr;
+    bmpHDR_st *p = pbmpHD;
 
-    for (i = 0, src = ramgAddr; i < nums; i++) {
-        pbmpHD[i].len = appFileToRamG(pbmpHD[i].path,src,1,0,0);
-        if (appLenTricks(&pbmpHD[i], 0, src)){
-            FTPRINT("\nappLoadBmp: Len error");
-            return APP_ERR_LEN;
+    while (i < nums) {
+        switch (p->format) {
+            case PALETTED8:
+            case PALETTED565:
+            case PALETTED4444:
+            case PALETTED:
+                if (LoadImgFilePal(&addr, p)){
+                    FTPRINT("\nappLoadBmp: pal file len error");
+                    return APP_ERR_LEN;
+                }
+                break;
+            case FORMAT_DXT1:
+                if (LoadImgFileDXT1(&addr, p)){
+                    FTPRINT("\nappLoadBmp: dxt1 file len error");
+                    return APP_ERR_LEN;
+                }
+                break;
+            default:
+                if (LoadImgFile(&addr, p)){
+                    FTPRINT("\nappLoadBmp: file len error");
+                    return APP_ERR_LEN;
+                }
+                break;
         }
-        src += pbmpHD[i].len;
-#if defined(DEF_81X) || defined(DEF_BT81X)
-        if (PALETTED8 == pbmpHD[i].format || 
-            PALETTED565 == pbmpHD[i].format || 
-            PALETTED4444 == pbmpHD[i].format) {
-            pbmpHD[i].lut_src = src;
-            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,1,0,0);
-            if (appLenTricks(&pbmpHD[i], 1, pbmpHD[i].lut_src)) {
-                FTPRINT("\nappLoadBmp: 81X Lut error");
-                return APP_ERR_LEN;
-            }
-
-            src += pbmpHD[i].len_lut;
-        }
-#else
-        if (PALETTED == pbmpHD[i].format) {
-            pbmpHD[i].lut_src = RAM_PAL;
-            pbmpHD[i].len_lut = appFileToRamG(pbmpHD[i].path_lut,pbmpHD[i].lut_src,0,0,0);
-            
-            if (appLenTricks(&pbmpHD[i], 1, pbmpHD[i].lut_src)){
-                FTPRINT("\nappLoadBmp: 80X Lut error");
-                return APP_ERR_LEN;
-            }
-        }
-#endif
+        i++;
+        p++;
     }
 
     return APP_OK;
 }
-FTU8 appUseSetBitmp(FTU32 s, bmpHDR_st *p)
+FTVOID DXT1BmpInfo (FTU8 startHdl, FTU32 startAddr, FTU16 W, FTU16 H)
 {
+#define DXT1_BLOCK_NUMS (4)
+	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
+	HAL_CmdBufIn(BITMAP_SOURCE(startAddr));
+	HAL_CmdBufIn(BITMAP_LAYOUT(RGB565, W/DXT1_BLOCK_NUMS*2, H/DXT1_BLOCK_NUMS));
+    HAL_CmdBufIn(BITMAP_LAYOUT_H(W/DXT1_BLOCK_NUMS*2 >> 10, H/DXT1_BLOCK_NUMS >> 9));
+	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, W, H));
+    HAL_CmdBufIn(BITMAP_SIZE_H(W>>9, H>>9));
+
+	HAL_CmdBufIn(BITMAP_HANDLE(startHdl));
+	HAL_CmdBufIn(BITMAP_SOURCE(startAddr + 2*(W/DXT1_BLOCK_NUMS*2*H/DXT1_BLOCK_NUMS)));
+	HAL_CmdBufIn(BITMAP_LAYOUT(L1, W/DXT1_BLOCK_NUMS/2, H));
+    HAL_CmdBufIn(BITMAP_LAYOUT_H(W/DXT1_BLOCK_NUMS/2 >> 10, H >> 9));
+	HAL_CmdBufIn(BITMAP_SIZE(NEAREST, BORDER, BORDER, W, H));
+    HAL_CmdBufIn(BITMAP_SIZE_H(W>>9, H>>9));
+}
+
+FTVOID BmpInfo (FTU8 Hdl, FTU32 Format, FTU32 LnSt, FTU32 Addr, FTU16 W, FTU16 H)
+{
+    HAL_CmdBufIn(BITMAP_HANDLE(Hdl));
 #if defined(DEF_81X) || defined(DEF_BT81X)
     /* 
      * when using SETBITMAP 
@@ -412,35 +588,52 @@ FTU8 appUseSetBitmp(FTU32 s, bmpHDR_st *p)
      * option in size, you may use size seperatly
      * when you wish to set other option such as BILINEAR
      */
-    if (p->len) {
-        CoCmd_SETBITMAP(s,p->format,p->wide,p->high);
-    } else {
-        /* when len is zero, it means ASTC format in flash
-           use the len_lut to pass the flash address*/
-        CoCmd_SETBITMAP(0x800000 | (p->len_lut) / 32,p->format,p->wide,p->high);
-    }
-    return 1;
+    CoCmd_SETBITMAP(Addr,Format,W,H);
 #else
-    return 0;
+    HAL_CmdBufIn(BITMAP_SOURCE(Addr));
+    HAL_CmdBufIn(BITMAP_LAYOUT(Format,LnSt,H));
+    /* 
+     * select NEAREST or BILINEAR base on your image and requirement
+     * NEAREST: make the image shap clear
+     * BILINEAR: make the image shap smooth
+     */
+    HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,W,W));
 #endif
 }
-FTVOID appPalette(FTU32 *ps, bmpHDR_st *p)
-{
-#if defined(DEF_81X) || defined(DEF_BT81X)
-    FTU32 format = p->format, src = *ps;
 
-    switch (format) {
-        case PALETTED8:
-        case PALETTED565:
-        case PALETTED4444:
-            src += p->len_lut;
-            *ps = src;
-            break;
-        default:
-            break;
-    }
-#endif
+FTVOID appDispDXT1 (FTU8 startHdl, FT16 X, FT16 Y)
+{
+    HAL_CmdBufIn(SAVE_CONTEXT());
+	HAL_CmdBufIn(BLEND_FUNC(ONE,ZERO));
+	HAL_CmdBufIn(COLOR_A(0x55));
+	HAL_CmdBufIn(BITMAP_HANDLE(startHdl));
+	HAL_CmdBufIn(CELL(0));
+	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
+
+	HAL_CmdBufIn(BLEND_FUNC(ONE,ONE));
+	HAL_CmdBufIn(COLOR_A(0xAA));
+	HAL_CmdBufIn(BITMAP_HANDLE(startHdl));
+	HAL_CmdBufIn(CELL(1));
+	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
+
+	HAL_CmdBufIn(COLOR_MASK(1,1,1,0));
+
+	CoCmd_LOADIDENTITY;
+	CoCmd_SCALE(4*EVE_TRANSFORM_MAX, 4*EVE_TRANSFORM_MAX);
+	CoCmd_SETMATRIX;
+
+	HAL_CmdBufIn(BLEND_FUNC(DST_ALPHA,ZERO));
+	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
+	HAL_CmdBufIn(CELL(1));
+	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
+
+	HAL_CmdBufIn(BLEND_FUNC(ONE_MINUS_DST_ALPHA,ONE));
+	HAL_CmdBufIn(BITMAP_HANDLE(startHdl+1));
+	HAL_CmdBufIn(CELL(0));
+	HAL_CmdBufIn(VERTEX2F(X*EVE_PIXEL_UNIT,Y*EVE_PIXEL_UNIT));
+    HAL_CmdBufIn(RESTORE_CONTEXT());
 }
+
 #if defined(DEF_81X) || defined(DEF_BT81X)
 FTVOID appDispPalette8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
 {
@@ -473,7 +666,8 @@ FTVOID appDispPalette8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell)
 #endif
 appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-    if (nums > EVE_BMP_EXT_HANDLE || bmpHdl >= EVE_BMP_EXT_HANDLE) {
+    if ((nums + 1) > EVE_BMP_EXT_HANDLE || (bmpHdl + 1) >= EVE_BMP_EXT_HANDLE) {
+        /* plus 1 is for in case there is DXT1, need 2 handle for 1 image */
         FTPRINT("\nappBmpToRamG: items exceed");
         return APP_ERR_HDL_EXC;
     }
@@ -482,7 +676,7 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
         return APP_ERR_LEN;
     }
 
-    appUI_FillBmpDL(bmpHdl, ramgAddr, pbmpHD, nums);
+    appUI_FillBmpDL(bmpHdl, pbmpHD, nums);
 
     return APP_OK;
 }
@@ -862,26 +1056,35 @@ FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update)
  * all base on your actual application needed
  * it just one of the way to tell the EVE about bitmap information
  */
-FTVOID appUI_FillBmpDL(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nums)
+FTVOID appUI_FillBmpDL(FTU32 bmpHdl, bmpHDR_st *pbmpHD, FTU32 nums)
 {
-    FTU32 i, src;
+    FTU32 i, src, hdl;
 
     HAL_CmdBufIn(CMD_DLSTART);
-    for (i = 0, src = ramgAddr; i < nums; i++) {
-        HAL_CmdBufIn(BITMAP_HANDLE(i+bmpHdl));
-        if (!appUseSetBitmp(src, pbmpHD+i)) {
-            HAL_CmdBufIn(BITMAP_SOURCE(src));
-            HAL_CmdBufIn(BITMAP_LAYOUT(pbmpHD[i].format,appGetLinestride(&pbmpHD[i]),pbmpHD[i].high));
-            /* 
-             * select NEAREST or BILINEAR base on your image and requirement
-             * NEAREST: make the image shap clear
-             * BILINEAR: make the image shap smooth
-             */
-            HAL_CmdBufIn(BITMAP_SIZE(NEAREST,BORDER,BORDER,pbmpHD[i].wide,pbmpHD[i].high));
+    
+    for (i = 0, hdl = bmpHdl; i < nums; i++) {
+        switch (pbmpHD[i].format) {
+            case PALETTED8:
+            case PALETTED565:
+            case PALETTED4444:
+            case PALETTED:
+                ((ImgInfoPal_st *)pbmpHD[i].info)->handle = hdl + i;
+                src = ((ImgInfoPal_st *)pbmpHD[i].info)->addr_inx;
+                BmpInfo(hdl + i,pbmpHD[i].format,appGetLinestride(&pbmpHD[i]),src,pbmpHD[i].wide,pbmpHD[i].high);
+                break;
+            case FORMAT_DXT1:
+                ((ImgInfoDXT1_st *)pbmpHD[i].info)->handle = hdl + i;
+                src = ((ImgInfoDXT1_st *)pbmpHD[i].info)->addr;
+                DXT1BmpInfo(hdl + i,src,pbmpHD[i].wide,pbmpHD[i].high);
+                /* one DXT1 image need two handle */
+                hdl += 1;
+                break;
+            default:
+                ((ImgInfo_st *)pbmpHD[i].info)->handle = hdl + i;
+                src = ((ImgInfo_st *)pbmpHD[i].info)->addr;
+                BmpInfo(hdl + i,pbmpHD[i].format,appGetLinestride(&pbmpHD[i]),src,pbmpHD[i].wide,pbmpHD[i].high);
+                break;
         }
-        src += pbmpHD[i].len;
-
-        appPalette(&src, pbmpHD + i);
     }
 
     HAL_CmdBufIn(DISPLAY());
@@ -1073,6 +1276,9 @@ STATIC FTVOID appUI_EVETchCfg ( FTVOID )
     /* for Goodix touch panel, I don't know why */
     HAL_Write16(REG_CYA_TOUCH,0x05D0);
 #else
+    /* I don't know why need to set the CYA register,
+       it was from some version of sample code
+       may no need it in later version, but I just leave it here */
     HAL_Write16(REG_CYA_TOUCH,(HAL_Read16(REG_CYA_TOUCH) & 0x7fff));
 #endif
     FTDELAY(300);
@@ -1084,16 +1290,16 @@ STATIC FTVOID appUI_EVETchCfg ( FTVOID )
 #endif
 
 #else
+
+#if !defined(LCD_WVGA)
     /*
      * for this code, I consider "resistance touch" + "WVGA" 
      * means using FTDI WH70R, it use default touch threshold: 
      * the lightest touch will be accepted
      * you may change it depends on your real system
      */
-#if !defined(LCD_WVGA)
     HAL_Write16(REG_TOUCH_RZTHRESH,EVE_TOUCH_THRESHOLD);
 #endif
-    HAL_Write16(REG_CYA_TOUCH,(HAL_Read16(REG_CYA_TOUCH) | 0x8000));
 #endif
 }
 STATIC FTVOID appUI_EVESetSPI (FTU32 type)
