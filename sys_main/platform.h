@@ -192,7 +192,7 @@
 #if (defined(UI_AVI) || \
     defined(UI_BITMAP) || \
     defined(UI_DASHBOARD) || \
-    defined(UI_JPGDISP) || \
+    defined(UI_PICTURE) || \
     defined(UI_METER))
 #define DEF_81X
 

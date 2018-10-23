@@ -7,11 +7,11 @@
 */
 
 #if defined(FILESYS_USED)
-#define PATH_JPG_A ROOT_PATH"jpgdisp\\a.jpg"
-#define PATH_JPG_B ROOT_PATH"jpgdisp\\b.jpg" /* higher compressed with smoothing effect */
-#define PATH_PNG_A ROOT_PATH"jpgdisp\\a.png"
-#define PATH_PNG_B ROOT_PATH"jpgdisp\\b.png" /* paletted PNG with dithering effect */
-#define PATH_PNG_X ROOT_PATH"jpgdisp\\x.png" /* unsupported image, to simulate fault catch */
+#define PATH_JPG_A ROOT_PATH"picture\\a.jpg"
+#define PATH_JPG_B ROOT_PATH"picture\\b.jpg" /* higher compressed with smoothing effect */
+#define PATH_PNG_A ROOT_PATH"picture\\a.png"
+#define PATH_PNG_B ROOT_PATH"picture\\b.png" /* paletted PNG with dithering effect */
+#define PATH_PNG_X ROOT_PATH"picture\\x.png" /* unsupported image, to simulate fault catch */
 #else
 #define PATH_JPG_A ROOT_PATH"a.jpg"
 #define PATH_JPG_B ROOT_PATH"b.jpg"

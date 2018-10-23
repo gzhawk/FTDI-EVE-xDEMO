@@ -40,8 +40,8 @@ app_para_t appGP = {0};
 #include "UI_midea_w.h"
 #elif defined(UI_CJ)
 #include "UI_cj.h"
-#elif defined(UI_JPGDISP)
-#include "UI_jpgdisp.h"
+#elif defined(UI_PICTURE)
+#include "UI_picture.h"
 #elif defined(UI_BSH)
 #include "UI_bsh.h"
 #elif defined(UI_GRG)
