@@ -252,20 +252,6 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-#if defined(UI_XIZI)
-#define DEF_80X 
-
-#define LCD_WQVGA
-#define DEF_CAP_NONMULTI
-#define EVE_SPI_TYPE 1
-
-#if (defined(ARDUINO) || \
-     defined(STM32F4))
-#error "not supported"
-#endif
-#endif
-
-/*----------------------------------------------------------------------------*/
 #if defined(UI_EVEUI) || \
     defined(UI_AUDIO) || \
     defined(UI_DRAGICON)
