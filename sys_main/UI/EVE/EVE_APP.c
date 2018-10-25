@@ -460,6 +460,8 @@ FTU8 LenTricks(FTU32 *p_addr, bmpHDR_st *pbmpHD)
                file uncompress and forward to EVE action had been done
                in FileProcess, only got the correct length
                of uncompressed file, for the address offset
+               TODO: if using CELL function, there is a problem in len
+                     would find some time to overcome it.
              */
             p->len = appGetLinestride(pbmpHD)*pbmpHD->high;
             break;
@@ -474,6 +476,10 @@ FTU8 LenTricks(FTU32 *p_addr, bmpHDR_st *pbmpHD)
             break;
         case TYPE_Z_FLASH:
             appFlashUnzip(p->path, *p_addr);
+            /*
+             TODO: if using CELL function, there is a problem in len
+                   would find some time to overcome it.
+            */
             p->len = appGetLinestride(pbmpHD)*pbmpHD->high;
             break;
         case TYPE_FLASH:
@@ -706,6 +712,11 @@ FTVOID appEveZERO(FTU32 eve_addr, FTU32 len)
 FTU8 appFlashPath (FTC8 *path, FTU32 *len)
 {
 #if defined(DEF_BT81X)
+	if (!path) {
+		FTPRINT("\nappFlashAddr: path NULL");
+		return 0;
+	}
+
     if (!memcmp(path, "ASTC_FLASH", L_ASTC_FLASH)) {
         appFlashSetFull();
         *len = TYPE_ASTC_FLASH;
@@ -858,7 +869,7 @@ FTU8 appFlashToEVE(FTU32 f_addr, FTU32 e_addr, FTU32 len)
 {
     FTU32 cmd[4];
     
-    if (f_addr % 64 || e_addr % 4 || len % 4) {
+    if (f_addr % 64 || e_addr % 4 || len % 4 || len == 0) {
         FTPRINT("\nappFlashToEVE: input error");
         return 1;
     }
@@ -881,7 +892,7 @@ FTU8 appFlashUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len)
 {
 	FTU32 cmd[4];
 
-    if (f_addr % EVE_FLHUPDATE_LEN || e_addr % 4 || len % EVE_FLHUPDATE_LEN) {
+    if (f_addr % EVE_FLHUPDATE_LEN || e_addr % 4 || len % EVE_FLHUPDATE_LEN || len == 0) {
         FTPRINT("\nappFlashUpdate: input error");
         return 1;
     }
