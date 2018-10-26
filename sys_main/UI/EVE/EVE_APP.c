@@ -254,6 +254,11 @@ FTU8 appFileExist (FTC8 *path)
 }
 FTU32 appGetNumFromStr(FTU8 *str)
 {
+/*
+ max NUMBER string should be less than 10
+ just expand it for any SPACE insert in NUMBER string
+ */
+#define SEARCH_MAX 100
     FTU32 tmp = 0, i = 0;
 
     while (str[i]) {
@@ -262,10 +267,8 @@ FTU32 appGetNumFromStr(FTU8 *str)
             tmp += (FTU32)(str[i] - '0');
         } else if (str[i] == MARK_LEN) {
             break;
-		} else {
-			return 0;
 		}
-        if (++i >= 10) {
+        if (++i >= SEARCH_MAX) {
             return 0;
         }
     }
@@ -773,15 +776,22 @@ FTU32 appFlashAddr(FTC8 *path)
     FTU8 *p = (FTU8 *)path;
 
     if (p[L_Z_FLASH] == MARK_ADDR) {
-        return appGetNumFromStr(&p[L_Z_FLASH+1]);
+        p += L_Z_FLASH+1;
     } else if (p[L_ASTC_FLASH] == MARK_ADDR) {
-        return appGetNumFromStr(&p[L_ASTC_FLASH+1]);
+        p += L_ASTC_FLASH+1;
     } else if (p[L_FLASH] == MARK_ADDR) {
-        return appGetNumFromStr(&p[L_FLASH+1]);
+        p += L_FLASH+1;
     } else {
         FTPRINT("\nappFlashAddr: addr mark not found");
         return 0;
     }
+
+    /* in case any space between ':' and number */
+    while (*p < '0' || *p > '9') {
+        p++;
+    }
+
+    return appGetNumFromStr(p);
 }
 FTU32 appFlashLen(FTC8 *path)
 {
@@ -804,6 +814,10 @@ FTU32 appFlashLen(FTC8 *path)
         p++;
     }
     p++;
+    /* in case any space between ':' and number */
+    while (*p < '0' || *p > '9') {
+        p++;
+    }
 
     return appGetNumFromStr(p);
 }
@@ -1462,14 +1476,12 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
         1,0,0,0,0};
 #elif defined(LCD_WVGA)
         /* 
-        this setting seems better than SampleApp (below)
+        this setting seems better than SampleApp
         setting in some project
+        */
         1058,40,0,20,
         525,25,0,10,
-         */
-        928,88,0,48, 
-        525,32,0,3, 
-        2,0,1,0,1};
+        3,0,1,0,1}; //normally it PCLK should be 2
 #elif defined(LCD_QVGA)
         408,70,0,10, 
         263,13,0, 2, 
