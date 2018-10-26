@@ -54,6 +54,8 @@ app_para_t appGP = {0};
 #include "UI_scan.h"
 #elif defined(UI_WXGA)
 #include "UI_wxga.h"
+#elif defined(UI_SWITCH)
+#include "UI_switch.h"
 #else
 #error "no UI be selected"
 #endif
