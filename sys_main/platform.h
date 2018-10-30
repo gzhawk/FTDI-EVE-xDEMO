@@ -34,9 +34,32 @@
  * LCD_WQVGA        480x272
  * LCD_WVGA         800x480 only FT81X have WVGA
  * LCD_WXGA         1280x800 only for test
+ * LCD_1200X280     1200x280 only for test
  * EVE_SPI_TYPE     SPI, DSPI or QSPI supported
  */
 /*------------------------------------------demo setting, platform limitation */
+#if defined(UI_LONGLCD)
+#define DEF_BT81X
+#define LCD_1200X280
+/* using RTP, no need to define DEF_CAP_... */
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
+#define EVE_SPI_TYPE 1
+#endif
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_81X) || \
+     defined(DEF_80X))
+#error "not supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
+
 #if defined(UI_SWITCH)
 #define DEF_BT81X
 #define LCD_WVGA
@@ -281,6 +304,7 @@
     !defined(LCD_HVGA) && \
     !defined(LCD_WQVGA) && \
     !defined(LCD_WXGA) && \
+    !defined(LCD_1200X280) && \
     !defined(LCD_WVGA))
 #error "no display be selected"
 #endif
@@ -304,7 +328,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.5"
+#define APPS_VER "5.D.6"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

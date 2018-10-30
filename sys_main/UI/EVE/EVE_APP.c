@@ -1481,7 +1481,14 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
         */
         1058,40,0,20,
         525,25,0,10,
-        3,0,1,0,1}; //normally it PCLK should be 2
+        /*
+         normally PCLK should be 2
+         I set it to 3 in order to give
+         larger tolorance while displaying
+         complex bitmap 
+         (e.g. multilayer overlap Pal8 bitmap)
+         */
+        3,0,1,0,1};
 #elif defined(LCD_QVGA)
         408,70,0,10, 
         263,13,0, 2, 
@@ -1494,6 +1501,10 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
         548,43,0,41, 
         292,12,0,10, 
         5,0,1,1,1};
+#elif defined(LCD_1200X280)
+        1338,38,0,16, 
+        298,8,0,2, 
+        3,0,1,0,0};
 #else
 #error "undefined LCD"
 #endif

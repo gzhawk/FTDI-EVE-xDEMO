@@ -7,6 +7,9 @@
 
 #ifndef _EVE_HAL_H_
 #define _EVE_HAL_H_
+#define LONGLCD_WIDTH  1200
+#define LONGLCD_HIGH   280
+
 #define WXGA_WIDTH  1280
 #define WXGA_HIGH   800
 
@@ -25,6 +28,9 @@
 #if defined(LCD_WXGA)
 #define EVE_LCD_WIDTH WXGA_WIDTH
 #define EVE_LCD_HIGH  WXGA_HIGH
+#elif defined(LCD_1200X280)
+#define EVE_LCD_WIDTH LONGLCD_WIDTH
+#define EVE_LCD_HIGH  LONGLCD_HIGH
 #elif defined(LCD_WVGA)
 #define EVE_LCD_WIDTH WVGA_WIDTH
 #define EVE_LCD_HIGH  WVGA_HIGH
@@ -39,15 +45,15 @@
 #define EVE_LCD_HIGH  WQVGA_HIGH
 #endif
 
-#define EVE_ID_REG            (0xC0001)
+#define EVE_ID_REG          (0xC0001)
 #define EVE_ID              (0x7C)
 #define EVE_CMD_WAIT_MAX    50
 #define EVE_DLP_WAIT_MAX    100
 #define EVE_TOUCH_THRESHOLD 1800
 #define EVE_PIXEL_UNIT      (16)
 
-#define EVE_DLP_SIZE          (8*1024)
-#define REG_FLAG_CLN          (0xFFFFFFFF)
+#define EVE_DLP_SIZE        (8*1024)
+#define REG_FLAG_CLN        (0xFFFFFFFF)
 #define EVE_TRACK_VALUE_MAX (0xFFFF)
 #define EVE_TRANSFORM_MAX   (0x10000)
 
