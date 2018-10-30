@@ -31,7 +31,7 @@
 #define MENU3_H 24
 
 #define MENU4_W   240
-#define MENU4_H   260//264
+#define MENU4_H   260
 #define MENU4_X   124
 #define MENU4_Y   10
 #define MENU4_GAP 10
@@ -108,7 +108,7 @@ FTVOID ui_move(FTU16 x_in)
 {
 #define MENU4_NUM       7
 #define MENU4_LEFT_MAX  (MENU4_X - (MENU4_W + MENU4_GAP))
-#define MENU4_RIGHT_MAX EVE_LCD_WIDTH
+#define MENU4_PIXEL_UNIT 8
     static FTU16 preX = 0;
     static FT16  offset = 0, initX = 10;
     FT16 i, j;
@@ -125,27 +125,24 @@ FTVOID ui_move(FTU16 x_in)
     }
 
     initX += offset;
-
+    HAL_CmdBufIn(SAVE_CONTEXT());
+    /* make the VERTEX2F range -2048 to 2047 */
+    HAL_CmdBufIn(VERTEX_FORMAT(3));
 	HAL_CmdBufIn(BEGIN(BITMAPS));
     
     for (i = 0;i < MENU4_NUM;i++) {
         j = initX + MENU4_X + i*MENU4_GAP + i*MENU4_W;
         /* don't need to show the invisable part */
-        if (j > MENU4_RIGHT_MAX) {
+        if (j > EVE_LCD_WIDTH) {
             break;
         } else if (j < MENU4_LEFT_MAX) {
             continue;
         }
 	    HAL_CmdBufIn(BITMAP_HANDLE(info_hdr[INX_MENU4_1 + i].handle));
 	    HAL_CmdBufIn(CELL(0));
-        HAL_CmdBufIn(VERTEX2F(j*EVE_PIXEL_UNIT, MENU4_Y*EVE_PIXEL_UNIT));
-
-        HAL_CmdBufIn(SAVE_CONTEXT());
-        HAL_CmdBufIn(COLOR_RGB(255,0,0));
-		CoCmd_NUMBER(j, MENU4_Y, 24, 0, i);
-        CoCmd_NUMBER(j,MENU4_Y+24,24,0,j);
-        HAL_CmdBufIn(RESTORE_CONTEXT());
+        HAL_CmdBufIn(VERTEX2F(j*MENU4_PIXEL_UNIT, MENU4_Y*MENU4_PIXEL_UNIT));
     }
+    HAL_CmdBufIn(RESTORE_CONTEXT());
 }
 
 FTVOID ui_unchange(FTVOID)
