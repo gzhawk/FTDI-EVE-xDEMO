@@ -1465,20 +1465,25 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
        while too much commands needs to be executed
      */
     EVE_LCD lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
-        /*
-           HCycle HOffset HSync0 HSync1 
-           VCycle VOffset VSync0 VSync1 
-           PCLK Swizzle PCLKPol Cspread Dither
-         */
 #if defined(LCD_WXGA)
+        /*
+         HCycle HOffset HSync0 HSync1 
+         VCycle VOffset VSync0 VSync1 
+         PCLK Swizzle PCLKPol Cspread Dither
+         */
+
         1440,38,0,16,
         838,8,0,2,
         1,0,0,0,0};
 #elif defined(LCD_WVGA)
         /* 
-        this setting seems better than SampleApp
-        setting in some project
+         this setting seems better than SampleApp
+         setting in some project
+
+         HCycle HOffset HSync0 HSync1 
+         VCycle VOffset VSync0 VSync1 
         */
+
         1058,40,0,20,
         525,25,0,10,
         /*
@@ -1487,21 +1492,48 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
          larger tolorance while displaying
          complex bitmap 
          (e.g. multilayer overlap Pal8 bitmap)
+         
+         PCLK Swizzle PCLKPol Cspread Dither
          */
+
         3,0,1,0,1};
 #elif defined(LCD_QVGA)
+        /*
+         HCycle HOffset HSync0 HSync1 
+         VCycle VOffset VSync0 VSync1 
+         PCLK Swizzle PCLKPol Cspread Dither
+         */
+
         408,70,0,10, 
         263,13,0, 2, 
         8,2,0,1,1};
 #elif defined(LCD_HVGA)
+        /*
+         HCycle HOffset HSync0 HSync1 
+         VCycle VOffset VSync0 VSync1 
+         PCLK Swizzle PCLKPol Cspread Dither
+         */
+
         400,40,0,10, 
         500,10,0, 5, 
         5,2,1,1,1}; //for ME810A_HV35R pclk is 5
 #elif defined(LCD_WQVGA)
+        /*
+         HCycle HOffset HSync0 HSync1 
+         VCycle VOffset VSync0 VSync1 
+         PCLK Swizzle PCLKPol Cspread Dither
+         */
+
         548,43,0,41, 
         292,12,0,10, 
         5,0,1,1,1};
 #elif defined(LCD_1200X280)
+        /*
+         HCycle HOffset HSync0 HSync1 
+         VCycle VOffset VSync0 VSync1 
+         PCLK Swizzle PCLKPol Cspread Dither
+         */
+
         1338,38,0,16, 
         298,8,0,2, 
         3,0,1,0,0};
