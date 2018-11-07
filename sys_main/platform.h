@@ -170,7 +170,7 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-#if defined(UI_FLASH_ANIM)
+#if defined(UI_ANIM)
 #define DEF_BT81X
 #define LCD_WVGA
 #define DEF_CAP_MULTI

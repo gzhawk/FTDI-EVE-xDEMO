@@ -42,8 +42,8 @@ app_para_t appGP = {0};
 #include "UI_dashboard.h"
 #elif defined(UI_HVGA)
 #include "UI_hvga.h"
-#elif defined(UI_FLASH_ANIM)
-#include "UI_flash_anim.h"
+#elif defined(UI_ANIM)
+#include "UI_anim.h"
 #elif defined(UI_FLASH_PROG)
 #include "UI_flash_prog.h"
 #elif defined(UI_WATER)
