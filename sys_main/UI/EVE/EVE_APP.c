@@ -20,12 +20,9 @@
  */
 #define READ_ID_WAIT 100
 
-/* 
- * longer delay for CAP touch engin ready
- * for RES touch engin, 10 would be enough 
- * do longer delay anyway for safer status
- */
-#define CLK_DELAY 200
+#define ACTIVE_DELAY 300
+
+#define FREQ_DELAY 50
 
 FTU8 READ_ID = 0;
 
@@ -1188,13 +1185,29 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 
 STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 {
+    /*
+     it's nothing to do with EVE
+     I just put some related preparation action
+     you may handle this things some other place
+     */
     HAL_preparation();
 
-    HAL_McuCmdBufInit();
     /* 
-       the SPI clock shall not exceed 11MHz before system clock is enabled. 
+     do the data buffering base on your system
+     you may even not do the buffering before sending out the data
+     it just an example, you may do it in your own way
+     */
+    HAL_McuCmdBufInit();
+    
+    /* 
+     1.the SPI clock shall not exceed 11MHz before system clock is enabled. 
        After system clock is properly enabled, 
-       the SPI clock is allowed to go up to 30MHz.	
+       the SPI clock is allowed to go up to 30MHz.
+       
+     2.if you going to send 4 bytes, after pull low the CS,
+       pull high the CS after all 4 bytes finish
+       if you going to send 100 bytes,
+       pull high the CS after all 100 bytes finish
      */
     HAL_SpiInit();
 }
@@ -1202,43 +1215,63 @@ STATIC FTVOID appUI_EVEPathCfg ( FTVOID )
 STATIC FTVOID appUI_EVEActive ( FTVOID )
 {
     HAL_Cfg(FT_GPU_ACTIVE_M);
+
 #if defined(DEF_81X) || defined(DEF_BT81X)
     /* 81X need more action for the active */
     HAL_Cfg(FT_GPU_ACTIVE_M);
 #endif
-    FTDELAY(300);
+
+    /* 
+     it's important to wait enough long 
+     for the EVE to active
+     */
+    FTDELAY(ACTIVE_DELAY);
 }
 
 STATIC FTVOID appUI_EVEClk ( FTVOID )
 {
     FTPRINT("\nOSC: ");
+
+    /*
+     setting the EVE clock source
+     */
 #if defined(TRIM_NEEDED)
     FTPRINT("internal");
+    HAL_Cfg(FT_GPU_INTERNAL_OSC);
 #else
     FTPRINT("external");
-    /* Set the clk to external clock */
     HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
 #endif
-#if !defined(DEF_81X) && !defined(DEF_BT81X)
-    /* default 48MHz, no need to config
-    HAL_Cfg(FT_GPU_PLL_48M);  
-    */
+    
+    /*
+     setting the EVE system frequence
+     */
+#if !defined(DEF_BT81X)
+    /*
+     default is 48MHz, I'm using default, so no need to config
+     you can set it to other this way:
+     (for example you want it work at 24MHz)
+    
+     HAL_Cfg(FT_GPU_PLL_24M);
+     */
+#else
+    /* 
+     default is 60MHz, I'm using default, so no need to config
+     you can set it to other this way:
+     (for example you want it work at 72MHz)
 
-    /* for BT81X, you may select EVE system clock
-    HAL_Cfg(FT_GPU_SLEEP_M); 
-    FTDELAY(50);
-    HAL_Cfg3(GPU_SYSCLK_72M);
-    FTDELAY(50);
-    HAL_Cfg(FT_GPU_ACTIVE_M);
-    FTDELAY(50);
+     HAL_Cfg(FT_GPU_SLEEP_M); 
+     FTDELAY(FREQ_DELAY);
+     HAL_Cfg3(GPU_SYSCLK_72M);
+     FTDELAY(FREQ_DELAY);
+     HAL_Cfg(FT_GPU_ACTIVE_M);
+     FTDELAY(FREQ_DELAY);
     */
 #endif
-    FTDELAY(CLK_DELAY);
 }
 
 STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
 {
-    /* set DISP to output, then enable the DISP */
 #if defined(DEF_81X) || defined(DEF_BT81X)
     /*
        Bit 31-16: Reserved
@@ -1287,10 +1320,6 @@ STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
     while(HAL_Read8(REG_PLAY));
 }
 
-/*
- * Add the FT81X support, with the CTP controller
- * you may change the delay time base on your own HW and CTP
- */
 STATIC FTVOID appUI_EVETchCfg ( FTVOID )
 {
 #if defined(DEF_CAP_NONMULTI) || defined(DEF_CAP_MULTI)
@@ -1675,18 +1704,26 @@ FTVOID appUI_EVEBeforeLaunch(FTVOID)
 }
 FTVOID UI_INIT (FTVOID)
 {
+    /* 
+     there are some basic hardware related init in it
+     such as SPI interface init
+     */
     appUI_EVEPathCfg();
 
-    /* in some very old BASIC board, 
-     * the input should be 0,
-     * but all the offical board outside should be 1
-     * so leave it 1 */
+    /* 
+     PD pin has to be pull high.
+     */
     HAL_PwdCyc(1);
-
-    appUI_EVEActive();
-
+    
     appUI_EVEClk();
-
+    
+    appUI_EVEActive();
+     
+    /* 
+     you should be able to see the clock in X1/X2 pin here
+     if not, you will never read the ChipID
+     there is some problem above (power, SPI, PD, CLK, etc.)
+     */
     if (!appUI_EVEVerify()) {
         FTPRINT("\nEVE init fail");
         while(1);
@@ -1694,28 +1731,49 @@ FTVOID UI_INIT (FTVOID)
     
     FTPRINT("\nEVE inited");
     /* 
-     * After recognizing the type of chip, 
-     * perform the trimming if necessary 
+     better do the trimming when using internal clock 
      */
     appUI_EVEClkTrim();
 
+    /* 
+     set DISP to output, then enable the DISP
+     and some other GPIO related pin
+     */
     appUI_EVEGPIOCfg();
-
+    
+    /* 
+     config the touch related part
+     the 'host mode' for FT81X and BT81X not implimented here
+     you may refer to offical code example
+     */
     appUI_EVETchCfg();
-    /* clear the screen before enable the LCD
-       to avoid messy info on LCD during bootup */
+    
+    /* 
+     clear the screen before enable the LCD
+     to avoid messy info on LCD during bootup 
+     */
     appUI_EVEClnScrn();
-
+    
+    /* 
+     do the LCD HW related part here
+     */
     appUI_EVELCDCfg();
 
-    /* you may put some initial steps
-       before launch here */
+    /* 
+     I just put some none EVE related initial steps
+     before launch the major code here 
+     */
     appUI_EVEBeforeLaunch();
     
+    /* 
+     execute the screen calibration step for the touch
+     */
     appUI_WaitCal();
 
-    /* after use single SPI to config the EVE
-       set the SPI base on real HW: SPI/DSPI/QSPI */
+    /* 
+     after use single SPI to config the EVE
+     you may set the SPI base on real HW: SPI/DSPI/QSPI 
+     */
     appUI_EVESetSPI(EVE_SPI_TYPE); 
     
     FTPRINT("\nDisplay inited");
