@@ -1749,15 +1749,15 @@ FTVOID UI_INIT (FTVOID)
     appUI_EVETchCfg();
     
     /* 
-     clear the screen before enable the LCD
-     to avoid messy info on LCD during bootup 
-     */
-    appUI_EVEClnScrn();
-    
-    /* 
      do the LCD HW related part here
      */
     appUI_EVELCDCfg();
+
+	/*
+	clear the screen before enable the LCD
+	to avoid messy info on LCD during bootup
+	*/
+	appUI_EVEClnScrn();
 
     /* 
      I just put some none EVE related initial steps
