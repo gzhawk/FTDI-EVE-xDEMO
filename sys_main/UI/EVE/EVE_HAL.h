@@ -171,6 +171,12 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
 #define CoCmd_ROTATE(a)             HAL_CmdBufIn(CMD_ROTATE); \
                                     HAL_CmdBufIn((FT32)(a))
 
+#define CoCmd_ROTATEAROUND(x,y,a,s) HAL_CmdBufIn(CMD_ROTATEAROUND); \
+                                    HAL_CmdBufIn((FT32)(x)); \
+                                    HAL_CmdBufIn((FT32)(y)); \
+                                    HAL_CmdBufIn((FT32)(a)); \
+                                    HAL_CmdBufIn((FT32)(s))
+
 #define CoCmd_ROMFONT(hdl, font) HAL_CmdBufIn(CMD_ROMFONT); \
                                     HAL_CmdBufIn(hdl); \
                                     HAL_CmdBufIn(font)
