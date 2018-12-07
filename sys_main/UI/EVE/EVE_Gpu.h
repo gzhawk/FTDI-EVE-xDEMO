@@ -456,7 +456,7 @@
 #define REG_VSYNC0           3153996UL
 #define REG_VSYNC1           3154000UL
 #define PATCH_ADDR           3182946UL
-/* BT81X only support Flash less than 256MBytes */
+/* BT81X only support EVE connected Flash less than 256MBytes */
 #define FLASH_ADDR_HEAD      8388608UL
 #else
 #define ROM_FONT_ADDR        1048572UL

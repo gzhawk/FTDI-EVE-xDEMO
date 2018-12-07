@@ -6,25 +6,25 @@
 */
 
 #if defined(VC_EMULATOR)
-//#error "copy res/d_bitmap/bt81x.flash to res/flash, then comment this line"
+//#error "copy res/d_bitmap/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/d_bitmap/bt81x.flash to on-board flash, then comment this line"
+#error "program res/d_bitmap/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
 
-/* raw file in Flash, display from RAM_G */
-#define IMG1_INX       "FLASH@388096:384000"
-#define IMG1_LUT       "FLASH@772096:1024"
-#define IMG1_RGB565    "FLASH@773120:768000"
-#define IMG2_INX       "FLASH@1925120:384000"
-#define IMG2_LUT       "FLASH@2309120:1024"
-#define IMG2_RGB565    "FLASH@2310144:768000"
-#define IMG3_INX       "FLASH@3462144:384000"
-#define IMG3_LUT       "FLASH@3846144:1024"
-#define IMG3_RGB565    "FLASH@3847168:768000"
-/* raw file in Flash, direct display from Flash*/
-#define IMG1_ASTC      "ASTC_FLASH@4096"
-#define IMG2_ASTC      "ASTC_FLASH@1541120"
-#define IMG3_ASTC      "ASTC_FLASH@3078144"
+/* raw file in EVEFLH, display from RAM_G */
+#define IMG1_INX       "EVEFLH@388096:384000"
+#define IMG1_LUT       "EVEFLH@772096:1024"
+#define IMG1_RGB565    "EVEFLH@773120:768000"
+#define IMG2_INX       "EVEFLH@1925120:384000"
+#define IMG2_LUT       "EVEFLH@2309120:1024"
+#define IMG2_RGB565    "EVEFLH@2310144:768000"
+#define IMG3_INX       "EVEFLH@3462144:384000"
+#define IMG3_LUT       "EVEFLH@3846144:1024"
+#define IMG3_RGB565    "EVEFLH@3847168:768000"
+/* raw file in EVEFLH, direct display from EVEFLH*/
+#define IMG1_ASTC      "ASTC_EVEFLH@4096"
+#define IMG2_ASTC      "ASTC_EVEFLH@1541120"
+#define IMG3_ASTC      "ASTC_EVEFLH@3078144"
 
 #define HDL_START      0
 #define FNT_NUM        24

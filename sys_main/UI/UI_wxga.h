@@ -6,15 +6,15 @@
 */
 
 #if defined(VC_EMULATOR)
-//#error "copy res/wxga/bt81x.flash to res/flash, then comment this line"
+#error "copy res/wxga/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/wxga/bt81x.flash to on-board flash, then comment this line"
+#error "program res/wxga/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
 
-/* raw file in EVE Flash, display from GRAM*/
-#define IMG_1      "FLASH@4096:819200"
-#define IMG_2      "FLASH@823296:819200"
-#define IMG_3      "FLASH@1642496:819200"
+/* raw file in EVE EVEFLH, display from GRAM*/
+#define IMG_1      "EVEFLH@4096:819200"
+#define IMG_2      "EVEFLH@823296:819200"
+#define IMG_3      "EVEFLH@1642496:819200"
 
 #define HDL_START      0
 #define FNT_NUM        24

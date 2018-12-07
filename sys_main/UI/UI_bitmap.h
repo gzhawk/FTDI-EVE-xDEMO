@@ -55,11 +55,11 @@
 #endif
 
 /* zlib compressed file in flash, DEINFLATE in RAM_G and display*/
-#define DISPBP_ASTC4X4_ZFLH    "Z_FLASH@2249984"
-/* raw file in Flash, display from RAM_G */
-#define DISPBP_ARGB4_FLH       "FLASH@2217216:32768"
-/* raw file in Flash, direct display from Flash*/
-#define DISPBP_ASTC12X12_AFLH  "ASTC_FLASH@2257856"
+#define DISPBP_ASTC4X4_ZFLH    "Z_EVEFLH@2249984"
+/* raw file in EVEFLH, display from RAM_G */
+#define DISPBP_ARGB4_FLH       "EVEFLH@2217216:32768"
+/* raw file in EVEFLH, direct display from EVEFLH*/
+#define DISPBP_ASTC12X12_AFLH  "ASTC_EVEFLH@2257856"
 
 #define HDL_START 0
 #define FNT_WIDE  30

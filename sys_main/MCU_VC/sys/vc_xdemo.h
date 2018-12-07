@@ -112,7 +112,7 @@ FTU8 spi_type;
 #if defined(VC_EMULATOR)
 extern BT8XXEMU_Emulator *gEmulator;
 
-#define BTFLASH_DATA_FILE   L"..\\..\\res\\flash\\bt81X.flash"
+#define BTFLASH_DATA_FILE   L"..\\..\\res\\eveflh\\eveflh.bin"
 #define BTFLASH_DEVICE_TYPE L"mx25lemu"
 #define BTFLASH_SIZE        (16 * 1024 * 1024)
 

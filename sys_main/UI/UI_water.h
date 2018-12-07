@@ -6,20 +6,20 @@
 */
 
 #if defined(VC_EMULATOR)
-//#error "copy res/water/bt81x.flash to res/flash, then comment this line"
+//#error "copy res/water/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/water/bt81x.flash to on-board flash, then comment this line"
+#error "program res/water/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
 
-#define BKGRD_PATH         "ASTC_FLASH@30976"
+#define BKGRD_PATH         "ASTC_EVEFLH@30976"
 #define BKGRD_X            0
 #define BKGRD_Y            0
 
-#define BAR_PATH           "ASTC_FLASH@4096"
+#define BAR_PATH           "ASTC_EVEFLH@4096"
 #define BAR_X              0
 #define BAR_Y              0
 
-#define NUM_PATH           "ASTC_FLASH@219776"
+#define NUM_PATH           "ASTC_EVEFLH@219776"
 #define NUM_X              13
 #define NUM_Y              69
 
@@ -32,7 +32,7 @@
 
 #define DOWN_W             128
 #define DOWN_H             64
-#define DOWN_1_PATH        "ASTC_FLASH@211584"
+#define DOWN_1_PATH        "ASTC_EVEFLH@211584"
 #define DOWN_1_ANIM_ADDR   211456
 #define DOWN_1_ANIM_FRAM   10
 #define DOWN_1_X           34
@@ -40,14 +40,14 @@
 
 #define UP_W               48
 #define UP_H               52
-#define UP_1_PATH          "ASTC_FLASH@860352"
+#define UP_1_PATH          "ASTC_EVEFLH@860352"
 #define UP_1_ANIM_ADDR     860224
 #define UP_1_ANIM_FRAM     10
 #define UP_1_X             144
 #define UP_1_Y             0
 
-#define SUB_UP_PATH        "ASTC_FLASH@379904"
-#define SUB_DOWN_PATH      "ASTC_FLASH@249344"
+#define SUB_UP_PATH        "ASTC_EVEFLH@379904"
+#define SUB_DOWN_PATH      "ASTC_EVEFLH@249344"
 
 /* I don't have 480x272 screen on my hand now,
    so use 800x480 screen to demonstrate it
@@ -101,7 +101,7 @@ typedef enum ITEM_TAG_ {
 
 FTU8 load_resources(bmpHDR_st *p_res, FTU8 num)
 {
-    if (appFlashSetFull()) {
+    if (appEVEFLHSetFull()) {
         FTPRINT("\nflash error occur");
         return 1;
     }

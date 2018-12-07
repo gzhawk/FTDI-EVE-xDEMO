@@ -191,7 +191,7 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-#if defined(UI_FLASH_PROG)
+#if defined(UI_EVEFLH_PROG)
 #define DEF_BT81X
 #define LCD_WVGA
 #define DEF_CAP_NONMULTI
@@ -328,7 +328,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.8"
+#define APPS_VER "5.D.9"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

@@ -1,5 +1,5 @@
 /* 
-    Sample code to show how to program the Flash 
+    Sample code to show how to program the EVEFLH 
     from the file in SD Card
     Author: Hawk
 	Email : hawk.gao@ftdichip.com
@@ -7,13 +7,13 @@
 */
 
 /* 
-   when set FLASH_ONESHORT to 1: 
+   when set EVEFLH_ONESHORT to 1: 
    1. no flash progress be reported
  */
-#define FLASH_ONESHORT     0
+#define EVEFLH_ONESHORT     0
 
-/* when set FLASH_SAFTY to 1: 
-    0. no whole Flash Erase action be taken
+/* when set EVEFLH_SAFTY to 1: 
+    0. no whole EVEFLH Erase action be taken
     1. it would compare the contain before program
        the action is 4KBytes a block
     1.1 if the content are the same
@@ -21,11 +21,11 @@
     1.2 if not, erase 4KBytes when necessary,
         program this 4KBytes
  */
-#define FLASH_SAFTY        1
+#define EVEFLH_SAFTY        1
 
-#define FLASH_INFO_LEN     36
+#define EVEFLH_INFO_LEN     36
 
-#define FLASH_F            ROOT_PATH"flash\\bt81x.flash"
+#define EVEFLH_F            ROOT_PATH"eveflh\\eveflh.bin"
 
 typedef enum PROG_STEP_ {
     P_STAT = 0,
@@ -42,13 +42,13 @@ typedef enum PROG_STEP_ {
     P_END
 } PROG_STEP_E;
 
-FTC8 prog_info[P_END][FLASH_INFO_LEN] = {
-"Set Flash to full",
-"Set Flash to full fail",
+FTC8 prog_info[P_END][EVEFLH_INFO_LEN] = {
+"Set EVEFLH to full",
+"Set EVEFLH to full fail",
 "Check user file",
 "Check user file fail",
-"Erase Flash",
-#if FLASH_SAFTY
+"Erase EVEFLH",
+#if EVEFLH_SAFTY
 "Update user file [%d/100]",
 "Update user file fail [%d/100]",
 #else
@@ -117,7 +117,7 @@ FTVOID flash_ui (FTU32 para)
     }
     
     if (state > P_ERASE) {
-        if (FLASH_SAFTY) {
+        if (EVEFLH_SAFTY) {
             HAL_CmdBufIn(COLOR_RGB(128, 128, 128));
         } else {
             HAL_CmdBufIn(COLOR_RGB(0, 255, 0));
@@ -176,9 +176,9 @@ FTVOID flash_ui (FTU32 para)
     }
 }
 /* 
-    except for FLASHSPITX, FLASHSPIRX, FLASHDESEL
-    all other FLASH co-processor command such as FLASHREAD,
-    FLASHWRITE, etc. need an binary flash driver
+    except for EVEFLHSPITX, EVEFLHSPIRX, EVEFLHDESEL
+    all other EVEFLH co-processor command such as EVEFLHREAD,
+    EVEFLHWRITE, etc. need an binary flash driver
     (blob file) in the header of 4096 space of the flash.
     since the program of flash needs to be erase all,
     and eve do not have the command to only erase some particular
@@ -193,28 +193,28 @@ FTVOID flash_prog (FTU32 para)
 
     switch (state) {
         case P_STAT:
-            if (!appFlashSetFull()) {
+            if (!appEVEFLHSetFull()) {
 				state = P_CK_FILE;
             } else {
 				state = P_STAT_F;
             }
             break;
         case P_CK_FILE:
-            if(appFileExist((FTC8 *)FLASH_F)) {
-				state = FLASH_SAFTY?P_PG_RES:P_ERASE;
+            if(appFileExist((FTC8 *)EVEFLH_F)) {
+				state = EVEFLH_SAFTY?P_PG_RES:P_ERASE;
             } else {
 				state = P_CK_FILE_F;
             }
             break;
         case P_ERASE:
-            appFlashErase();
+            appEVEFLHErase();
 			state = P_PG_RES;
 			pro_w = 0;
             break;
         case P_PG_RES:
-            pro_w = appFlashProgProgress((FTU8 *)FLASH_F, 0, 
-                                           FLASH_ONESHORT?0:EVE_FLHBLOCK_LEN,
-                                           FLASH_SAFTY);
+            pro_w = appEVEFLHProgProgress((FTU8 *)EVEFLH_F, 0, 
+                                           EVEFLH_ONESHORT?0:EVE_FLHBLOCK_LEN,
+                                           EVEFLH_SAFTY);
             if (pro_w == 100) {
                 state = P_VR_RES;
             } else if (pro_w == 0) {
@@ -224,7 +224,7 @@ FTVOID flash_prog (FTU32 para)
             }
             break;
         case P_VR_RES:
-            pro_v = appFlashVerify((FTU8 *)FLASH_F, 0);
+            pro_v = appEVEFLHVerify((FTU8 *)EVEFLH_F, 0);
             if (!pro_v) {
 				state = P_SUCC;
             } else if (pro_v & 0x80){

@@ -6,15 +6,15 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "copy res/bean/bt81x.flash to res/flash, then comment this line"
+#error "copy res/bean/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/bean/bt81x.flash to on-board flash, then comment this line"
+#error "program res/bean/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
 
-#define UI_1_PATH     "ASTC_FLASH@4096"
-#define UI_2_PATH     "ASTC_FLASH@134656"
-#define UI_3_PATH     "ASTC_FLASH@265216"
-#define UI_4_PATH     "ASTC_FLASH@395776"
+#define UI_1_PATH     "ASTC_EVEFLH@4096"
+#define UI_2_PATH     "ASTC_EVEFLH@134656"
+#define UI_3_PATH     "ASTC_EVEFLH@265216"
+#define UI_4_PATH     "ASTC_EVEFLH@395776"
 
 #define ANIM_ADDR     1942336
 #define ANIM_FRAM     284
@@ -59,8 +59,8 @@ bmpHDR_st bmp_hdr[] = {
 
 FTU8 load_resources(bmpHDR_st *p_res, FTU8 num)
 {
-    if (appFlashSetFull()) {
-        FTPRINT("\nflash error occur");
+    if (appEVEFLHSetFull()) {
+        FTPRINT("\neveflh error occur");
         return 1;
     }
 

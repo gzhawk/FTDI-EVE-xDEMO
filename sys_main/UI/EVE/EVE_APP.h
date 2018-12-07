@@ -28,17 +28,17 @@
 
 #define TYPE_ZLIB           (0xFFFFFFFF)
 /* 
-there would be three kinds of flash file location mark:
-"Z_FLASH:addr:len"      all kinds of compressed format
-"ASTC_FLASH:addr:len"   original ASTC format
-"FLASH:addr:len"        all other none ASTC format
+there would be three kinds of eve-connected-flash file location mark:
+"Z_EVEFLH@addr:len"      all kinds of compressed format
+"ASTC_EVEFLH@addr:len"   original ASTC format
+"EVEFLH@addr:len"        all other none ASTC format
 */
-#define TYPE_Z_FLASH          (0xFFFFFFFE)
-#define TYPE_ASTC_FLASH       (0xFFFFFFFD)
-#define TYPE_FLASH            (0xFFFFFFFC)
-#define L_Z_FLASH             7
-#define L_ASTC_FLASH          10
-#define L_FLASH               5
+#define TYPE_Z_EVEFLH          (0xFFFFFFFE)
+#define TYPE_ASTC_EVEFLH       (0xFFFFFFFD)
+#define TYPE_EVEFLH            (0xFFFFFFFC)
+#define L_Z_EVEFLH             8  //Z_EVEFLH
+#define L_ASTC_EVEFLH          11 //ASTC_EVEFLH
+#define L_EVEFLH               6  //EVEFLH
 #define MARK_ADDR             '@'
 #define MARK_LEN              ':'
 
@@ -62,7 +62,7 @@ typedef struct ImgInfo_ {
     FTC8  *path;
     FTU32 handle;
     FTU32 len;
-    FTU32 addr; /* address in EVE or Flash */
+    FTU32 addr; /* address in EVE or EVEFLH */
 }ImgInfo_st;
 typedef struct ImgInfoPal_ {
     FTC8  *path_inx;
@@ -70,11 +70,11 @@ typedef struct ImgInfoPal_ {
     FTU32 handle;
     FTU32 len_inx;
     FTU32 len_lut;
-    FTU32 addr_inx; /* address in EVE or Flash */
-    FTU32 addr_lut; /* address in EVE or Flash */
+    FTU32 addr_inx; /* address in EVE or EVEFLH */
+    FTU32 addr_lut; /* address in EVE or EVEFLH */
 }ImgInfoPal_st;
 typedef struct ImgInfoDXT1_ {
-    FTU32 addr; /* address in EVE or Flash, 
+    FTU32 addr; /* address in EVE or EVEFLH, 
                    consider b0,b1,c0,c1 should
                    be continuous stored */
     FTU32 handle;
@@ -116,23 +116,23 @@ FTU32 appGetLinestride(bmpHDR_st *bmpHD);
 FTVOID appUI_DbgPrint (FTC8 *p_fname, FTU32 fline);
 FTU32 appEveCRC(FTU32 eve_addr, FTU32 len);
 FTVOID appEveZERO(FTU32 eve_addr, FTU32 len);
-FTU8 appFlashPath (FTC8 *path, FTU32 *len);
+FTU8 appEVEFLHPath (FTC8 *path, FTU32 *len);
 FTVOID SegmentOperation (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 toCoPro);
 FTVOID appDispDXT1 (FTU8 startHdl, FT16 X, FT16 Y);
 #if defined(DEF_81X) || defined(DEF_BT81X)
 FTVOID appDispPalette8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell);
 #endif
 #if defined(DEF_BT81X)
-FTVOID resWrFlash (FTU32 para);
-FTU8 appFlashSetFull(FTVOID);
-FTVOID appFlashErase(FTVOID);
-FTU8 appFlashToEVE(FTU32 flash_addr, FTU32 eve_addr, FTU32 len);
-FTU8 appFlashUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len);
-FTU32 appFlashVerify(FTU8 *golden_file, FTU32 flash_addr);
-FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update);
-FTU32 appFlashAddr(FTC8 *path);
-FTU32 appFlashLen(FTC8 *path);
-FTVOID appFlashUnzip(FTC8 *path, FTU32 src);
+FTVOID resWrEVEFLH (FTU32 para);
+FTU8 appEVEFLHSetFull(FTVOID);
+FTVOID appEVEFLHErase(FTVOID);
+FTU8 appEVEFLHToEVE(FTU32 flash_addr, FTU32 eve_addr, FTU32 len);
+FTU8 appEVEFLHUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len);
+FTU32 appEVEFLHVerify(FTU8 *golden_file, FTU32 flash_addr);
+FTU32 appEVEFLHProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update);
+FTU32 appEVEFLHAddr(FTC8 *path);
+FTU32 appEVEFLHLen(FTC8 *path);
+FTVOID appEVEFLHUnzip(FTC8 *path, FTU32 src);
 #endif
 
 FTVOID UI_INIT (FTVOID);

@@ -278,13 +278,13 @@ FTU32 appFileToRamG (FTC8 *path, FTU32 inAddr, FTU8 chkExceed, FTU8 *outAddr, FT
     FTU32 Len, resHDL;
 
     /* 
-      the reason why not handle the flash reading operation here is
-      during the flash reading operation, 
+      the reason why not handle the eve-connected-flash reading operation here is
+      during the eve-connected-flash reading operation, 
       there would be some image realted info is needed, 
       don't want to integrate too much function 
       in one simple purpose routine.
     */
-    if (!appFlashPath(path, &Len)) {
+    if (!appEVEFLHPath(path, &Len)) {
         
         resHDL = HAL_SegFileOpen((FTU8 *)path);
         if (resHDL == 0) {
@@ -332,25 +332,25 @@ FTU8 LenTricksPal(FTU32 *p_addr, bmpHDR_st *pbmpHD)
             /* break out to read the lookup table file later*/
             break;
 #if defined(DEF_BT81X)
-        case TYPE_Z_FLASH:
-            appFlashUnzip(p->path_inx, p->addr_inx);
+        case TYPE_Z_EVEFLH:
+            appEVEFLHUnzip(p->path_inx, p->addr_inx);
             p->len_inx = appGetLinestride(pbmpHD)*pbmpHD->high;
             p->addr_lut = p->addr_inx + p->len_inx;
             
-            appFlashUnzip(p->path_lut, p->addr_lut);
+            appEVEFLHUnzip(p->path_lut, p->addr_lut);
             
             *p_addr = p->addr_lut + p->len_lut;
             return 0;
-        case TYPE_FLASH:
-            p->len_inx = appFlashLen(p->path_inx);
-            if (appFlashToEVE(appFlashAddr(p->path_inx), p->addr_inx, p->len_inx)) {
+        case TYPE_EVEFLH:
+            p->len_inx = appEVEFLHLen(p->path_inx);
+            if (appEVEFLHToEVE(appEVEFLHAddr(p->path_inx), p->addr_inx, p->len_inx)) {
                 FTPRINT("\nLenTricksPal: inx flash to eve fail");
                 return 1;
             }
             
             p->addr_lut = p->addr_inx + p->len_inx;
-            p->len_lut = appFlashLen(p->path_lut);
-            if (appFlashToEVE(appFlashAddr(p->path_lut), p->addr_lut, p->len_lut)) {
+            p->len_lut = appEVEFLHLen(p->path_lut);
+            if (appEVEFLHToEVE(appEVEFLHAddr(p->path_lut), p->addr_lut, p->len_lut)) {
                 FTPRINT("\nLenTricksPal: lut flash to eve fail");
                 return 1;
             }
@@ -373,7 +373,7 @@ FTU8 LenTricksPal(FTU32 *p_addr, bmpHDR_st *pbmpHD)
         *p_addr = p->addr_lut + p->len_lut;
     }
     /* 
-       whatever none Flash index file use compressed file or not, 
+       whatever none EVEFLH index file use compressed file or not, 
        FilePrecess inside the FileToRamG would handle it,
        no need to know the length
      */
@@ -391,31 +391,31 @@ FTU8 LenTricksDXT1(FTU32 *p_addr, bmpHDR_st *pbmpHD)
     p->addr = *p_addr;
 
     /* 
-       no TYPE_ZLIB,TYPE_Z_FLASH,TYPE_ASTC_FLASH for DXT1 
-       if one file is in Flash all consider all others in Flash
+       no TYPE_ZLIB,TYPE_Z_EVEFLH,TYPE_ASTC_EVEFLH for DXT1 
+       if one file is in EVEFLH all consider all others in EVEFLH
        vice versa
      */
     switch (p->len_c0) {
 #if defined(DEF_BT81X)
-        case TYPE_FLASH:
-            p->len_c0 = appFlashLen(p->path_c0);
-            if (appFlashToEVE(appFlashAddr(p->path_c0), p->addr, p->len_c0)) {
+        case TYPE_EVEFLH:
+            p->len_c0 = appEVEFLHLen(p->path_c0);
+            if (appEVEFLHToEVE(appEVEFLHAddr(p->path_c0), p->addr, p->len_c0)) {
                 FTPRINT("\nLenTricksDXT1: flash c0 to eve fail");
                 return 1;
             }
-            p->len_c1 = appFlashLen(p->path_c1);
-            if (appFlashToEVE(appFlashAddr(p->path_c1), p->addr+p->len_c0, p->len_c1)) {
+            p->len_c1 = appEVEFLHLen(p->path_c1);
+            if (appEVEFLHToEVE(appEVEFLHAddr(p->path_c1), p->addr+p->len_c0, p->len_c1)) {
                 FTPRINT("\nLenTricksDXT1: flash c1 to eve fail");
                 return 1;
             }
-            p->len_b0 = appFlashLen(p->path_b0);
-            if (appFlashToEVE(appFlashAddr(p->path_b0), p->addr+p->len_c0+p->len_b0, \
+            p->len_b0 = appEVEFLHLen(p->path_b0);
+            if (appEVEFLHToEVE(appEVEFLHAddr(p->path_b0), p->addr+p->len_c0+p->len_b0, \
                                            p->len_b0)) {
                 FTPRINT("\nLenTricksDXT1: flash b0 to eve fail");
                 return 1;
             }
-            p->len_b1 = appFlashLen(p->path_b1);
-            if (appFlashToEVE(appFlashAddr(p->path_b1), p->addr+p->len_c0+p->len_b0+p->len_b1, \
+            p->len_b1 = appEVEFLHLen(p->path_b1);
+            if (appEVEFLHToEVE(appEVEFLHAddr(p->path_b1), p->addr+p->len_c0+p->len_b0+p->len_b1, \
                                            p->len_b1)) {
                 FTPRINT("\nLenTricksDXT1: flash b1 to eve fail");
                 return 1;
@@ -466,25 +466,25 @@ FTU8 LenTricks(FTU32 *p_addr, bmpHDR_st *pbmpHD)
             p->len = appGetLinestride(pbmpHD)*pbmpHD->high;
             break;
 #if defined(DEF_BT81X)
-        case TYPE_ASTC_FLASH:
+        case TYPE_ASTC_EVEFLH:
             /* 
                ONLY for ASTC: when using flash to display raw file
-               no RAM is needed, EVE render directly from Flash
+               no RAM is needed, EVE render directly from EVEFLH
              */
             p->len = 0;
-            p->addr = 0x800000 | appFlashAddr(p->path) / 32;
+            p->addr = 0x800000 | appEVEFLHAddr(p->path) / 32;
             break;
-        case TYPE_Z_FLASH:
-            appFlashUnzip(p->path, *p_addr);
+        case TYPE_Z_EVEFLH:
+            appEVEFLHUnzip(p->path, *p_addr);
             /*
              TODO: if using CELL function, there is a problem in len
                    would find some time to overcome it.
             */
             p->len = appGetLinestride(pbmpHD)*pbmpHD->high;
             break;
-        case TYPE_FLASH:
-            p->len = appFlashLen(p->path);
-            if (appFlashToEVE(appFlashAddr(p->path), p->addr, p->len)) {
+        case TYPE_EVEFLH:
+            p->len = appEVEFLHLen(p->path);
+            if (appEVEFLHToEVE(appEVEFLHAddr(p->path), p->addr, p->len)) {
                 FTPRINT("\nLenTricks: flash to eve fail");
                 return 1;
             }
@@ -709,36 +709,36 @@ FTVOID appEveZERO(FTU32 eve_addr, FTU32 len)
 	cmd[2] = len;
     HAL_CmdExeNow(cmd, 3);
 }
-FTU8 appFlashPath (FTC8 *path, FTU32 *len)
+FTU8 appEVEFLHPath (FTC8 *path, FTU32 *len)
 {
 #if defined(DEF_BT81X)
 	if (!path) {
-		FTPRINT("\nappFlashAddr: path NULL");
+		FTPRINT("\nappEVEFLHAddr: path NULL");
 		return 0;
 	}
 
-    if (!memcmp(path, "ASTC_FLASH", L_ASTC_FLASH)) {
-        appFlashSetFull();
-        *len = TYPE_ASTC_FLASH;
+    if (!memcmp(path, "ASTC_EVEFLH", L_ASTC_EVEFLH)) {
+        appEVEFLHSetFull();
+        *len = TYPE_ASTC_EVEFLH;
         return 1;
     }
     
-    if (!memcmp(path, "Z_FLASH", L_Z_FLASH)) {
-        appFlashSetFull();
-        *len = TYPE_Z_FLASH;
+    if (!memcmp(path, "Z_EVEFLH", L_Z_EVEFLH)) {
+        appEVEFLHSetFull();
+        *len = TYPE_Z_EVEFLH;
         return 1;
     }
 
-    if (!memcmp(path, "FLASH", L_FLASH)) {
-        appFlashSetFull();
-        *len = TYPE_FLASH;
+    if (!memcmp(path, "EVEFLH", L_EVEFLH)) {
+        appEVEFLHSetFull();
+        *len = TYPE_EVEFLH;
         return 1;
     }
 #endif
     return 0;
 }
 #if defined(DEF_BT81X)
-FTU32 appFlashSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 update)
+FTU32 appEVEFLHSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 update)
 {
     FTU32 file_index = src, flash_addr = des, block, l = len;
 
@@ -750,7 +750,7 @@ FTU32 appFlashSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 upda
             SegmentOperation(handle, file_index, EVE_FLHUPDATE_ADDR, block, 0);
             
             /* then start update the flash */
-            appFlashUpdate(flash_addr, EVE_FLHUPDATE_ADDR, EVE_FLHUPDATE_LEN);
+            appEVEFLHUpdate(flash_addr, EVE_FLHUPDATE_ADDR, EVE_FLHUPDATE_LEN);
 
             l -= block;
             file_index += block;
@@ -768,18 +768,18 @@ FTU32 appFlashSrcToDes (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 upda
     }
     return len;
 }
-FTU32 appFlashAddr(FTC8 *path)
+FTU32 appEVEFLHAddr(FTC8 *path)
 {
     FTU8 *p = (FTU8 *)path;
 
-    if (p[L_Z_FLASH] == MARK_ADDR) {
-        p += L_Z_FLASH+1;
-    } else if (p[L_ASTC_FLASH] == MARK_ADDR) {
-        p += L_ASTC_FLASH+1;
-    } else if (p[L_FLASH] == MARK_ADDR) {
-        p += L_FLASH+1;
+    if (p[L_Z_EVEFLH] == MARK_ADDR) {
+        p += L_Z_EVEFLH+1;
+    } else if (p[L_ASTC_EVEFLH] == MARK_ADDR) {
+        p += L_ASTC_EVEFLH+1;
+    } else if (p[L_EVEFLH] == MARK_ADDR) {
+        p += L_EVEFLH+1;
     } else {
-        FTPRINT("\nappFlashAddr: addr mark not found");
+        FTPRINT("\nappEVEFLHAddr: addr mark not found");
         return 0;
     }
 
@@ -790,18 +790,18 @@ FTU32 appFlashAddr(FTC8 *path)
 
     return appGetNumFromStr(p);
 }
-FTU32 appFlashLen(FTC8 *path)
+FTU32 appEVEFLHLen(FTC8 *path)
 {
     FTU8 *p = (FTU8 *)path;
 
-    if (p[L_Z_FLASH] == MARK_ADDR) {
-        p += L_Z_FLASH+1;
-    } else if (p[L_ASTC_FLASH] == MARK_ADDR) {
-        p += L_ASTC_FLASH+1;
-    } else if (p[L_FLASH] == MARK_ADDR) {
-        p += L_FLASH+1;
+    if (p[L_Z_EVEFLH] == MARK_ADDR) {
+        p += L_Z_EVEFLH +1;
+    } else if (p[L_ASTC_EVEFLH] == MARK_ADDR) {
+        p += L_ASTC_EVEFLH +1;
+    } else if (p[L_EVEFLH] == MARK_ADDR) {
+        p += L_EVEFLH +1;
     } else {
-        FTPRINT("\nappFlashLen: addr mark not found");
+        FTPRINT("\nappEVEFLHLen: addr mark not found");
         return 0;
     }
 
@@ -818,18 +818,18 @@ FTU32 appFlashLen(FTC8 *path)
 
     return appGetNumFromStr(p);
 }
-FTVOID appFlashUnzip(FTC8 *path, FTU32 src)
+FTVOID appEVEFLHUnzip(FTC8 *path, FTU32 src)
 {
     FTU32 cmd[5] = {0};
 
     cmd[0] = CMD_FLASHSOURCE;
-    cmd[1] = appFlashAddr(path);
+    cmd[1] = appEVEFLHAddr(path);
     cmd[2] = CMD_INFLATE2;
     cmd[3] = src;
     cmd[4] = OPT_FLASH;
     HAL_CmdExeNow(cmd,5);
 }
-FTU8 appFlashSetFull(FTVOID)
+FTU8 appEVEFLHSetFull(FTVOID)
 {
     FTU32 addr, a[2];
 
@@ -854,34 +854,34 @@ FTU8 appFlashSetFull(FTVOID)
     
     switch (HAL_Read32(RAM_CMD+addr+4)) {
         case 0:
-            FTPRINT("\nFlash: successful set full");
+            FTPRINT("\nEVEFLH: successful set full");
             return 0;
         case 0xE001:
-            FTPRINT("\nFlash: flash is not supported");
+            FTPRINT("\nEVEFLH: flash is not supported");
             return 1; 
         case 0xE002:
-            FTPRINT("\nFlash: no header detected in sector 0");
+            FTPRINT("\nEVEFLH: no header detected in sector 0");
             return 1; 
         case 0xE003:
-            FTPRINT("\nFlash: sector 0 data failed integrity check");
+            FTPRINT("\nEVEFLH: sector 0 data failed integrity check");
             return 1; 
         case 0xE004:
-            FTPRINT("\nFlash: device/blob mismatch");
+            FTPRINT("\nEVEFLH: device/blob mismatch");
             return 1; 
         case 0xE005:
-            FTPRINT("\nFlash: failed full-speed test");
+            FTPRINT("\nEVEFLH: failed full-speed test");
             return 1; 
         default:
-            FTPRINT("\nFlash: unknown failure");
+            FTPRINT("\nEVEFLH: unknown failure");
             return 1; 
     }
 }
-FTU8 appFlashToEVE(FTU32 f_addr, FTU32 e_addr, FTU32 len)
+FTU8 appEVEFLHToEVE(FTU32 f_addr, FTU32 e_addr, FTU32 len)
 {
     FTU32 cmd[4];
     
     if (f_addr % 64 || e_addr % 4 || len % 4 || len == 0) {
-        FTPRINT("\nappFlashToEVE: input error");
+        FTPRINT("\nappEVEFLHToEVE: input error");
         return 1;
     }
 
@@ -893,18 +893,18 @@ FTU8 appFlashToEVE(FTU32 f_addr, FTU32 e_addr, FTU32 len)
 
     return 0;
 }
-FTVOID appFlashErase(FTVOID)
+FTVOID appEVEFLHErase(FTVOID)
 {
     FTU32 cmd = CMD_FLASHERASE;
 
     HAL_CmdExeNow(&cmd, 1);
 }
-FTU8 appFlashUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len)
+FTU8 appEVEFLHUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len)
 {
 	FTU32 cmd[4];
 
     if (f_addr % EVE_FLHUPDATE_LEN || e_addr % 4 || len % EVE_FLHUPDATE_LEN || len == 0) {
-        FTPRINT("\nappFlashUpdate: input error");
+        FTPRINT("\nappEVEFLHUpdate: input error");
         return 1;
     }
 
@@ -917,7 +917,7 @@ FTU8 appFlashUpdate(FTU32 f_addr, FTU32 e_addr, FTU32 len)
 
 	return 0;
 }
-FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
+FTU32 appEVEFLHVerify(FTU8 *golden_file, FTU32 f_addr)
 {
 #define CHECK_NUM   3 //head, middle, tail
 #define CHECK_LEN   256
@@ -930,12 +930,12 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     if (!resHDL) {
         resHDL = HAL_SegFileOpen(golden_file);
         if (resHDL == 0) {
-            FTPRINT("\nappFlashVerify: file open error");
+            FTPRINT("\nappEVEFLHVerify: file open error");
             return CHECK_NUM|0x80;
         }
 
         if (f_addr%64) {
-            FTPRINT("\nappFlashVerify: flash addr error");
+            FTPRINT("\nappEVEFLHVerify: flash addr error");
             HAL_SegFileClose(resHDL);
             return CHECK_NUM|0x80;
         }
@@ -957,7 +957,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     /* read a piece of file to a block */
     pbuf = HAL_LoopMemMalloc(0,0,CHECK_LEN);
     if (HAL_WriteSrcToDes(resHDL,point,(FTU32)pbuf,block) != block) {
-        FTPRINT("\nappFlashVerify: file read error");
+        FTPRINT("\nappEVEFLHVerify: file read error");
         HAL_SegFileClose(resHDL);
         return count|0x80;
     }
@@ -976,14 +976,14 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     appEveZERO(CHECK_EVE_TMP, block);
 
     /* read a piece of flash to EVE */
-    if (appFlashToEVE(f_addr+point, CHECK_EVE_TMP, block)) {
-        FTPRINT("\nappFlashVerify: fail to write to eve");
+    if (appEVEFLHToEVE(f_addr+point, CHECK_EVE_TMP, block)) {
+        FTPRINT("\nappEVEFLHVerify: fail to write to eve");
         return count|0x80;
     }
 
     /* do CRC in EVE and compare the CRC with file piece*/
     if (crc != appEveCRC(CHECK_EVE_TMP, block)) {
-        FTPRINT("\nappFlashVerify: crc not match");
+        FTPRINT("\nappEVEFLHVerify: crc not match");
         HAL_SegFileClose(resHDL);
         return count|0x80;
     }
@@ -1004,7 +1004,7 @@ FTU32 appFlashVerify(FTU8 *golden_file, FTU32 f_addr)
     return count;
 }
 
-FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update)
+FTU32 appEVEFLHProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update)
 {
     static FTU32 resHDL = 0, Len = 0, f_addr_index = 0;
     FTU32 piece = 0;
@@ -1012,7 +1012,7 @@ FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update)
     if (!Len || !resHDL) {
         resHDL = HAL_SegFileOpen(f_file);
         if (resHDL == 0) {
-            FTPRINT("\nappFlashProgProgress: file open error");
+            FTPRINT("\nappEVEFLHProgProgress: file open error");
             resHDL = 0;
             Len = 0;
             return 0;
@@ -1024,13 +1024,13 @@ FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update)
         
         if (update) {
             if (f_addr%EVE_FLHUPDATE_LEN) {
-                FTPRINT("\nappFlashProgProgress: file addr error");
+                FTPRINT("\nappEVEFLHProgProgress: file addr error");
                 HAL_SegFileClose(resHDL);
                 return 0;
             }
         } else {
             if (f_addr%256) {
-                FTPRINT("\nappFlashProgProgress: file addr error");
+                FTPRINT("\nappEVEFLHProgProgress: file addr error");
                 HAL_SegFileClose(resHDL);
                 resHDL = 0;
                 Len = 0;
@@ -1052,8 +1052,8 @@ FTU32 appFlashProgProgress(FTU8 *f_file, FTU32 f_addr, FTU32 block, FTU8 update)
         piece = block;
     }
 
-    if (appFlashSrcToDes(resHDL,0, f_addr_index, piece, update) != piece) {
-        FTPRINT("\nappFlashProgProgress: file program error");
+    if (appEVEFLHSrcToDes(resHDL,0, f_addr_index, piece, update) != piece) {
+        FTPRINT("\nappEVEFLHProgProgress: file program error");
         HAL_SegFileClose(resHDL);
         resHDL = 0;
         Len = 0;

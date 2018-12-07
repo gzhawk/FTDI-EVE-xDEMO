@@ -6,9 +6,9 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "copy res/diehl/bt81x.flash to res/flash, then comment this line"
+#error "copy res/diehl/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/diehl/bt81x.flash to on-board flash, then comment this line"
+#error "program res/diehl/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
 
 #define ANIM_ADDR  1454400
@@ -23,16 +23,16 @@ FTVOID loop_frame(FTU32 *pframe, FTU32 max)
     }
 }
 
-FTVOID flash_anim(FTU32 para)
+FTVOID eveflh_anim(FTU32 para)
 {
 	static FTU8 load = 1;
 	static FTU32 addr = ANIM_ADDR, index = 0, max = ANIM_FRAME;
 
 	if (load) {
-		if (!appFlashSetFull()) {
+		if (!appEVEFLHSetFull()) {
 			load = 0;
 		} else {
-			FTPRINT("\nflash error occur");
+			FTPRINT("\neveflh error occur");
 			return;
 		}
 	}
@@ -56,6 +56,6 @@ FTVOID flash_anim(FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	flash_anim
+	eveflh_anim
 };
 

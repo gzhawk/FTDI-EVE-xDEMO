@@ -6,24 +6,24 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "copy res/switch/bt81x.flash to res/flash, then comment this line"
+#error "copy res/switch/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/switch/bt81x.flash to on-board flash, then comment this line"
+#error "program res/switch/eveflh.bin to eve-connected-flash, then comment this line"
 #endif 
 
-#define UI1_BKGN_INX  "FLASH@155392:384000"
-#define UI2_BKGN_INX  "FLASH@539392:384000"
-#define UI3_BKGN_INX  "FLASH@923392:384000"
-#define UI1_BKGN_LUT  "FLASH@1307392:1024"
-#define UI2_BKGN_LUT  "FLASH@1308416:1024"
-#define UI3_BKGN_LUT  "FLASH@1309440:640"
+#define UI1_BKGN_INX  "EVEFLH@155392:384000"
+#define UI2_BKGN_INX  "EVEFLH@539392:384000"
+#define UI3_BKGN_INX  "EVEFLH@923392:384000"
+#define UI1_BKGN_LUT  "EVEFLH@1307392:1024"
+#define UI2_BKGN_LUT  "EVEFLH@1308416:1024"
+#define UI3_BKGN_LUT  "EVEFLH@1309440:640"
 
-#define UI1_BUTN_INX  "FLASH@4096:28480"
-#define UI2_BUTN_INX  "FLASH@32576:16384"
-#define UI3_BUTN_INX  "FLASH@48960:103360"
-#define UI1_BUTN_LUT  "FLASH@152320:1024"
-#define UI2_BUTN_LUT  "FLASH@153344:1024"
-#define UI3_BUTN_LUT  "FLASH@154368:1024"
+#define UI1_BUTN_INX  "EVEFLH@4096:28480"
+#define UI2_BUTN_INX  "EVEFLH@32576:16384"
+#define UI3_BUTN_INX  "EVEFLH@48960:103360"
+#define UI1_BUTN_LUT  "EVEFLH@152320:1024"
+#define UI2_BUTN_LUT  "EVEFLH@153344:1024"
+#define UI3_BUTN_LUT  "EVEFLH@154368:1024"
 
 #define UI1_BUTN_W 146
 #define UI1_BUTN_H 195
@@ -91,7 +91,7 @@ butn_st butn3[BUTN3_NUM*BUTN3_LINE] = {
 
 FTU8 FileToEVE(bmpHDR_st *p_res, FTU8 num)
 {
-    if (appFlashSetFull()) {
+    if (appEVEFLHSetFull()) {
         FTPRINT("\nflash error occur");
         return 1;
     }

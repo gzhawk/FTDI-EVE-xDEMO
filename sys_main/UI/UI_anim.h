@@ -1,6 +1,6 @@
 /* 
     Sample code to show how to display continous ASTC
-    image from flash
+    image from eve-connected-flash
     Author: Hawk
 	Email : hawk.gao@ftdichip.com
 	Date  : 2018/Jun
@@ -30,7 +30,7 @@ FTVOID loop_frame(FTU32 *pframe, FTU32 max)
     }
 }
 
-FTVOID flash_anim(FTU32 para)
+FTVOID eveflh_anim(FTU32 para)
 {
 	static FTU8 flag = 1;
 	static FTU32 c1 = 0, c2 = 0, 
@@ -39,10 +39,10 @@ FTVOID flash_anim(FTU32 para)
     FTU32 xy;
 
 	if (flag) {
-		if (!appFlashSetFull()) {
+		if (!appEVEFLHSetFull()) {
 			flag = 0;
 		} else {
-			FTPRINT("\nflash error occur");
+			FTPRINT("\neveflh error occur");
 			return;
 		}
 	}
@@ -106,6 +106,6 @@ FTVOID flash_anim(FTU32 para)
 }
 
 AppFunc APPS_UI[] = {
-	flash_anim
+	eveflh_anim
 };
 

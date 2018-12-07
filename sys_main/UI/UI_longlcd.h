@@ -6,22 +6,22 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "copy res/longlcd/bt81x.flash to res/flash, then comment this line"
+#error "copy res/longlcd/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/longlcd/bt81x.flash to on-board flash, then comment this line"
+#error "program res/longlcd/eveflh.bin to eve-connected-flash, then comment this line"
 #endif 
 
-#define PATH_MENU1      "FLASH@4096  : 1344"
-#define PATH_MENU2      "FLASH@5440  : 13824"
-#define PATH_MENU3      "FLASH@19264 : 2048"
-#define PATH_MASK       "FLASH@21312  : 268800"
-#define PATH_MENU4_1    "FLASH@290112 : 62400"
-#define PATH_MENU4_2    "FLASH@352512 : 62400"
-#define PATH_MENU4_3    "FLASH@414912 : 62400"
-#define PATH_MENU4_4    "FLASH@477312 : 62400"
-#define PATH_MENU4_5    "FLASH@539712 : 62400"
-#define PATH_MENU4_6    "FLASH@602112 : 62400"
-#define PATH_MENU4_7    "FLASH@664512 : 62400"
+#define PATH_MENU1      "EVEFLH@4096  : 1344"
+#define PATH_MENU2      "EVEFLH@5440  : 13824"
+#define PATH_MENU3      "EVEFLH@19264 : 2048"
+#define PATH_MASK       "EVEFLH@21312  : 268800"
+#define PATH_MENU4_1    "EVEFLH@290112 : 62400"
+#define PATH_MENU4_2    "EVEFLH@352512 : 62400"
+#define PATH_MENU4_3    "EVEFLH@414912 : 62400"
+#define PATH_MENU4_4    "EVEFLH@477312 : 62400"
+#define PATH_MENU4_5    "EVEFLH@539712 : 62400"
+#define PATH_MENU4_6    "EVEFLH@602112 : 62400"
+#define PATH_MENU4_7    "EVEFLH@664512 : 62400"
 
 #define MENU1_W 28
 #define MENU1_H 24
@@ -83,7 +83,7 @@ bmpHDR_st bmp_hdr_m[] = {
 
 FTU8 FileToEVE(bmpHDR_st *p_res, FTU8 num)
 {
-    if (appFlashSetFull()) {
+    if (appEVEFLHSetFull()) {
         FTPRINT("\nflash error occur");
         return 1;
     }

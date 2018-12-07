@@ -6,19 +6,19 @@
 */
 
 #if defined(VC_EMULATOR)
-#error "copy res/scan/bt81x.flash to res/flash, then comment this line"
+#error "copy res/scan/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
-#error "program res/scan/bt81x.flash to on-board flash, then comment this line"
+#error "program res/scan/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
 
 #define ANIM_ADDR    783552
 #define ANIM_MAX     180 
 #define ANIM_W       512
 #define ANIM_H       512
-#define QR_PATH      "ASTC_FLASH@785024"
+#define QR_PATH      "ASTC_EVEFLH@785024"
 #define QR_W         200
 #define QR_H         200
-#define QR_TXT_PATH  "ASTC_FLASH@825024"
+#define QR_TXT_PATH  "ASTC_EVEFLH@825024"
 #define QR_TXT_W     172
 #define QR_TXT_H     24
 #define COUNT        100
@@ -44,8 +44,8 @@ FTVOID loop_frame(FTU32 *pframe, FTU32 max)
 }
 FTU8 load_resources(bmpHDR_st *p_res, FTU8 num)
 {
-    if (appFlashSetFull()) {
-        FTPRINT("\nflash error occur");
+    if (appEVEFLHSetFull()) {
+        FTPRINT("\neveflh error occur");
         return 1;
     }
 
