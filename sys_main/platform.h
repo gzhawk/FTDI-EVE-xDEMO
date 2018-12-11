@@ -108,7 +108,6 @@
 #if defined(UI_SCAN)
 #define DEF_BT81X
 #define LCD_WQVGA
-#define DEF_CAP_NONMULTI
 
 #if (defined(FT9XXEV) || \
      defined(VC_FT4222))
@@ -130,7 +129,6 @@
 #if defined(UI_BEAN)
 #define DEF_BT81X
 #define LCD_WQVGA
-#define DEF_CAP_NONMULTI
 
 #if (defined(FT9XXEV) || \
      defined(VC_FT4222))
@@ -152,7 +150,6 @@
 #if defined(UI_WATER)
 #define DEF_BT81X
 #define LCD_WQVGA
-#define DEF_CAP_NONMULTI
 
 #if (defined(FT9XXEV) || \
      defined(VC_FT4222))
@@ -328,7 +325,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.9"
+#define APPS_VER "5.D.10"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
