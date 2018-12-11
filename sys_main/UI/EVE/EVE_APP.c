@@ -1555,7 +1555,7 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
 
         548,43,0,41, 
         292,12,0,10, 
-        5,0,1,1,1};
+        8,0,1,1,1};
 #elif defined(LCD_1200X280)
         /*
          HCycle HOffset HSync0 HSync1 
