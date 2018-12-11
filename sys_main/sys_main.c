@@ -22,7 +22,7 @@ FTVOID APP_RUN (FTVOID)
         /* 
          run the indexed UI application
          it should set the appGP.appIndex within limit
-         or, the main routine would exit to expection handle
+         or, the main routine would exit to exception handle
          UI_END, SYS_END
          */
         APPS_UI[index](appGP.appPara);
