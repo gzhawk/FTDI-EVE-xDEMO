@@ -11,15 +11,15 @@
 #error "program res/water/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
 
-#define BKGRD_PATH         "ASTC_EVEFLH@30976"
+#define BKGRD_PATH         "EVEFLH@30976:130560"
 #define BKGRD_X            0
 #define BKGRD_Y            0
 
-#define BAR_PATH           "ASTC_EVEFLH@4096"
+#define BAR_PATH           "EVEFLH@4096:26880"
 #define BAR_X              0
 #define BAR_Y              0
 
-#define NUM_PATH           "ASTC_EVEFLH@219776"
+#define NUM_PATH           "EVEFLH@219776:29568"
 #define NUM_X              13
 #define NUM_Y              69
 
@@ -32,7 +32,7 @@
 
 #define DOWN_W             128
 #define DOWN_H             64
-#define DOWN_1_PATH        "ASTC_EVEFLH@211584"
+#define DOWN_1_PATH        "EVEFLH@211584:8192"
 #define DOWN_1_ANIM_ADDR   211456
 #define DOWN_1_ANIM_FRAM   10
 #define DOWN_1_X           34
@@ -40,14 +40,14 @@
 
 #define UP_W               48
 #define UP_H               52
-#define UP_1_PATH          "ASTC_EVEFLH@860352"
+#define UP_1_PATH          "EVEFLH@860352:2496"
 #define UP_1_ANIM_ADDR     860224
 #define UP_1_ANIM_FRAM     10
 #define UP_1_X             144
 #define UP_1_Y             0
 
-#define SUB_UP_PATH        "ASTC_EVEFLH@379904"
-#define SUB_DOWN_PATH      "ASTC_EVEFLH@249344"
+#define SUB_UP_PATH        "EVEFLH@379904:130560"
+#define SUB_DOWN_PATH      "EVEFLH@249344:130560"
 
 /* I don't have 480x272 screen on my hand now,
    so use 800x480 screen to demonstrate it
