@@ -6,7 +6,7 @@
 */
 
 #if defined(VC_EMULATOR)
-//#error "copy res/water/eveflh.bin to res/eveflh, then comment this line"
+#error "copy res/water/eveflh.bin to res/eveflh, then comment this line"
 #elif defined(VC_MPSSE) || defined(VC_FT4222)
 #error "program res/water/eveflh.bin to eve-connected-flash, then comment this line"
 #endif
