@@ -191,7 +191,6 @@
 #if defined(UI_EVEFLH_PROG)
 #define DEF_BT81X
 #define LCD_WVGA
-#define DEF_CAP_NONMULTI
 
 #if (defined(FT9XXEV) || \
      defined(VC_FT4222))
@@ -224,7 +223,6 @@
 #define EVE_SPI_TYPE 1
 #endif
 
-#define DEF_CAP_NONMULTI
 #define LCD_WVGA
 
 #if (defined(ARDUINO) || \
@@ -238,7 +236,6 @@
 #if defined(UI_FONT)
 #define DEF_81X
 #define LCD_WQVGA
-#define DEF_CAP_NONMULTI
 
 #if (defined(FT9XXEV) || \
      defined(VC_FT4222))
@@ -279,7 +276,6 @@
 #define DEF_80X
 
 #define LCD_WQVGA
-#define DEF_CAP_NONMULTI
 #define EVE_SPI_TYPE 1
 
 #endif
@@ -325,7 +321,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.10"
+#define APPS_VER "5.D.11"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
