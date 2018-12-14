@@ -200,7 +200,8 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
  */
 FTVOID HAL_CmdBufInStr (FTC8 *pstr)
 {
-    FTU32 i,tmp = 0;
+	FTU32 i;
+	FTU8 tmp[4] = {0};
     /*
      * one of the reason I'm doing this is:
      * there are two loop buffer needs to be handled
@@ -212,31 +213,15 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
      * 3. string buf
      * when continous filling into whatever mcu buffer or eve buffer
      * to prevent too many 'if there are still free space ahead'
-     * judgement in program, I use make the action to 4 byte a shot
+     * judgement in program, I make the action to 4 byte a shot
      */
     for (i = 0; pstr[i] != '\0'; i++) {
-        switch (i%4) {
-            case 0:
-                /* 
-                 * force type definition is critical 
-                 * while running on different platform 
-                 */
-                tmp = (FTU32)pstr[i];
-                continue;
-            case 1:
-                tmp |= (FTU32)pstr[i]<<8;
-                continue;
-            case 2:
-                tmp |= (FTU32)pstr[i]<<16;
-                continue;
-            case 3:
-                tmp |= (FTU32)pstr[i]<<24;
-                break;
-            default:
-                break;
-        }
+		tmp[i%4] = pstr[i];
+		if (i%4 != 3) {
+			continue;
+		}
 
-        HAL_CmdBufIn(tmp);
+        HAL_CmdBufIn(*(FTU32 *)tmp);
 
         /* 
          make sure:
@@ -244,7 +229,7 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
          2. 4 byte align length str would have '\0'
          once it break from the while loop
          */
-        tmp = 0;
+		*(FTU32 *)tmp = 0;
     }
 
     /*
@@ -252,7 +237,7 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
      1. 4 byte align, here is to give '\0'
      2. none 4 byte align, here is to give the tmp with '\0'
      */
-    HAL_CmdBufIn(tmp);	
+    HAL_CmdBufIn(*(FTU32 *)tmp);
 
     return;
 }
