@@ -256,6 +256,12 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
                                     HAL_CmdBufIn(CMD_SETFONT); \
                                     HAL_CmdBufIn((FTU32)(f)); \
                                     HAL_CmdBufIn((FTU32)(s))
+
+#define CoCmd_SETFONT2(f, p, c)     HAL_CmdBufIn(CMD_SETFONT2); \
+                                    HAL_CmdBufIn((FTU32)(f)); \
+                                    HAL_CmdBufIn((FTU32)(p)); \
+                                    HAL_CmdBufIn((FTU32)(c))
+
 #else
 #define CoCmd_SETFONT(f, s, pf)     HAL_CmdBufIn(BITMAP_HANDLE((FTU32)(f))); \
                                     HAL_CmdBufIn(BITMAP_SOURCE(((FT_Gpu_Fonts_t *)(pf))->PointerToFontGraphicsData)); \
