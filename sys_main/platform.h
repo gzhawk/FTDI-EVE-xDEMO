@@ -74,7 +74,6 @@
 
 #if (defined(ARDUINO) || \
      defined(STM32F4) || \
-     defined(DEF_81X) || \
      defined(DEF_80X))
 #error "not supported"
 #endif

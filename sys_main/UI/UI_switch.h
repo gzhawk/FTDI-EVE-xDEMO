@@ -5,12 +5,13 @@
 	Date  : 2018/Oct
 */
 
-#if defined(VC_EMULATOR)
+#if defined(DEF_BT81X) && defined(VC_EMULATOR)
 #error "copy res/switch/eveflh.bin to res/eveflh, then comment this line"
-#elif defined(VC_MPSSE) || defined(VC_FT4222)
+#elif defined(DEF_BT81X) && (defined(VC_MPSSE) || defined(VC_FT4222))
 #error "program res/switch/eveflh.bin to eve-connected-flash, then comment this line"
 #endif 
 
+#if defined(DEF_BT81X)
 #define UI1_BKGN_INX  "EVEFLH@155392:384000"
 #define UI2_BKGN_INX  "EVEFLH@539392:384000"
 #define UI3_BKGN_INX  "EVEFLH@923392:384000"
@@ -24,6 +25,21 @@
 #define UI1_BUTN_LUT  "EVEFLH@152320:1024"
 #define UI2_BUTN_LUT  "EVEFLH@153344:1024"
 #define UI3_BUTN_LUT  "EVEFLH@154368:1024"
+#else
+#define UI1_BKGN_INX  ROOT_PATH"switch\\ui1_bkgn_inx.raw"
+#define UI2_BKGN_INX  ROOT_PATH"switch\\ui2_bkgn_inx.raw"
+#define UI3_BKGN_INX  ROOT_PATH"switch\\ui3_bkgn_inx.raw"
+#define UI1_BKGN_LUT  ROOT_PATH"switch\\ui1_bkgn_lut.raw"
+#define UI2_BKGN_LUT  ROOT_PATH"switch\\ui2_bkgn_lut.raw"
+#define UI3_BKGN_LUT  ROOT_PATH"switch\\ui3_bkgn_lut.raw"
+
+#define UI1_BUTN_INX  ROOT_PATH"switch\\ui1_butn_inx.raw"
+#define UI2_BUTN_INX  ROOT_PATH"switch\\ui2_butn_inx.raw"
+#define UI3_BUTN_INX  ROOT_PATH"switch\\ui3_butn_inx.raw"
+#define UI1_BUTN_LUT  ROOT_PATH"switch\\ui1_butn_lut.raw"
+#define UI2_BUTN_LUT  ROOT_PATH"switch\\ui2_butn_lut.raw"
+#define UI3_BUTN_LUT  ROOT_PATH"switch\\ui3_butn_lut.raw"
+#endif
 
 #define UI1_BUTN_W 146
 #define UI1_BUTN_H 195
@@ -91,11 +107,12 @@ butn_st butn3[BUTN3_NUM*BUTN3_LINE] = {
 
 FTU8 FileToEVE(bmpHDR_st *p_res, FTU8 num)
 {
+#if defined(DEF_BT81X)
     if (appEVEFLHSetFull()) {
         FTPRINT("\nflash error occur");
         return 1;
     }
-
+#endif
     if(appBmpToRamG(INX_UI1_BKG, RAM_G, p_res, num)){
         FTPRINT("\nload bitmap error occur");
         return 1;
@@ -270,7 +287,6 @@ FTVOID load_res(FT16 x_m)
 }
 FTVOID switch_panel(FTU32 para)
 {
-	static FTU8 t_delay = 0;
     static FT16 x_middle;
     FTU8 t = HAL_Read8(REG_TOUCH_TAG);
    
