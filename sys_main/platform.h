@@ -38,6 +38,28 @@
  * EVE_SPI_TYPE     SPI, DSPI or QSPI supported
  */
 /*------------------------------------------demo setting, platform limitation */
+
+#if defined(UI_DASHBOARD2)
+#define DEF_BT81X
+#define LCD_WVGA
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
+#define EVE_SPI_TYPE 1
+#endif
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_80X) || \
+     defined(DEF_81X))
+#error "not supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
+
 #if defined(UI_LONGLCD)
 #define DEF_BT81X
 #define LCD_1200X280
@@ -320,7 +342,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.13"
+#define APPS_VER "5.D.14"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

@@ -40,6 +40,8 @@ app_para_t appGP = {0};
 #include "UI_font.h"
 #elif defined(UI_DASHBOARD)
 #include "UI_dashboard.h"
+#elif defined(UI_DASHBOARD2)
+#include "UI_dashboard2.h"
 #elif defined(UI_HVGA)
 #include "UI_hvga.h"
 #elif defined(UI_ANIM)
