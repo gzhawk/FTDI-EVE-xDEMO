@@ -171,6 +171,7 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
 #define CoCmd_ROTATE(a)             HAL_CmdBufIn(CMD_ROTATE); \
                                     HAL_CmdBufIn((FT32)(a))
 
+/* ONLY BT81X would has this command */
 #define CoCmd_ROTATEAROUND(x,y,a,s) HAL_CmdBufIn(CMD_ROTATEAROUND); \
                                     HAL_CmdBufIn((FT32)(x)); \
                                     HAL_CmdBufIn((FT32)(y)); \
@@ -257,6 +258,7 @@ FTVOID CoCmd_TEXT(FTU32 x, FTU32 y, FTU32 font, FTU32 opt, FTC8 * s, ...);
                                     HAL_CmdBufIn((FTU32)(f)); \
                                     HAL_CmdBufIn((FTU32)(s))
 
+/* ONLY BT81X would has this command */
 #define CoCmd_SETFONT2(f, p, c)     HAL_CmdBufIn(CMD_SETFONT2); \
                                     HAL_CmdBufIn((FTU32)(f)); \
                                     HAL_CmdBufIn((FTU32)(p)); \
