@@ -607,6 +607,31 @@ FTVOID BmpInfo (FTU8 Hdl, FTU32 Format, FTU32 LnSt, FTU32 Addr, FTU16 W, FTU16 H
 #endif
 }
 
+FTVOID appBilinearModify (FTU8 Hdl, FTU16 MaxSize)
+{
+    /* 
+    this routine most likely to be used 
+    1. after config the bitmap info to it's dedicated handle,
+    2. before doing rotation and scaling
+
+    for each current handle related bitmap display
+    only need to do this once
+
+    MaxSize == ZERO means maximum
+    it consume eve resource, so 
+    better use the minimum MaxSize
+    */
+    HAL_CmdBufIn(CMD_DLSTART);
+    HAL_CmdBufIn(BITMAP_HANDLE(Hdl));
+    HAL_CmdBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,MaxSize,MaxSize));
+#if defined(DEF_81X) || defined(DEF_BT81X)
+    HAL_CmdBufIn(BITMAP_SIZE_H(MaxSize>>9,MaxSize>>9));
+#endif
+    HAL_CmdBufIn(DISPLAY());
+    HAL_CmdBufIn(CMD_SWAP);
+    HAL_BufToReg(RAM_CMD,0);
+}
+
 FTVOID appDispDXT1 (FTU8 startHdl, FT16 X, FT16 Y)
 {
     HAL_CmdBufIn(SAVE_CONTEXT());
