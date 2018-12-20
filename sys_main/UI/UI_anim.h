@@ -6,6 +6,10 @@
 	Date  : 2018/Jun
 */
 
+#if defined(VC_MPSSE) || defined(VC_FT4222)
+#error "program res/eveflh/eveflh.bin to eve-connected-flash, then comment this line"
+#endif
+
 #define ANIM_1_ADDR  1434752
 #define ANIM_2_ADDR  2215744
 

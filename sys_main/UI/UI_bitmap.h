@@ -6,6 +6,10 @@
             2018/Jun - Add ASTC support
 */
 
+#if defined(DEF_BT81X) && (defined(VC_MPSSE) || defined(VC_FT4222))
+#error "program res/eveflh/eveflh.bin to eve-connected-flash, then comment this line"
+#endif
+
 #if defined(FILESYS_USED)
 
 #define DXT1_B0                ROOT_PATH"bitmap\\DXT1_b0.raw"
