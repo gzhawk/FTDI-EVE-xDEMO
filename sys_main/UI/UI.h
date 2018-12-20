@@ -36,6 +36,8 @@ app_para_t appGP = {0};
 #include "UI_meter.h"
 #elif defined(UI_BITMAP)
 #include "UI_bitmap.h"
+#elif defined(UI_BITMAP2)
+#include "UI_bitmap2.h"
 #elif defined(UI_FONT)
 #include "UI_font.h"
 #elif defined(UI_DASHBOARD)
