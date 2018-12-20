@@ -116,13 +116,7 @@ FTVOID dashboard (FTU32 para)
             return;
         }
 
-        HAL_CmdBufIn(CMD_DLSTART);
-        HAL_CmdBufIn(BITMAP_HANDLE(img_info[HDL_NEEDLE].handle));
-        HAL_CmdBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,bmp_header[HDL_NEEDLE].high*2,bmp_header[HDL_NEEDLE].high*2));
-        HAL_CmdBufIn(BITMAP_SIZE_H((bmp_header[HDL_NEEDLE].high*2)>>9,(bmp_header[HDL_NEEDLE].high*2)>>9));
-        HAL_CmdBufIn(DISPLAY());
-        HAL_CmdBufIn(CMD_SWAP);
-        HAL_BufToReg(RAM_CMD,0);
+        appBilinearModify(HDL_NEEDLE, bmp_header[HDL_NEEDLE].high*2);
 
         flag = 1;
     }

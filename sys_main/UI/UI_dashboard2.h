@@ -50,25 +50,19 @@ FTVOID dashboard2 (FTU32 para)
             DBGPRINT;
             return;
         }
-       
         /* when doing the none-square image, 
            bilinear always give a better effect,
            while nearest often show jagger
-           so reset the bitmap_size info */
-        HAL_CmdBufIn(CMD_DLSTART);
-        HAL_CmdBufIn(BITMAP_HANDLE(img_info[HDL_NEEDLE].handle));
-        /* the reason why use HIGH 
+           so reset the bitmap_size info 
+           
+           the reason why use HIGH 
            assume HIGH > WIDE, if your image is WIDE > HIGH,
            then use WIDE instead of HIGH
            the reason why multiple 2 is
            when image rotate 90", and 270", the space is HIGH*2
            give the rotation the larger appearance space 
            you may also set it ZERO for the largest */
-        HAL_CmdBufIn(BITMAP_SIZE(BILINEAR,BORDER,BORDER,bmp_header[HDL_NEEDLE].high*2,bmp_header[HDL_NEEDLE].high*2));
-        HAL_CmdBufIn(BITMAP_SIZE_H((bmp_header[HDL_NEEDLE].high*2)>>9,(bmp_header[HDL_NEEDLE].high*2)>>9));
-        HAL_CmdBufIn(DISPLAY());
-        HAL_CmdBufIn(CMD_SWAP);
-        HAL_BufToReg(RAM_CMD,0);
+        appBilinearModify(HDL_NEEDLE, bmp_header[HDL_NEEDLE].high*2);
         flag = 1;
     }
 
