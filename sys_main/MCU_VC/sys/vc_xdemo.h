@@ -190,3 +190,4 @@ FTU32 HAL_Read8Buff ( FTU32 addr, FTU8 *buff, FTU32 len );
 FTU16 HAL_Read16 ( FTU32 addr );
 FTU32 HAL_Read32 ( FTU32 addr );
 
+FTU8 UTF8_Pump (FTU8 *utf8_file, FTU8 * p, FTU32 utf8_num);

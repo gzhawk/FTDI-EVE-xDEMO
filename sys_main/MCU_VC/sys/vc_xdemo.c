@@ -812,3 +812,48 @@ FTU8 HAL_ZlibCompressed (FTU32 handle, FTU32 src)
         return 0;
     }
 }
+FTU8 UTF8_Pump (FTU8 *utf8_file, FTU8 * p, FTU32 utf8_num)
+{
+#define UTF8_LEN 3
+    /* it just a test purpuse routine, NOT for common use */
+    static FTU32 index = 0;
+	static FILE *pF = NULL;
+    FTU8 header[UTF8_LEN] = {0}, *tmp = p;
+    FTU32 i,rd;
+
+    if (!pF) {
+        pF = fopen(utf8_file,"rb");
+        if(NULL == pF) {
+            FTPRINT("\nUTF8_Pump: file open error");
+            return 0;
+        }
+
+        fread(header, UTF8_LEN, 1, pF);
+
+        if (header[0] != 0xEF || 
+            header[1] != 0xBB || 
+            header[2] != 0xBF) {
+            FTPRINT("\nUTF8_Pump: not utf-8 file");
+            return 0;
+        }
+
+        index = UTF8_LEN;
+    }
+
+    for (i = 0; i < utf8_num; i++) {
+		rd = fread(tmp, UTF8_LEN, 1, pF);
+        if (!rd) {
+            fseek(pF, UTF8_LEN, SEEK_SET);
+		    fread(tmp, UTF8_LEN, 1, pF);
+            index = UTF8_LEN;
+            FTPRINT("\nUTF8_Pump: read from head again");
+        }
+        //this test TXT file use '0x0D,0x0A' to seperate each UTF8 char
+        index += UTF8_LEN + 2;
+        tmp += UTF8_LEN;
+        fseek(pF, index, SEEK_SET);
+    }
+    tmp = '\0';
+
+    return 1;
+}
