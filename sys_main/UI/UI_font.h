@@ -38,13 +38,6 @@ FTU8 screen_title[FONT_LINE][FONT_LEN] = {
 #define PATH_FONT1 ROOT_PATH"line1.raw"
 #define PATH_FONT2 ROOT_PATH"line2.raw"
 #endif
-/* this demo's GLYPH file store in address 4096 of the eve-connected-flash
-   should be the same address you input in EAB tools while generate xfont/glyph
-   it's address would be saved in XFONT+0x20 offset
-   the value would be "0x800000 | (address / 32)", e.g. "4096" would be "0x800080"
-   if you put your GLYPH in other address than the prevous address input in EAB
-   you may also follow above formula, change the data in XFONT+0x20 
-   then EVE would be able to find it */
 #define PATH_FONT3_XFONT "EVEFLH@279680:4672"
 
 #define FONT_ADDR1 RAM_G
@@ -55,16 +48,6 @@ FTVOID font_main (FTU32 para)
 #if defined(DEF_BT81X)
 	static FT_Gpu_Fonts_t stFB2;
 
-    /* instead of using index, coder may directly use 'unicode'
-       in code while using BT81X, to display the customer font
-       GLYPH: 
-       1. the customer font 'image' resource
-       2. can be stored in eve-connected-flash, or RAM_G of EVE
-       XFONT:
-       1. the header of each customer font 'image'
-       2. has to be stored in RAM_G of EVE
-       both GLYPH and XFONT are necessary when using 'unicode' font
-       */
     appEVEFLHSetFull();
     if (appEVEFLHToEVE(appEVEFLHAddr(PATH_FONT3_XFONT), FONT_ADDR1, appEVEFLHLen(PATH_FONT3_XFONT))) {
         DBGPRINT;
@@ -100,13 +83,6 @@ FTVOID font_main (FTU32 para)
 
     /* show how to impliment customer font directly on screen */
 #if defined(DEF_BT81X)
-    /* 
-       as long as your compiler can recognize UTF-8, you can do whatever you like while coding.
-       for this demo, I below two things to make sure my platform compiler recognize it:
-       1. make this file in UTF-8 format 
-          (simplest way is open your file in binary editer, add "0xEF, 0xBB, 0xEF" at your file head)
-       2. use 'u8' to indicate the compiler for the UFT-8 string
-     */
 	HAL_CmdBufIn(LINE1_COLOR);
 	CoCmd_TEXT(0,0,FONT_3,0,u8"全新的");
 	HAL_CmdBufIn(LINE2_COLOR);
