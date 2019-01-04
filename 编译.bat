@@ -1,29 +1,29 @@
 @echo off
 echo.
-echo Çë²»ÒªÖ±½Ó½øÈësys_mainÎÄ¼þ¼Ð£¬ÔÙÍ¨¹ýÎÄ¼þ¼ÐÃû×Ö
-echo ²Â²âÄ³¸öÆ½Ì¨Ó¦¸ÃÓÐµÄ±àÒë»·¾³£¬ÉÃ×Ô³¢ÊÔ×ÔÐÐ¿ªÆô¡£
-echo °²×°ÁËÏàÓ¦³ÌÐòºó£¬Åú´¦Àí»á×Ô¶¯´ò¿ª¶ÔÓ¦Æ½Ì¨ÏÂµÄ±àÒë»·¾³¡£
+echo è¯·ä¸è¦ç›´æŽ¥è¿›å…¥sys_mainæ–‡ä»¶å¤¹ï¼Œå†é€šè¿‡æ–‡ä»¶å¤¹åå­—
+echo çŒœæµ‹æŸä¸ªå¹³å°åº”è¯¥æœ‰çš„ç¼–è¯‘çŽ¯å¢ƒï¼Œæ“…è‡ªå°è¯•è‡ªè¡Œå¼€å¯ã€‚
+echo å®‰è£…äº†ç›¸åº”ç¨‹åºåŽï¼Œæ‰¹å¤„ç†ä¼šè‡ªåŠ¨æ‰“å¼€å¯¹åº”å¹³å°ä¸‹çš„ç¼–è¯‘çŽ¯å¢ƒã€‚
 echo.
-echo 1: FT9XX»·¾³ÏÂ£¬ÐèÒª¹ºÂòMM900EV1A+UMFTPD2A+UMFT81XÅäºÏÊ¹ÓÃ.
+echo 1: FT9XXçŽ¯å¢ƒä¸‹ï¼Œéœ€è¦è´­ä¹°MM900EV1A+UMFTPD2A+UMFT81Xé…åˆä½¿ç”¨.
 echo.
-echo 2: Arduino (Atmel MCU)»·¾³ÏÂ£¬ÔÚVM800P/VM801PÉÏ£¬ÅäºÏÒ»¸ùÈÎÒâUSBÏßÀÂÖ±½ÓÔËÐÐ
-echo £¨ArduinoÏà¹ØIDE¿ÉÒÔÔÚArduino.ccÍøÕ¾Ãâ·ÑÏÂÔØÊ¹ÓÃ£©
-echo »òÕß£¬Ö±½Ó¹ºÂòArduino ProÏµÁÐ°å×Ó£¬¼ÓÉÏCCModule/BasicModuleÔËÐÐ
+echo 2: Arduino (Atmel MCU)çŽ¯å¢ƒä¸‹ï¼Œåœ¨VM800P/VM801Pä¸Šï¼Œé…åˆä¸€æ ¹ä»»æ„USBçº¿ç¼†ç›´æŽ¥è¿è¡Œ
+echo ï¼ˆArduinoç›¸å…³IDEå¯ä»¥åœ¨Arduino.ccç½‘ç«™å…è´¹ä¸‹è½½ä½¿ç”¨ï¼‰
+echo æˆ–è€…ï¼Œç›´æŽ¥è´­ä¹°Arduino Proç³»åˆ—æ¿å­ï¼ŒåŠ ä¸ŠCCModule/BasicModuleè¿è¡Œ
 echo.
-echo 3: ARM (STM32)»·¾³ÏÂ£¬ÕâÊÇ»ùÓÚSTM32F4-Discovery¿ª·¢°å¿ª·¢µÄ
-echo DiscoveryÖ»ÓÐMCUÆ½Ì¨£¬ÐèÒª¹ºÂòCCModule/BasicModuleÔËÐÐ¡£
+echo 3: ARM (STM32)çŽ¯å¢ƒä¸‹ï¼Œè¿™æ˜¯åŸºäºŽSTM32F4-Discoveryå¼€å‘æ¿å¼€å‘çš„
+echo Discoveryåªæœ‰MCUå¹³å°ï¼Œéœ€è¦è´­ä¹°CCModule/BasicModuleè¿è¡Œã€‚
 echo.
-echo 4: PC»·¾³ÏÂ£¬Í¨¹ýVC2017±àÒë»·¾³£¬Ä£ÄâMCU¿ØÖÆEVE£¬
-echo ±ØÐë½áºÏÊ¹ÓÃMPSSEÏßÀÂºÍCCModule/BasicModule½øÐÐµ÷ÊÔ¡£
+echo 4: PCçŽ¯å¢ƒä¸‹ï¼Œé€šè¿‡VC2017ç¼–è¯‘çŽ¯å¢ƒï¼Œæ¨¡æ‹ŸMCUæŽ§åˆ¶EVEï¼Œ
+echo å¿…é¡»ç»“åˆä½¿ç”¨MPSSEçº¿ç¼†å’ŒCCModule/BasicModuleè¿›è¡Œè°ƒè¯•ã€‚
 echo.
-echo 5: PC»·¾³ÏÂ£¬Í¨¹ýVC2017±àÒë»·¾³£¬Ä£ÄâMCU¿ØÖÆEVE£¬
-echo ±ØÐë½áºÏÊ¹ÓÃ°åÔØFT4222µÄCCModule/BasicModule½øÐÐµ÷ÊÔ¡£
+echo 5: PCçŽ¯å¢ƒä¸‹ï¼Œé€šè¿‡VC2017ç¼–è¯‘çŽ¯å¢ƒï¼Œæ¨¡æ‹ŸMCUæŽ§åˆ¶EVEï¼Œ
+echo å¿…é¡»ç»“åˆä½¿ç”¨æ¿è½½FT4222çš„CCModule/BasicModuleè¿›è¡Œè°ƒè¯•ã€‚
 echo.
-echo 6: PC»·¾³ÏÂ£¬Í¨¹ýVC2017±àÒë»·¾³£¬Ä£ÄâMCU¿ØÖÆEVE£¬
-echo ÎÞÐè¶îÍâÊ¹ÓÃÈÎºÎÍâÎ§Éè±¸£¨ÏßÀÂ/Ä£¿éµÈµÈ£©£¬ 
-echo Ëû¿ÉÒÔÖ±½ÓÔÚPCÉÏÄ£Äâ³öLCDÆÁ£¬²¢½«ÔËÐÐ½á¹ûÏÔÊ¾ÔÚÄ£Äâ³öµÄLCDÆÁÉÏ
+echo 6: PCçŽ¯å¢ƒä¸‹ï¼Œé€šè¿‡VC2017ç¼–è¯‘çŽ¯å¢ƒï¼Œæ¨¡æ‹ŸMCUæŽ§åˆ¶EVEï¼Œ
+echo æ— éœ€é¢å¤–ä½¿ç”¨ä»»ä½•å¤–å›´è®¾å¤‡ï¼ˆçº¿ç¼†/æ¨¡å—ç­‰ç­‰ï¼‰ï¼Œ 
+echo ä»–å¯ä»¥ç›´æŽ¥åœ¨PCä¸Šæ¨¡æ‹Ÿå‡ºLCDå±ï¼Œå¹¶å°†è¿è¡Œç»“æžœæ˜¾ç¤ºåœ¨æ¨¡æ‹Ÿå‡ºçš„LCDå±ä¸Š
 echo.
-echo 7: ÍË³ö
+echo 7: é€€å‡º
 echo.
 
 choice /C:1234567
@@ -36,12 +36,13 @@ if errorlevel 3 goto STM32
 if errorlevel 2 goto Arduino
 if errorlevel 1 goto FT9XX
 
+
 :FT9XX
 echo.
-@echo ÇëÈ·±£Íê³Ésys_main\MCU_FT900\ReadMe.txtÀïÃæËùÓÐ¹¤×÷ºóÔÙ¼ÌÐø
-@echo 1: ÒÑÍê³É
-@echo 2: Î´Íê³É
-@echo 3: ½ö±àÒë
+@echo è¯·ç¡®ä¿å®Œæˆsys_main\MCU_FT900\ReadMe.txté‡Œé¢æ‰€æœ‰å·¥ä½œåŽå†ç»§ç»­
+@echo 1: å·²å®Œæˆ
+@echo 2: æœªå®Œæˆ
+@echo 3: ä»…ç¼–è¯‘
 echo.
 
 choice /C:123
@@ -67,17 +68,17 @@ goto SkipRunme
 
 :Arduino
 echo.
-@echo ÇëÔÄ¶Ásys_main\MCU_Arduino\ReadMe.txt
+@echo è¯·é˜…è¯»sys_main\MCU_Arduino\ReadMe.txt
 echo.
 pause
 goto SkipRunme
 
 :STM32
 echo.
-@echo ÇëÈ·±£Íê³Ésys_main\MCU_STM32F4\ReadMe.txtÀïÃæËùÓÐ¹¤×÷ºóÔÙ¼ÌÐø
-@echo 1: ÒÑÍê³É
-@echo 2: Î´Íê³É
-@echo 3: ½ö±àÒë
+@echo è¯·ç¡®ä¿å®Œæˆsys_main\MCU_STM32F4\ReadMe.txté‡Œé¢æ‰€æœ‰å·¥ä½œåŽå†ç»§ç»­
+@echo 1: å·²å®Œæˆ
+@echo 2: æœªå®Œæˆ
+@echo 3: ä»…ç¼–è¯‘
 echo.
 choice /C:123
 if errorlevel 3 goto Compile
@@ -97,11 +98,11 @@ goto SkipRunme
 cd sys_main\MCU_STM32F4
 make
 cd ..\..
-choice /M "Y: JlinkÒÑÁ¬½Ó N: JlinkÎ´Á¬½Ó"
+choice /M "Y: Jlinkå·²è¿žæŽ¥ N: Jlinkæœªè¿žæŽ¥"
 if errorlevel 2 goto SkipRunme
 echo.
-@echo Ê¹ÓÃJlinkÁ¬½ÓPCºÍDiscovery°å×Ó
-@echo °´Ë³ÐòÖ´ÐÐÏÂÃæÃüÁî£¬½øÐÐÉÕÂ¼
+@echo ä½¿ç”¨Jlinkè¿žæŽ¥PCå’ŒDiscoveryæ¿å­
+@echo æŒ‰é¡ºåºæ‰§è¡Œä¸‹é¢å‘½ä»¤ï¼Œè¿›è¡Œçƒ§å½•
 @echo 1. device STM32F407VG
 @echo 2. h
 @echo 3. r
