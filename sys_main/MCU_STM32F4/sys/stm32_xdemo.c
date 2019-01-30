@@ -1,5 +1,8 @@
 #include "platform.h"
 
+#error "remove it after confirmation: only for little-endian, do some change if for big-endian"
+#error "remove it after confirmation: this FILE system just a stupid example, use your own one"
+
 #define XTAL            (168000000UL)    /* Oscillator frequency             */
 #define SYSCLK 4*XTAL
 /* the very first file storage starting flag 

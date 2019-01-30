@@ -200,8 +200,8 @@ FTVOID HAL_CmdBufIn (FTU32 Cmd)
  */
 FTVOID HAL_CmdBufInStr (FTC8 *pstr)
 {
-	FTU32 i;
-	FTU8 tmp[4] = {0};
+	FTU32 i = 1,tmp = 0;
+	FTU8 *p = (FTU8 *)&tmp, little_endian;
     /*
      * one of the reason I'm doing this is:
      * there are two loop buffer needs to be handled
@@ -215,13 +215,18 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
      * to prevent too many 'if there are still free space ahead'
      * judgement in program, I make the action to 4 byte a shot
      */
+    little_endian = *(FTU8 *)&i;
     for (i = 0; pstr[i] != '\0'; i++) {
-		tmp[i%4] = pstr[i];
+        if (little_endian) {
+		    p[i%4] = pstr[i];
+        } else {
+		    p[3 - i%4] = pstr[i];
+        }
 		if (i%4 != 3) {
 			continue;
 		}
 
-        HAL_CmdBufIn(*(FTU32 *)tmp);
+        HAL_CmdBufIn(tmp);
 
         /* 
          make sure:
@@ -229,7 +234,7 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
          2. 4 byte align length str would have '\0'
          once it break from the while loop
          */
-		*(FTU32 *)tmp = 0;
+		tmp = 0;
     }
 
     /*
@@ -237,7 +242,7 @@ FTVOID HAL_CmdBufInStr (FTC8 *pstr)
      1. 4 byte align, here is to give '\0'
      2. none 4 byte align, here is to give the tmp with '\0'
      */
-    HAL_CmdBufIn(*(FTU32 *)tmp);
+    HAL_CmdBufIn(tmp);
 
     return;
 }

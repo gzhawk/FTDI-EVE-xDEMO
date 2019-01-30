@@ -4,6 +4,9 @@
     Email : hawk.gao@ftdichip.com	
 	Date  : 2013/May
 */
+
+#error "remove it after confirmation: only for little-endian, do some change if for big-endian"
+
 #define EVE_AUD_BLOCK_SIZE  (5*1024UL)
 /* WINDOW SIZE has to base on BLOCK SIZE */
 #define EVE_AUD_WINDOW_SIZE (3*EVE_AUD_BLOCK_SIZE)
