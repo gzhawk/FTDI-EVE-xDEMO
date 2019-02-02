@@ -64,6 +64,8 @@ app_para_t appGP = {0};
 #include "UI_switch.h"
 #elif defined(UI_LONGLCD)
 #include "UI_longlcd.h"
+#elif defined(UI_ECAR)
+#include "UI_ecar.h"
 #else
 #error "no UI be selected"
 #endif

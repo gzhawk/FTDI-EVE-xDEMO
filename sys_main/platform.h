@@ -39,6 +39,27 @@
  */
 /*------------------------------------------demo setting, platform limitation */
 
+#if defined(UI_ECAR)
+#define DEF_BT81X
+#define LCD_WVGA
+
+#if (defined(FT9XXEV) || \
+     defined(VC_FT4222))
+#define EVE_SPI_TYPE 4
+#else
+#define EVE_SPI_TYPE 1
+#endif
+
+#if (defined(ARDUINO) || \
+     defined(STM32F4) || \
+     defined(DEF_81X) || \
+     defined(DEF_80X))
+#error "not supported"
+#endif
+#endif
+
+/*----------------------------------------------------------------------------*/
+
 #if defined(UI_FONT2)
 #define DEF_BT81X
 #define LCD_WVGA
@@ -385,7 +406,7 @@
  5  - 5 small changes/modify
  *
  */
-#define APPS_VER "5.D.17"
+#define APPS_VER "5.D.18"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:
