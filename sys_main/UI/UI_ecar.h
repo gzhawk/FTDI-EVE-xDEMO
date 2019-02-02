@@ -238,10 +238,6 @@ FTVOID ecar_boot(FTU32 para)
 	static FTU8 first = 1;
 	static FTU32 c = 1;
 
-    /* finished this step, debugging dashboard */
-	appGP.appIndex = 1;
-    return;
-
 	if (first) {
 		if(APP_OK != appBmpToRamG(ECAR_HDL_BG, ECAR_RAM_BOOT, bmp_header, 1)){
 			DBGPRINT;
