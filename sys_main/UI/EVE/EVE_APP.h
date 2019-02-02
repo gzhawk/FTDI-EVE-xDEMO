@@ -120,6 +120,7 @@ FTU8 appEVEFLHPath (FTC8 *path, FTU32 *len);
 FTVOID SegmentOperation (FTU32 handle, FTU32 src, FTU32 des, FTU32 len, FTU8 toCoPro);
 FTVOID appDispDXT1 (FTU8 startHdl, FT16 X, FT16 Y);
 FTVOID appBilinearModify (FTU8 Hdl, FTU16 MaxSize);
+FTVOID appClnScrn (FTU8 R, FTU8 G, FTU8 B);
 #if defined(DEF_81X) || defined(DEF_BT81X)
 FTVOID appDispPalette8 (FTU32 X, FTU32 Y, FTU32 PalSrc, FTU32 hdl, FTU32 cell);
 #endif

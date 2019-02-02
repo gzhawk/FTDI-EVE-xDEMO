@@ -711,6 +711,15 @@ appRet_en appBmpToRamG(FTU32 bmpHdl, FTU32 ramgAddr, bmpHDR_st *pbmpHD, FTU32 nu
 
     return APP_OK;
 }
+FTVOID appClnScrn (FTU8 R, FTU8 G, FTU8 B)
+{
+    HAL_CmdBufIn(CMD_DLSTART);
+    HAL_CmdBufIn(CLEAR_COLOR_RGB(R,G,B));
+    HAL_CmdBufIn(CLEAR(1,1,1));
+    HAL_CmdBufIn(DISPLAY());
+    HAL_CmdBufIn(CMD_SWAP);
+    HAL_BufToReg(RAM_CMD,0);
+}
 FTU32 appEveCRC(FTU32 eve_addr, FTU32 len)
 {
     FTU32 addr = HAL_Read32(REG_CMD_WRITE), cmd[4];
@@ -1665,16 +1674,6 @@ STATIC FTU8 appUI_EVEVerify (FTVOID)
     }
 }
 
-STATIC FTVOID appUI_EVEClnScrn (FTVOID)
-{
-    HAL_CmdBufIn(CMD_DLSTART);
-    HAL_CmdBufIn(CLEAR_COLOR_RGB(0,0,0));
-    HAL_CmdBufIn(CLEAR(1,1,1));
-    HAL_CmdBufIn(DISPLAY());
-    HAL_CmdBufIn(CMD_SWAP);
-    HAL_BufToReg(RAM_CMD,0);
-}
-
 STATIC appRet_en appUI_WaitCal (FTVOID)
 {
 #if defined(CAL_NEEDED)
@@ -1712,7 +1711,7 @@ STATIC appRet_en appUI_WaitCal (FTVOID)
         } while (ret != APP_OK);
     }
 #endif
-    appUI_EVEClnScrn();
+    appClnScrn(0,0,0);
     return APP_OK; 
 }
 
@@ -1782,7 +1781,7 @@ FTVOID UI_INIT (FTVOID)
 	clear the screen before enable the LCD
 	to avoid messy info on LCD during bootup
 	*/
-	appUI_EVEClnScrn();
+	appClnScrn(0,0,0);
 
     /* 
      I just put some none EVE related initial steps
