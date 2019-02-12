@@ -212,10 +212,10 @@ FT16 ecar_Qcos(FTU16 Angle)
         return 1; 
     }
 }
-FTVOID ecar_getXYfrmCenter(FT16 Angle, FTU32 Radius, FT16 *pX, FT16 *pY)
+FTVOID ecar_getXYfrmCenter(FT16 Angle, FT16 Radius, FT16 *pX, FT16 *pY)
 {
-    *pX = *pX - (FT16)(((FT64)Radius*ecar_Qsin(Angle)) >> 13);
-    *pY = *pY + (FT16)(((FT64)Radius*ecar_Qcos(Angle)) >> 13);
+    *pX = *pX - ((Radius*ecar_Qsin(Angle)) >> 13);
+    *pY = *pY + ((Radius*ecar_Qcos(Angle)) >> 13);
 }
 
 FTU8 ecar_boot_frame(FTU32 *pframe, FTU32 max)
@@ -270,10 +270,15 @@ FTVOID ecar_boot(FTU32 para)
             /* boot process finished, go next */
 	        appGP.appIndex = 1;
         } else {
-            FTDELAY(100);
             /* stay in boot process */
             appGP.appIndex = 0;
         }
+        /* 
+         the delay has two function
+         1. for the delay of each frame (you may use other way to do it)
+         2. for the delay of appClnScrn (occasionally blurred screen be shown without delay)
+         */
+        FTDELAY(100);
     }
 }
 
