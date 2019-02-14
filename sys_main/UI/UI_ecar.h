@@ -27,6 +27,21 @@
 #define ECAR_WARNING     "EVEFLH@9682048 : 4800"
 #define ECAR_XPATCH      "EVEFLH@9686848 : 960"
 
+/* 
+ it just for easy debug/implimentable of your evaluation
+ once found the proper value in your system 
+ recommanded to use calculated fixed number
+ less multiple/division, better performance
+ */
+#define ECAR_PRECISE_SPEED  2
+#define ECAR_PRECISE_PWR    2
+#define ECAR_PRECISE_TRPM   10
+/* 
+ the division of 1 degree
+ you MUST have the correct corresponding "sintbl"
+*/
+#define ECAR_PRECISE_CIRCLE 4
+
 #define ECAR_WIDTH          800
 #define ECAR_HIGH           480
 
@@ -44,7 +59,7 @@
 
 #define ECAR_OVERSPEED_W    228
 #define ECAR_OVERSPEED_H    196
-#define ECAR_OVERSPEED_SPD  120
+#define ECAR_OVERSPEED_SPD  (120*ECAR_PRECISE_SPEED)
 
 #define ECAR_NUM_C_W        14
 #define ECAR_NUM_C_H        23//23*11
@@ -62,18 +77,18 @@
 #define ECAR_XPATCH_W       40
 #define ECAR_XPATCH_H       24
 
-#define ECAR_MIN_SPEED      0
-#define ECAR_MIN_PWR        (-25)
-#define ECAR_MIN_TRPM       (-10)
+#define ECAR_MIN_SPEED      (0*ECAR_PRECISE_SPEED)
+#define ECAR_MIN_PWR        (-25*ECAR_PRECISE_PWR)
+#define ECAR_MIN_TRPM       (-10*ECAR_PRECISE_TRPM)
 #define ECAR_MIN_TKM        0
 #define ECAR_MIN_AKM        0
 #define ECAR_MIN_BKM        0
 #define ECAR_MIN_VOT        0
 #define ECAR_MIN_AMP        (-200)
 
-#define ECAR_MAX_SPEED      160
-#define ECAR_MAX_PWR        125
-#define ECAR_MAX_TRPM       20
+#define ECAR_MAX_SPEED      (160*ECAR_PRECISE_SPEED)
+#define ECAR_MAX_PWR        (125*ECAR_PRECISE_PWR)
+#define ECAR_MAX_TRPM       (20*ECAR_PRECISE_TRPM)
 #define ECAR_MAX_TKM        999999
 #define ECAR_MAX_AKM        999999
 #define ECAR_MAX_BKM        999999
@@ -82,22 +97,23 @@
 
 #define ECAR_MARK_NUM       9
 
-#define ECAR_WARNING_SPD    80
+#define ECAR_WARNING_SPD    (80*ECAR_PRECISE_SPEED)
 
-#define ECAR_AB_SPD         80
+#define ECAR_AB_SPD         (80*ECAR_PRECISE_SPEED)
 
-typedef enum ECAR_HDL_ {
+typedef enum ECAR_HDL_ { //bitmap handle
     ECAR_HDL_BOOT = 0,
-    ECAR_HDL_BG   = 0, //in new screen, reuse handle 0
-    ECAR_HDL_NEEDLE_0,
-    ECAR_HDL_NEEDLE_1,
-    ECAR_HDL_NUM_C,
-    ECAR_HDL_NUM_D,
-    ECAR_HDL_OVERSPEED_B,
-    ECAR_HDL_SPEED_B,
-    ECAR_HDL_SPEED_N,
-    ECAR_HDL_WARNING,
-    ECAR_HDL_XPATCH,
+    ECAR_HDL_BG   = 0,   //background
+                         //in new screen, reuse handle 0
+    ECAR_HDL_NEEDLE_0,   //speed needle
+    ECAR_HDL_NEEDLE_1,   //power/trpm needle
+    ECAR_HDL_NUM_C,      //number in the center (V/A) of dashboard
+    ECAR_HDL_NUM_D,      //number in the down (A/B/Total trip) dashboard
+    ECAR_HDL_OVERSPEED_B,//overspeed waning display in center
+    ECAR_HDL_SPEED_B,    //speed number in big size
+    ECAR_HDL_SPEED_N,    //speed number in normal size
+    ECAR_HDL_WARNING,    //3 warning icon
+    ECAR_HDL_XPATCH,     //cover the km/h mark when speed over 160km/h
     ECAR_HDL_MAX,
 }ECAR_HDL_E;
 
@@ -166,48 +182,135 @@ spd_mark_st spd_mark[ECAR_MARK_NUM] = {
     {119,132,133,159,0xFF,0xFF,528, 255}, //140
     {140,154,155,160,0xFF,0xFF,498, 335}, //160
 };
+/* 
+ 1. angle unit: 1/ECAR_PRECISE_CIRCLE degree
+ 2. the original sin data multiple 10000 (e.g. sin(1) = 0.0174)
+    so the calulated result need to div 10000, in order to 
+    make the calulation faster for MCU (bit shift faster than div)
+    div the original sin data by 1.22 to come out a new sin table
+    then the result only need to right shift 13 bits
+    (2^13=8192, 10000/8192=1.22) 
+ 3. there is an easy way to generate the table by using EXCEL
+    you may search it online, the way I'm using is
+    by using this formular "ROUND(SIN(RADIANS(A1))/1.22*10000,0)"
+    "A1" the cell which content the "angle" value
+ 4. in MCU, you may put this table in Flash instead of memory
+    as long as your system has a fast accessing Flash mechanism
+ */
 FTU16 sintbl[] = 
 {
-/* 
-   the original sin data multiple 10000 (e.g. sin(1) = 0.0174)
-   so the calulated result need to div 10000, in order to 
-   make the calulation faster for MCU (bit shift faster than div)
-   div the original sin data by 1.22 to come out a new sin table
-   then the result only need to right shift 13 bits
-   (2^13=8192, 10000/8192=1.22) 
-*/
-    0   ,142 ,286 ,428 ,572 ,714 ,856 ,999 ,1140,
-    1281,1422,1563,1704,1843,1982,2121,2259,2396,
-    2532,2668,2803,2937,3070,3202,3333,3463,3593,
-    3721,3848,3973,4098,4221,4343,4463,4583,4701,
-    4818,4932,5046,5158,5268,5377,5484,5590,5694,
-    5795,5895,5995,6090,6186,6278,6370,6459,6545,
-    6631,6713,6795,6874,6950,7025,7098,7168,7236,
-    7303,7367,7428,7487,7545,7600,7652,7702,7750,
-    7795,7838,7879,7917,7953,7986,8017,8045,8072,
-    8095,8117,8136,8151,8165,8177,8185,8191,8195,
-    8196
+0	,	36	,	72	,	107	,
+143	,	179	,	215	,	250	,
+286	,	322	,	358	,	393	,
+429	,	465	,	500	,	536	,
+572	,	607	,	643	,	679	,
+714	,	750	,	786	,	821	,
+857	,	892	,	928	,	963	,
+999	,	1034	,	1070	,	1105	,
+1141	,	1176	,	1212	,	1247	,
+1282	,	1318	,	1353	,	1388	,
+1423	,	1459	,	1494	,	1529	,
+1564	,	1599	,	1634	,	1669	,
+1704	,	1739	,	1774	,	1809	,
+1844	,	1879	,	1913	,	1948	,
+1983	,	2018	,	2052	,	2087	,
+2121	,	2156	,	2190	,	2225	,
+2259	,	2294	,	2328	,	2362	,
+2396	,	2431	,	2465	,	2499	,
+2533	,	2567	,	2601	,	2635	,
+2669	,	2702	,	2736	,	2770	,
+2803	,	2837	,	2871	,	2904	,
+2937	,	2971	,	3004	,	3037	,
+3071	,	3104	,	3137	,	3170	,
+3203	,	3236	,	3268	,	3301	,
+3334	,	3367	,	3399	,	3432	,
+3464	,	3496	,	3529	,	3561	,
+3593	,	3625	,	3657	,	3689	,
+3721	,	3753	,	3785	,	3817	,
+3848	,	3880	,	3911	,	3943	,
+3974	,	4005	,	4036	,	4067	,
+4098	,	4129	,	4160	,	4191	,
+4222	,	4252	,	4283	,	4313	,
+4344	,	4374	,	4404	,	4434	,
+4464	,	4494	,	4524	,	4554	,
+4584	,	4613	,	4643	,	4672	,
+4701	,	4731	,	4760	,	4789	,
+4818	,	4847	,	4876	,	4904	,
+4933	,	4961	,	4990	,	5018	,
+5046	,	5075	,	5103	,	5131	,
+5158	,	5186	,	5214	,	5241	,
+5269	,	5296	,	5323	,	5350	,
+5378	,	5404	,	5431	,	5458	,
+5485	,	5511	,	5538	,	5564	,
+5590	,	5616	,	5642	,	5668	,
+5694	,	5720	,	5745	,	5771	,
+5796	,	5821	,	5846	,	5871	,
+5896	,	5921	,	5946	,	5970	,
+5995	,	6019	,	6043	,	6067	,
+6091	,	6115	,	6139	,	6163	,
+6186	,	6210	,	6233	,	6256	,
+6279	,	6302	,	6325	,	6347	,
+6370	,	6392	,	6415	,	6437	,
+6459	,	6481	,	6503	,	6525	,
+6546	,	6568	,	6589	,	6610	,
+6631	,	6652	,	6673	,	6694	,
+6714	,	6735	,	6755	,	6775	,
+6795	,	6815	,	6835	,	6855	,
+6874	,	6894	,	6913	,	6932	,
+6951	,	6970	,	6989	,	7007	,
+7026	,	7044	,	7063	,	7081	,
+7099	,	7116	,	7134	,	7152	,
+7169	,	7186	,	7203	,	7220	,
+7237	,	7254	,	7271	,	7287	,
+7303	,	7319	,	7336	,	7351	,
+7367	,	7383	,	7398	,	7414	,
+7429	,	7444	,	7459	,	7473	,
+7488	,	7503	,	7517	,	7531	,
+7545	,	7559	,	7573	,	7586	,
+7600	,	7613	,	7626	,	7639	,
+7652	,	7665	,	7678	,	7690	,
+7702	,	7715	,	7727	,	7738	,
+7750	,	7762	,	7773	,	7784	,
+7796	,	7807	,	7817	,	7828	,
+7839	,	7849	,	7859	,	7869	,
+7879	,	7889	,	7899	,	7908	,
+7917	,	7927	,	7936	,	7945	,
+7953	,	7962	,	7970	,	7979	,
+7987	,	7995	,	8002	,	8010	,
+8018	,	8025	,	8032	,	8039	,
+8046	,	8053	,	8059	,	8066	,
+8072	,	8078	,	8084	,	8090	,
+8096	,	8101	,	8107	,	8112	,
+8117	,	8122	,	8127	,	8131	,
+8136	,	8140	,	8144	,	8148	,
+8152	,	8155	,	8159	,	8162	,
+8166	,	8169	,	8171	,	8174	,
+8177	,	8179	,	8181	,	8184	,
+8185	,	8187	,	8189	,	8190	,
+8192	,	8193	,	8194	,	8195	,
+8195	,	8196	,	8196	,	8197	,
+8197							
 };
 FT16 ecar_Qsin(FTU16 Angle)
 {
-    if (Angle >= 0 && Angle <= 90) {
+    if (Angle >= 0 && Angle <= 90*ECAR_PRECISE_CIRCLE) {
         return sintbl[Angle];
-    } else if (Angle > 90 && Angle <= 180) {
-        return sintbl[90 - (Angle-90)];
-    } else if (Angle > 180 && Angle <= 270) {
-        return 0 - sintbl[Angle-180];
-    } else if (Angle > 270 && Angle <= 360) {
-        return 0 - sintbl[90 - (Angle-270)];
+    } else if (Angle > 90*ECAR_PRECISE_CIRCLE && Angle <= 180*ECAR_PRECISE_CIRCLE) {
+        return sintbl[90*ECAR_PRECISE_CIRCLE - (Angle-90*ECAR_PRECISE_CIRCLE)];
+    } else if (Angle > 180*ECAR_PRECISE_CIRCLE && Angle <= 270*ECAR_PRECISE_CIRCLE) {
+        return 0 - sintbl[Angle-180*ECAR_PRECISE_CIRCLE];
+    } else if (Angle > 270*ECAR_PRECISE_CIRCLE && Angle < 360*ECAR_PRECISE_CIRCLE) {
+        return 0 - sintbl[90*ECAR_PRECISE_CIRCLE - (Angle-270*ECAR_PRECISE_CIRCLE)];
     } else {
         return 0;
     }
 }
 FT16 ecar_Qcos(FTU16 Angle)
 {
-    if (Angle >= 0 && Angle+90 <= 360) {
-        return ecar_Qsin(Angle+90);
-    } else if (Angle+90 > 360 && Angle <= 360) {
-        return ecar_Qsin(90 + (Angle - 360));
+    if (Angle >= 0 && Angle+90*ECAR_PRECISE_CIRCLE < 360*ECAR_PRECISE_CIRCLE) {
+        return ecar_Qsin(Angle+90*ECAR_PRECISE_CIRCLE);
+    } else if (Angle+90*ECAR_PRECISE_CIRCLE > 360*ECAR_PRECISE_CIRCLE && Angle < 360*ECAR_PRECISE_CIRCLE) {
+        return ecar_Qsin(90*ECAR_PRECISE_CIRCLE + (Angle - 360*ECAR_PRECISE_CIRCLE));
     } else {
         return 1; 
     }
@@ -402,15 +505,15 @@ FTVOID ecar_speed(FT16 spd)
     FTU8 i;
   
     for (i = 0; i < ECAR_MARK_NUM; i++) {
-        if ((spd >= spd_mark[i].spd_n1_low && spd <= spd_mark[i].spd_n1_high) || 
-            (spd >= spd_mark[i].spd_n2_low && spd <= spd_mark[i].spd_n2_high)) {
+        if ((spd >= ECAR_PRECISE_SPEED*spd_mark[i].spd_n1_low && spd <= ECAR_PRECISE_SPEED*spd_mark[i].spd_n1_high) || 
+            (spd >= ECAR_PRECISE_SPEED*spd_mark[i].spd_n2_low && spd <= ECAR_PRECISE_SPEED*spd_mark[i].spd_n2_high)) {
             HAL_CmdBufIn(BITMAP_HANDLE(ECAR_HDL_SPEED_N));
             HAL_CmdBufIn(PALETTE_SOURCE(((ImgInfoPal_st *)(bmp_header[ECAR_INX_SPEED_N].info))->addr_lut));
             HAL_CmdBufIn(CELL(i));
             HAL_CmdBufIn(VERTEX2F(spd_mark[i].spd_x*EVE_PIXEL_UNIT,spd_mark[i].spd_y*EVE_PIXEL_UNIT));
         }
         
-        if (spd >= spd_mark[i].spd_b_low && spd <= spd_mark[i].spd_b_high) {
+        if (spd >= ECAR_PRECISE_SPEED*spd_mark[i].spd_b_low && spd <= ECAR_PRECISE_SPEED*spd_mark[i].spd_b_high) {
             HAL_CmdBufIn(BITMAP_HANDLE(ECAR_HDL_SPEED_B));
             HAL_CmdBufIn(PALETTE_SOURCE(((ImgInfoPal_st *)(bmp_header[ECAR_INX_SPEED_B].info))->addr_lut));
             HAL_CmdBufIn(CELL(i));
@@ -418,20 +521,17 @@ FTVOID ecar_speed(FT16 spd)
         }
     }
 }
-
-static FTU32  ecar_spd2agl(FT16 spd)
+static FTU32  ecar_x2a(FT16 x, FT16 x_min, FT16 x_max, FT16 a_start, FT16 a_end)
 {
-#define SPEED2ANGLE_START (56)
-#define SPEED2ANGLE_END   (302)
-#define SPEED2ANGLE_RANGE (ECAR_MAX_SPEED - ECAR_MIN_SPEED)
-/*
-    speed from 0 ~ 160
-    angle from start ~ end
-    it's an internal function
-    the speed would not exceed 160
-    so not considering the 360 border
- */
-    return (SPEED2ANGLE_START + spd*(SPEED2ANGLE_END-SPEED2ANGLE_START)/SPEED2ANGLE_RANGE);
+    FT16 a = (x - x_min);
+
+    if (a < 0) {
+        a = (-1)*a;
+    }
+
+    a = a_start + a*(a_end-a_start)/(x_max - x_min);
+
+    return (a >= 360*ECAR_PRECISE_CIRCLE)?0:a;
 }
 FTVOID ecar_needle_speed(FT16 speed)
 {
@@ -439,10 +539,12 @@ FTVOID ecar_needle_speed(FT16 speed)
 #define NEEDLE_SPD_CENTER_X (10)
 #define NEEDLE_SPD_CENTER_Y (5)
 #define NEEDLE_SPD_OFFSET   (bmp_header[ECAR_INX_NEEDLE_0].high)
+#define SPEED2ANGLE_START   (56*ECAR_PRECISE_CIRCLE)
+#define SPEED2ANGLE_END     (302*ECAR_PRECISE_CIRCLE)
 
     FT16 x = (EVE_LCD_WIDTH/2-10)-NEEDLE_SPD_OFFSET,
          y = (EVE_LCD_HIGH/2+10)-NEEDLE_SPD_OFFSET,
-         agl = ecar_spd2agl(speed);
+         agl = ecar_x2a(speed,ECAR_MIN_SPEED,ECAR_MAX_SPEED,SPEED2ANGLE_START,SPEED2ANGLE_END);
 
     HAL_CmdBufIn(BITMAP_HANDLE(ECAR_HDL_NEEDLE_0));
     HAL_CmdBufIn(CELL(0));
@@ -454,7 +556,7 @@ FTVOID ecar_needle_speed(FT16 speed)
                     NEEDLE_SPD_OFFSET*EVE_TRANSFORM_MAX);
     CoCmd_ROTATEAROUND(NEEDLE_SPD_CENTER_X,
                        NEEDLE_SPD_CENTER_Y,
-                       agl*EVE_TRANSFORM_MAX/360,EVE_TRANSFORM_MAX);
+                       agl*EVE_TRANSFORM_MAX/(360*ECAR_PRECISE_CIRCLE),EVE_TRANSFORM_MAX);
     CoCmd_SETMATRIX;
     
     ecar_getXYfrmCenter(agl,NEEDLE_SPD_R,&x,&y);
@@ -462,24 +564,18 @@ FTVOID ecar_needle_speed(FT16 speed)
     HAL_CmdBufIn(VERTEX2F(x*EVE_PIXEL_UNIT,y*EVE_PIXEL_UNIT));
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }
-static FTU32  ecar_pwr2agl(FT16 pwr)
-{
-#define POWER2ANGLE_START (56)
-#define POWER2ANGLE_END   (132)
-#define POWER2ANGLE_RANGE (ECAR_MAX_PWR - ECAR_MIN_PWR)
-    return (POWER2ANGLE_START + (pwr - ECAR_MIN_PWR)*(POWER2ANGLE_END-POWER2ANGLE_START)/POWER2ANGLE_RANGE);
-}
-
 FTVOID ecar_needle_power(FT16 power)
 {
 #define NEEDLE_PWR_R        (260)
 #define NEEDLE_PWR_CENTER_X (6)
 #define NEEDLE_PWR_CENTER_Y (5)
 #define NEEDLE_PWR_OFFSET   (bmp_header[ECAR_INX_NEEDLE_1].high)
+#define POWER2ANGLE_START   (56*ECAR_PRECISE_CIRCLE)
+#define POWER2ANGLE_END     (132*ECAR_PRECISE_CIRCLE)
 
     FT16 x = (EVE_LCD_WIDTH/2-10)-NEEDLE_PWR_OFFSET,
          y = (EVE_LCD_HIGH/2+10)-NEEDLE_PWR_OFFSET,
-         agl = ecar_pwr2agl(power);
+         agl = ecar_x2a(power,ECAR_MIN_PWR,ECAR_MAX_PWR,POWER2ANGLE_START,POWER2ANGLE_END);
 
     HAL_CmdBufIn(BITMAP_HANDLE(ECAR_HDL_NEEDLE_1));
     HAL_CmdBufIn(CELL(0));
@@ -491,7 +587,7 @@ FTVOID ecar_needle_power(FT16 power)
                     NEEDLE_PWR_OFFSET*EVE_TRANSFORM_MAX);
     CoCmd_ROTATEAROUND(NEEDLE_PWR_CENTER_X,
                        NEEDLE_PWR_CENTER_Y,
-                       agl*EVE_TRANSFORM_MAX/360,EVE_TRANSFORM_MAX);
+                       agl*EVE_TRANSFORM_MAX/(360*ECAR_PRECISE_CIRCLE),EVE_TRANSFORM_MAX);
     CoCmd_SETMATRIX;
     
     ecar_getXYfrmCenter(agl,NEEDLE_PWR_R,&x,&y);
@@ -499,29 +595,18 @@ FTVOID ecar_needle_power(FT16 power)
     HAL_CmdBufIn(VERTEX2F(x*EVE_PIXEL_UNIT,y*EVE_PIXEL_UNIT));
     HAL_CmdBufIn(RESTORE_CONTEXT());
 }
-static FTU32  ecar_trpm2agl(FT16 trpm)
-{
-#define TRPM2ANGLE_START (299)
-#define TRPM2ANGLE_END   (228)
-#define TRPM2ANGLE_RANGE (ECAR_MAX_TRPM - ECAR_MIN_TRPM)
-    FTU16 move = (trpm - ECAR_MIN_TRPM);
-
-    if (move < 0) {
-        move *= (-1);
-    }
-    return (TRPM2ANGLE_START - move*(TRPM2ANGLE_START-TRPM2ANGLE_END)/TRPM2ANGLE_RANGE);
-}
-
 FTVOID ecar_needle_trpm(FT16 trpm)
 {
 #define NEEDLE_TRPM_R        (260)
 #define NEEDLE_TRPM_CENTER_X (6)
 #define NEEDLE_TRPM_CENTER_Y (5)
 #define NEEDLE_TRPM_OFFSET   (bmp_header[ECAR_INX_NEEDLE_1].high)
+#define TRPM2ANGLE_START     (299*ECAR_PRECISE_CIRCLE)
+#define TRPM2ANGLE_END       (228*ECAR_PRECISE_CIRCLE)
 
     FT16 x = (EVE_LCD_WIDTH/2-10)-NEEDLE_TRPM_OFFSET,
          y = (EVE_LCD_HIGH/2+10)-NEEDLE_TRPM_OFFSET,
-         agl = ecar_trpm2agl(trpm);
+         agl = ecar_x2a(trpm,ECAR_MIN_TRPM,ECAR_MAX_TRPM,TRPM2ANGLE_START,TRPM2ANGLE_END);
 
     HAL_CmdBufIn(BITMAP_HANDLE(ECAR_HDL_NEEDLE_1));
     HAL_CmdBufIn(CELL(0));
@@ -533,7 +618,7 @@ FTVOID ecar_needle_trpm(FT16 trpm)
                     NEEDLE_PWR_OFFSET*EVE_TRANSFORM_MAX);
     CoCmd_ROTATEAROUND(NEEDLE_PWR_CENTER_X,
                        NEEDLE_PWR_CENTER_Y,
-                       agl*EVE_TRANSFORM_MAX/360,EVE_TRANSFORM_MAX);
+                       agl*EVE_TRANSFORM_MAX/(360*ECAR_PRECISE_CIRCLE),EVE_TRANSFORM_MAX);
     CoCmd_SETMATRIX;
     
     ecar_getXYfrmCenter(agl,NEEDLE_TRPM_R,&x,&y);
