@@ -28,10 +28,13 @@
 #define ECAR_XPATCH      "EVEFLH@9686848 : 960"
 
 /* 
- it just for easy debug/implimentable of your evaluation
- once found the proper value in your system 
- recommanded to use calculated fixed number
- less multiple/division, better performance
+ 1. it just for easy debug/implimentable of your evaluation
+    once found the proper value in your system 
+    recommanded to use calculated fixed number
+    less multiple/division, better performance
+ 2. be careful when selecting too high precise number,
+    for some 16bit MCU, some calculation below
+    may cause overflow
  */
 #define ECAR_PRECISE_SPEED  2
 #define ECAR_PRECISE_PWR    2
@@ -317,8 +320,13 @@ FT16 ecar_Qcos(FTU16 Angle)
 }
 FTVOID ecar_getXYfrmCenter(FT16 Angle, FT16 Radius, FT16 *pX, FT16 *pY)
 {
-    *pX = *pX - ((Radius*ecar_Qsin(Angle)) >> 13);
-    *pY = *pY + ((Radius*ecar_Qcos(Angle)) >> 13);
+    /* 
+     the redefine (FT32) is critical for some 16bit MCU
+     for example: Radius = 260, ecar_Qsin = 8197 (angle == 90)
+                  Radius*ecar_Qsin = 0x208514, more than 16bit
+     */
+    *pX = *pX - ((FT32)(Radius*ecar_Qsin(Angle)) >> 13);
+    *pY = *pY + ((FT32)(Radius*ecar_Qcos(Angle)) >> 13);
 }
 
 FTU8 ecar_boot_frame(FTU32 *pframe, FTU32 max)
@@ -529,7 +537,12 @@ static FTU32  ecar_x2a(FT16 x, FT16 x_min, FT16 x_max, FT16 a_start, FT16 a_end)
         a = (-1)*a;
     }
 
-    a = a_start + a*(a_end-a_start)/(x_max - x_min);
+    /*
+     the redefine (FT32) is critical for some 16bit MCU
+     a*(a_end-a_start)/(x_max - x_min) result may easily more than 16bit
+     especially when selecting higher ECAR_PRECISE_xxx number
+     */
+    a = a_start + (FT32)a*(a_end-a_start)/(x_max - x_min);
 
     return (a >= 360*ECAR_PRECISE_CIRCLE)?0:a;
 }
