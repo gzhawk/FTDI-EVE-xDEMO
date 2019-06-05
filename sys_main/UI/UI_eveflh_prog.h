@@ -1,6 +1,5 @@
 /* 
-    Sample code to show how to program the EVEFLH 
-    from the file in SD Card
+    Sample code to show how to program the EVEFLH via MCU
     Author: Hawk
 	Email : hawk.gao@ftdichip.com
 	Date  : 2018/Jul
