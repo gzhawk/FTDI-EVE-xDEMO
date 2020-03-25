@@ -28,6 +28,89 @@ FTU8 READ_ID = 0;
 
 FTU8 dbg_str_buf[EVE_DBG_BUF_LEN] = "Error occur / Stop display";
 
+/* 
+   PCLK is critical,
+   sometime it may need to set to larger number (2,3)
+   some smaller number (set to 1), may case under run issue 
+   while too much commands needs to be executed
+ */
+EVE_LCD g_lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
+#if defined(LCD_WXGA)
+    /*
+       HCycle HOffset HSync0 HSync1 
+       VCycle VOffset VSync0 VSync1 
+       PCLK Swizzle PCLKPol Cspread Dither
+     */
+
+    1440,38,0,16,
+    838,8,0,2,
+    1,0,0,0,0};
+#elif defined(LCD_WVGA)
+/* 
+   this setting seems better than SampleApp
+   setting in some project
+
+   HCycle HOffset HSync0 HSync1 
+   VCycle VOffset VSync0 VSync1 
+ */
+
+    1058,40,0,20,
+    525,25,0,10,
+    /*
+       normally PCLK should be 2
+       I set it to 3 in order to give
+       larger tolorance while displaying
+       complex bitmap 
+       (e.g. multilayer overlap Pal8 bitmap)
+
+       PCLK Swizzle PCLKPol Cspread Dither
+     */
+
+    3,0,1,0,1};
+#elif defined(LCD_QVGA)
+/*
+   HCycle HOffset HSync0 HSync1 
+   VCycle VOffset VSync0 VSync1 
+   PCLK Swizzle PCLKPol Cspread Dither
+ */
+
+    408,70,0,10, 
+    263,13,0, 2, 
+    8,2,0,1,1};
+#elif defined(LCD_HVGA)
+/*
+   HCycle HOffset HSync0 HSync1 
+   VCycle VOffset VSync0 VSync1 
+   PCLK Swizzle PCLKPol Cspread Dither
+ */
+
+    400,40,0,10, 
+    500,10,0, 5, 
+    5,2,1,1,1}; //for ME810A_HV35R pclk is 5
+#elif defined(LCD_WQVGA)
+/*
+   HCycle HOffset HSync0 HSync1 
+   VCycle VOffset VSync0 VSync1 
+   PCLK Swizzle PCLKPol Cspread Dither
+ */
+
+    548,43,0,41, 
+    292,12,0,10, 
+    8,0,1,1,1};
+#elif defined(LCD_1200X280)
+/*
+   HCycle HOffset HSync0 HSync1 
+   VCycle VOffset VSync0 VSync1 
+   PCLK Swizzle PCLKPol Cspread Dither
+ */
+
+    1338,38,0,16, 
+    298,8,0,2, 
+    3,0,1,0,0};
+#else
+#error "undefined LCD"
+#endif
+
 #if defined(CAL_NEEDED)
 STATIC appRet_en appCalCmd (FTU8 font, FTC8 *str1, FTC8 *str2)
 {
@@ -1521,104 +1604,22 @@ STATIC FTVOID appUI_EVEClkTrim ( FTVOID )
 }
 STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
 {
-    /* 
-       PCLK is critical,
-       sometime it may need to set to larger number (2,3)
-       some smaller number (set to 1), may case under run issue 
-       while too much commands needs to be executed
-     */
-    EVE_LCD lcd = {EVE_LCD_WIDTH,EVE_LCD_HIGH, 
-#if defined(LCD_WXGA)
-        /*
-         HCycle HOffset HSync0 HSync1 
-         VCycle VOffset VSync0 VSync1 
-         PCLK Swizzle PCLKPol Cspread Dither
-         */
-
-        1440,38,0,16,
-        838,8,0,2,
-        1,0,0,0,0};
-#elif defined(LCD_WVGA)
-        /* 
-         this setting seems better than SampleApp
-         setting in some project
-
-         HCycle HOffset HSync0 HSync1 
-         VCycle VOffset VSync0 VSync1 
-        */
-
-        1058,40,0,20,
-        525,25,0,10,
-        /*
-         normally PCLK should be 2
-         I set it to 3 in order to give
-         larger tolorance while displaying
-         complex bitmap 
-         (e.g. multilayer overlap Pal8 bitmap)
-         
-         PCLK Swizzle PCLKPol Cspread Dither
-         */
-
-        3,0,1,0,1};
-#elif defined(LCD_QVGA)
-        /*
-         HCycle HOffset HSync0 HSync1 
-         VCycle VOffset VSync0 VSync1 
-         PCLK Swizzle PCLKPol Cspread Dither
-         */
-
-        408,70,0,10, 
-        263,13,0, 2, 
-        8,2,0,1,1};
-#elif defined(LCD_HVGA)
-        /*
-         HCycle HOffset HSync0 HSync1 
-         VCycle VOffset VSync0 VSync1 
-         PCLK Swizzle PCLKPol Cspread Dither
-         */
-
-        400,40,0,10, 
-        500,10,0, 5, 
-        5,2,1,1,1}; //for ME810A_HV35R pclk is 5
-#elif defined(LCD_WQVGA)
-        /*
-         HCycle HOffset HSync0 HSync1 
-         VCycle VOffset VSync0 VSync1 
-         PCLK Swizzle PCLKPol Cspread Dither
-         */
-
-        548,43,0,41, 
-        292,12,0,10, 
-        8,0,1,1,1};
-#elif defined(LCD_1200X280)
-        /*
-         HCycle HOffset HSync0 HSync1 
-         VCycle VOffset VSync0 VSync1 
-         PCLK Swizzle PCLKPol Cspread Dither
-         */
-
-        1338,38,0,16, 
-        298,8,0,2, 
-        3,0,1,0,0};
-#else
-#error "undefined LCD"
-#endif
 
     /* config the LCD related parameters */
-    HAL_Write16(REG_HSIZE, lcd.Width);
-    HAL_Write16(REG_VSIZE, lcd.Height);
-    HAL_Write16(REG_HCYCLE, lcd.HCycle);
-    HAL_Write16(REG_HOFFSET, lcd.HOffset);
-    HAL_Write16(REG_HSYNC0, lcd.HSync0);
-    HAL_Write16(REG_HSYNC1, lcd.HSync1);
-    HAL_Write16(REG_VCYCLE, lcd.VCycle);
-    HAL_Write16(REG_VOFFSET, lcd.VOffset);
-    HAL_Write16(REG_VSYNC0, lcd.VSync0);
-    HAL_Write16(REG_VSYNC1, lcd.VSync1);
-    HAL_Write8(REG_SWIZZLE, lcd.Swizzle);
-    HAL_Write8(REG_PCLK_POL, lcd.PCLKPol);
-    HAL_Write16(REG_CSPREAD, lcd.Cspread);
-    HAL_Write16(REG_DITHER, lcd.Dither);
+    HAL_Write16(REG_HSIZE, g_lcd.Width);
+    HAL_Write16(REG_VSIZE, g_lcd.Height);
+    HAL_Write16(REG_HCYCLE, g_lcd.HCycle);
+    HAL_Write16(REG_HOFFSET, g_lcd.HOffset);
+    HAL_Write16(REG_HSYNC0, g_lcd.HSync0);
+    HAL_Write16(REG_HSYNC1, g_lcd.HSync1);
+    HAL_Write16(REG_VCYCLE, g_lcd.VCycle);
+    HAL_Write16(REG_VOFFSET, g_lcd.VOffset);
+    HAL_Write16(REG_VSYNC0, g_lcd.VSync0);
+    HAL_Write16(REG_VSYNC1, g_lcd.VSync1);
+    HAL_Write8(REG_SWIZZLE, g_lcd.Swizzle);
+    HAL_Write8(REG_PCLK_POL, g_lcd.PCLKPol);
+    HAL_Write16(REG_CSPREAD, g_lcd.Cspread);
+    HAL_Write16(REG_DITHER, g_lcd.Dither);
 
     /* the backlight default is highest 
     HAL_Write8(REG_PWM_DUTY,128);
@@ -1643,9 +1644,6 @@ STATIC FTVOID appUI_EVELCDCfg ( FTVOID )
 #if defined(LCD_HVGA)
     HAL_ili9488();
 #endif
-
-    /* start to display */
-    HAL_Write8(REG_PCLK,lcd.PCLK);
 
 #if defined(DEF_BT81X)
     /* if you want to enable adaptive frame rate 
@@ -1724,7 +1722,12 @@ FTVOID appUI_EVEBeforeLaunch(FTVOID)
 #if defined(DEF_BT81X)
     // clean up the error report area
 	HAL_Write8(RAM_ERR_REPORT, 0);
-#endif    
+#endif
+    /* 
+     may not necessary to do so
+     just give more time to EVE for preparation
+     */
+	FTDELAY(300);
 }
 FTVOID UI_INIT (FTVOID)
 {
@@ -1788,7 +1791,10 @@ FTVOID UI_INIT (FTVOID)
      before launch the major code here 
      */
     appUI_EVEBeforeLaunch();
-    
+ 
+    /* start to display */
+    HAL_Write8(REG_PCLK,g_lcd.PCLK);
+   
     /* 
      execute the screen calibration step for the touch
      */
