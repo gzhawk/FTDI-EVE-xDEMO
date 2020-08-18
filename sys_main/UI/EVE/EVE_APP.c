@@ -910,6 +910,7 @@ FTU32 appEVEFLHAddr(FTC8 *path)
 FTU32 appEVEFLHLen(FTC8 *path)
 {
     FTU8 *p = (FTU8 *)path;
+    FTU32 l = 0;
 
     if (p[L_Z_EVEFLH] == MARK_ADDR) {
         p += L_Z_EVEFLH +1;
@@ -919,7 +920,7 @@ FTU32 appEVEFLHLen(FTC8 *path)
         p += L_EVEFLH +1;
     } else {
         FTPRINT("\nappEVEFLHLen: addr mark not found");
-        return 0;
+        return l;
     }
 
     /* it's a internal function
@@ -932,8 +933,17 @@ FTU32 appEVEFLHLen(FTC8 *path)
     while (*p < '0' || *p > '9') {
         p++;
     }
+    l = appGetNumFromStr(p);
 
-    return appGetNumFromStr(p);
+    /* in order to speed up the Nor Flash Erase/Read/Write action
+       and typically the Nor Flash block size from 64KB to 256KB
+       it would be better to have a 64 or 256 align Nor Flash file
+       but it should not return error, since EAB tools may already 
+       handle it properly*/
+    if ((l % 64) || (l % 256)) {
+        FTPRINT("\nappEVEFLHLen: not 64 or 256 align");
+    }
+    return l;
 }
 FTVOID appEVEFLHUnzip(FTC8 *path, FTU32 src)
 {
