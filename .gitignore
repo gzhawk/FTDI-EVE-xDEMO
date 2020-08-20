@@ -45,3 +45,7 @@ sys_main/MCU_FT900/img/pm.hex
 *.opendb
 *.exe
 *.enc
+*.recipe
+*.bak
+.vs
+*.FileListAbsolute.*

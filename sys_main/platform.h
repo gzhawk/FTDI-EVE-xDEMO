@@ -393,20 +393,17 @@
 /*---------------------------------------------------Universal platform define*/
 /*
  * Version: A.B.C
- * A: Basic version number, increase it when modify happen on core function
- (EVE chip, APP, HAL, etc.), or add a new MCU platform, 
- leave 'B' part unchange and clear the 'C' part when 'A' part change.
- * B: significant structure change version number, 
- increase it when significant changed
+ * A: how many project in this version
+ * B: significant structure change 
  * C: Modify tracking number
  * 
  *    for example: 3.X.5, 
- 3  - support 3 MCU platform
+ 3  - there are 3 project in this version
  X  - from A ~ Z, software structure change
- 5  - 5 small changes/modify
+ 5  - 5 small changes/modify under the X structure
  *
  */
-#define APPS_VER "5.D.19"
+#define APPS_VER "6.E.0"
 
 /*
  * In SampleApp, it use a better way, you may use it if you like:

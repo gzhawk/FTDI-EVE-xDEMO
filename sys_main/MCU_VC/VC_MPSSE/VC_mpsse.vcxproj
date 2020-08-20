@@ -9,13 +9,13 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{13DFD7EB-E935-4704-8F7A-EB3EBB5BAAB4}</ProjectGuid>
     <RootNamespace>EVE</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='img|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -26,29 +26,30 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='img|Win32'">
-    <IncludePath>.\sys;.\lib;..\;..\UI;..\UI\EVE;$(IncludePath)</IncludePath>
-    <ReferencePath>.\sys;.\lib;..\;..\UI;..\UI\EVE;$(VC_ReferencesPath_x86);</ReferencePath>
+    <IncludePath>.\sys;.\lib;..\;..\..\;..\..\UI;..\..\UI\EVE;$(IncludePath)</IncludePath>
+    <ReferencePath>.\sys;.\lib;..\;..\..\;..\..\UI;..\..\UI\EVE;$(VC_ReferencesPath_x86);</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='img|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;VC_FT4222;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\sys;.\lib;..\;..\UI;..\UI\EVE;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;VC_MPSSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\sys;.\lib;..\;..\..\;..\..\UI;..\..\UI\EVE;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>.\sys;.\lib;%</AdditionalLibraryDirectories>
-      <AdditionalDependencies>ftd2xx.lib;libFT4222.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libMPSSE.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>.\lib</ImportLibrary>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\sys_main.c" />
-    <ClCompile Include="..\UI\EVE\EVE_APP.c" />
-    <ClCompile Include="..\UI\EVE\EVE_HAL.c" />
-    <ClCompile Include="sys\vc_xdemo.c" />
+    <ClCompile Include="..\..\sys_main.c" />
+    <ClCompile Include="..\..\UI\EVE\EVE_APP.c" />
+    <ClCompile Include="..\..\UI\EVE\EVE_HAL.c" />
+    <ClCompile Include="sys\vc_mpsse.c" />
+    <ClCompile Include="..\vc_xdemo.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
