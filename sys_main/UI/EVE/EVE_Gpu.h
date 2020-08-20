@@ -13,6 +13,17 @@
 #define FT81X_VERSION "1.0.4"
 #define BT81X_VERSION "1.5.8"
 
+#define CHIPID_FT800 0x00
+#define CHIPID_FT801 0x01
+#define CHIPID_FT810 0x10
+#define CHIPID_FT811 0x11
+#define CHIPID_FT812 0x12
+#define CHIPID_FT813 0x13
+#define CHIPID_BT815 0x15
+#define CHIPID_BT816 0x16
+#define CHIPID_BT817 0x17
+#define CHIPID_BT818 0x18
+
 #define ADC_DIFFERENTIAL     1UL
 #define ADC_SINGLE_ENDED     0UL
 #define ADPCM_SAMPLES        2UL

@@ -1250,7 +1250,7 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
     READ_ID = HAL_Read8(EVE_ID_REG);
     FTPRINT("\nChip: ");
     switch (READ_ID) {
-        case 0x10:
+        case CHIPID_FT810:
             FTPRINT("FT810");
 #if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
             FTPRINT("\nDemo not for this chip");
@@ -1258,7 +1258,7 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 #else
             return 1;
 #endif
-        case 0x11:
+        case CHIPID_FT811:
             FTPRINT("FT811");
 #if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
             FTPRINT("\nDemo not for this chip");
@@ -1266,7 +1266,7 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 #else
             return 1;
 #endif
-        case 0x12:
+        case CHIPID_FT812:
             FTPRINT("FT812");
 #if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
             FTPRINT("\nDemo not for this chip");
@@ -1274,7 +1274,7 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 #else
             return 1;
 #endif
-        case 0x13:
+        case CHIPID_FT813:
             FTPRINT("FT813");
 #if defined(EVE_DEF_CHECK) && !defined(DEF_81X)
             FTPRINT("\nDemo not for this chip");
@@ -1282,7 +1282,7 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 #else
             return 1;
 #endif
-        case 0x15:
+        case CHIPID_BT815:
             FTPRINT("BT815");
 #if defined(EVE_DEF_CHECK) && !defined(DEF_BT81X)
             FTPRINT("\nDemo not for this chip");
@@ -1290,7 +1290,7 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 #else
             return 1;
 #endif
-        case 0x16:
+        case CHIPID_BT816:
             FTPRINT("BT816");
 #if defined(EVE_DEF_CHECK) && !defined(DEF_BT81X)
             FTPRINT("\nDemo not for this chip");
@@ -1298,6 +1298,23 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 #else
             return 1;
 #endif
+        case CHIPID_BT817:
+            FTPRINT("BT817");
+#if defined(EVE_DEF_CHECK) && !defined(DEF_BT81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
+        case CHIPID_BT818:
+            FTPRINT("BT818");
+#if defined(EVE_DEF_CHECK) && !defined(DEF_BT81X)
+            FTPRINT("\nDemo not for this chip");
+            return 0;
+#else
+            return 1;
+#endif
+
         default:
             /* only new FT81X able to read the EVE ID */
             FTPRINT("EVE");
