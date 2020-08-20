@@ -15,21 +15,20 @@ c. This series of software is developed base on the learning from SampleApp,
 
 d. How to execute the project:
    
-d.1 DO change the define in sys_main/platform.h based on each project's hardware
-    EVE chip     : FT80X, FT81X, BT81X
-    Touch control: Cap, Res
-    LCD          : QVGA, HVGA, WQVGA, etc.
-    SPI type     : SPI, DSPI, QSPI
-    UI type      : define the specific project by using "#define UI_XXX"
-                   for example: #define UI_EVEUI, #define UI_ECAR, etc.
-                   ONLY define and run one example at a time
+d.1 DO change the define in sys_main/platform.h based on each project's hardware:
+EVE chip     : FT80X, FT81X, BT81X
+Touch control: Cap, Res
+LCD          : QVGA, HVGA, WQVGA, etc.
+SPI type     : SPI, DSPI, QSPI
+UI type      : define the specific project by using "#define UI_XXX"
+for example: #define UI_EVEUI, #define UI_ECAR, etc.
+ONLY define and run one example at a time
     
 d.2 All the EVE related code (you may consider as UI code) are under the sys_main\UI:
-    sys_main\UI\ARCHIVE   : archived code,very old project, need too much 
-                            modify to make it work, I just keep it for myself
-               \EVE       : EVE chip related function
-               \SCREENSHOT: some project screenshot after running, just for reference
-               \UI_xxx.h  : specific project UI related code
+sys_main\UI\ARCHIVE   : archived code,very old project, need too much modify to make it work, I just keep it for myself
+           \EVE       : EVE chip related function
+           \SCREENSHOT: some project screenshot after running, just for reference
+           \UI_xxx.h  : specific project UI related code
 
 d.3 All the system function code are under the sys_main\MCU_XXX:
 
