@@ -1,4 +1,4 @@
-﻿a. Everything here is ONLY for learning EVE's purpose, I DO NOT have
+a. Everything here is ONLY for learning EVE's purpose, I DO NOT have
    any responsibility to any one or any organization, to their usage
    on any peices of my codes. I'll delete related parts, if any meterials
    have any license violate, just let me know.
@@ -32,6 +32,7 @@ d.2 All the EVE related code (you may consider as UI code) are under the sys_mai
                \UI_xxx.h  : specific project UI related code
 
 d.3 All the system function code are under the sys_main\MCU_XXX:
+
     Arduino platform: 
         *1 read the ReadMe.txt under the "sys_main\MCU_Arduino"
 
