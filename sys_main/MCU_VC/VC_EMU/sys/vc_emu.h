@@ -1,19 +1,7 @@
 
 #include <direct.h>
 #include <io.h>
-
-#if defined(_MSC_VER)
-typedef unsigned __int8 uint8_t;
-typedef signed __int8 int8_t;
-typedef unsigned __int16 uint16_t;
-typedef signed __int16 int16_t;
-typedef unsigned __int32 uint32_t;
-typedef signed __int32 int32_t;
-typedef unsigned __int64 uint64_t;
-typedef signed __int64 int64_t;
-#endif
-typedef uint32_t argb8888;
-#include "bt8xxemu_Emulator.h"
+#include "bt8xxemu.h"
 
 extern BT8XXEMU_Emulator *gEmulator;
 
@@ -29,36 +17,14 @@ extern BT8XXEMU_Emulator *gEmulator;
 #define EVEMODE BT8XXEMU_EmulatorFT800
 #endif
 
-#define FTMAIN FTVOID mcu (BT8XXEMU_Emulator *sender, void *context) 
-#define FTDUMMY \
-                int main(FT32 argc,FT8 *argv[]) \
-                { \
-                  BT8XXEMU_Flash *flash = NULL; \
-                  BT8XXEMU_FlashParameters flashParams; \
-				  BT8XXEMU_EmulatorParameters params; \
-                  \
-                  BT8XXEMU_Flash_defaults(BT8XXEMU_VERSION_API, &flashParams); \
-                  wcscpy(flashParams.DeviceType, BTFLASH_DEVICE_TYPE); \
-                  wcscpy(flashParams.DataFilePath, BTFLASH_DATA_FILE); \
-                  flashParams.SizeBytes = BTFLASH_SIZE; \
-                  flashParams.StdOut = 1; \
-                  flash = BT8XXEMU_Flash_create(BT8XXEMU_VERSION_API, &flashParams); \
-                  \
-				  BT8XXEMU_defaults(BT8XXEMU_VERSION_API, &params, EVEMODE); \
-				  params.Flags |= BT8XXEMU_EmulatorEnableStdOut; \
-				  params.Main = mcu; \
-				  params.Flash = flash; \
-				  BT8XXEMU_run(BT8XXEMU_VERSION_API, &gEmulator, &params); \
-                  BT8XXEMU_stop(gEmulator); \
-                  BT8XXEMU_destroy(gEmulator); \
-                  BT8XXEMU_Flash_destroy(flash); \
-                  \
-				  return 0; \
-			    }
+FT32 emu_main (FTVOID);
+
+#define FTMAIN FTVOID mcu (BT8XXEMU_Emulator *sender, FTVOID *context) 
+#define FTDUMMY FT32 main(FT32 argc,FT8 *argv[]) {return emu_main();}
 #define SYS_END BT8XXEMU_stop(gEmulator)
 
-FTVOID FT8XXEMU_cs(FT8 i);
-FTU32 FT8XXEMU_transfer(FTU32 data);
+FTMAIN; /* declaration of "mcu" for "emu_main" used */
+
 FTVOID HAL_speed_up (FTU32 type);
 FTVOID HAL_PwdCyc ( FTU8 OnOff );
 FTVOID HAL_SpiInit ( FTVOID );
