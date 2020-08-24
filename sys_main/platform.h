@@ -429,14 +429,6 @@
  */
 
 /* 
- * when not using external OSC, recommend to do the clock trimming
- * for H35R, it only use internal OSC, so trimming is needed
- */
-#if defined(LCD_HVGA)
-#define TRIM_NEEDED
-#endif
-
-/* 
  * you may bypass the calibration phase, when no touch in your UI
  */
 #define CAL_NEEDED

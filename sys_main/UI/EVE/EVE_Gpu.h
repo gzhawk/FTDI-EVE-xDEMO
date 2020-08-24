@@ -716,12 +716,12 @@ typedef enum {
 
 typedef enum {
 #if defined(DEF_80X)
-    GPU_SYSCLK_DEFAULT = 0x62,  //default 48MHz
-    GPU_SYSCLK_48M = GPU_SYSCLK_DEFAULT,  
+    GPU_SYSCLK_DEFAULT = 62,//default 48MHz
+    GPU_SYSCLK_48M = 0x62,
     GPU_SYSCLK_36M = 0x61,
     GPU_SYSCLK_24M = 0x64,
 #else
-    GPU_SYSCLK_DEFAULT = 0x61,  //default 60MHz
+    GPU_SYSCLK_DEFAULT = 0x61,//default 60MHz
     GPU_SYSCLK_72M = (0x61 | (0x40 << 8) | (0x06 << 8)), 
     GPU_SYSCLK_60M = (0x61 | (0x40 << 8) | (0x05 << 8)),  
     GPU_SYSCLK_48M = (0x61 | (0x40 << 8) | (0x04 << 8)),  

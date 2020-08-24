@@ -1372,44 +1372,50 @@ STATIC FTVOID appUI_EVEActive ( FTVOID )
     FTDELAY(ACTIVE_DELAY);
 }
 
-STATIC FTVOID appUI_EVEClk ( FTU8 extOSC, FTU32 clkSEL )
+STATIC FTVOID appUI_EVEClkSel ( FTU32 clkSEL )
 {
+    FTU32 f;
     FTPRINT("\nOSC: ");
 
     /*
      setting the EVE clock source
      */
-    if (extOSC) {
-        FTPRINT("external");
-        HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
-    } else {
-        FTPRINT("internal");
-        HAL_Cfg(FT_GPU_INTERNAL_OSC);
-    }
-    
+#if defined(UI_HVGA)
+    FTPRINT("internal");
+    HAL_Cfg(FT_GPU_INTERNAL_OSC);
+#else
+    FTPRINT("external");
+    HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
+#endif    
     /*
      setting the EVE system clock
      */
     FTPRINT("\nClock: ");
     switch (clkSEL) {
         case GPU_SYSCLK_24M:
+            f = 24;
             FTPRINT("24MHz");
             break;
         case GPU_SYSCLK_36M:
+            f = 36; 
             FTPRINT("36MHz");
             break;
         case GPU_SYSCLK_48M:
+            f = 48; 
             FTPRINT("48MHz");
             break;
         case GPU_SYSCLK_DEFAULT:
 #if defined(DEF_80X)
+            f = 48; 
             FTPRINT("48MHz");
             break;
 #else
         case GPU_SYSCLK_60M:
+            f = 60; 
             FTPRINT("60MHz");
             break;
         case GPU_SYSCLK_72M:
+            f = 72; 
             FTPRINT("72MHz");
             break;
 #endif
@@ -1429,6 +1435,8 @@ STATIC FTVOID appUI_EVEClk ( FTU8 extOSC, FTU32 clkSEL )
 #endif
 
     FTDELAY(FREQ_DELAY);
+
+    HAL_Write32(REG_FREQUENCY,f*1000*1000);  
 }
 
 STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
@@ -1613,11 +1621,10 @@ STATIC FTVOID appUI_EVEBootupDisp ( FTU32 count )
     } while (SYS_HANG);
 }
 #endif
-#if defined(TRIM_NEEDED)
 STATIC FTU32 appUI_EVEGetFrq (FTVOID)
 {
     FTU32 t0, t1;
-    FT32 r = 15625;
+    FT32 r = 15625; /* anyone could tell me why 15625? */
 
     t0 = HAL_Read32(REG_CLOCK); /* t0 read */
 
@@ -1625,24 +1632,27 @@ STATIC FTU32 appUI_EVEGetFrq (FTVOID)
 
     t1 = HAL_Read32(REG_CLOCK); /* t1 read */
     /* bitshift 6 places is the same as multiplying 64 */
-    return ((t1 - t0) * 64); 
+    return ((t1 - t0) << 6); 
 }
-#endif
 STATIC FTVOID appUI_EVEClkTrim ( FTVOID )
 {
-#if defined(TRIM_NEEDED)
-#define LOW_FREQ_BOUND  58800000L//98% of 60Mhz
-    FTU32 f;
+    /* 
+     better do the trimming when using internal clock 
+     and so far, only UI_HVGA use internal clock
+     so...
+     */
+#if defined(UI_HVGA)
+    FTU32 f, f98 = HAL_Read32(REG_FREQUENCY)*98/100;
     FTU8 i;
     /* Trim the internal clock by increase the REG_TRIM register
        till the measured frequency is within the acceptable range.*/
-    for (i=0; (i < 31) && ((f= appUI_EVEGetFrq()) < LOW_FREQ_BOUND); i++)
+    for (i=0; (i < 31) && ((f= appUI_EVEGetFrq()) < f98); i++)
     {
         /* increase the REG_TRIM register value 
            automatically increases the internal clock */
         HAL_Write8(REG_TRIM, i);  
     }
-    /* Set the final frequency to be used for internal operations */
+    
     HAL_Write32(REG_FREQUENCY,f);  
 #endif
 }
@@ -1786,11 +1796,7 @@ FTVOID UI_INIT (FTVOID)
      */
     HAL_PwdCyc(1);
 
-#if defined(TRIM_NEEDED)
-    appUI_EVEClk(0, GPU_SYSCLK_DEFAULT);
-#else
-    appUI_EVEClk(1, GPU_SYSCLK_DEFAULT);
-#endif
+    appUI_EVEClkSel(GPU_SYSCLK_DEFAULT);
    
     appUI_EVEActive();
      
@@ -1805,9 +1811,7 @@ FTVOID UI_INIT (FTVOID)
     }
     
     FTPRINT("\nEVE inited");
-    /* 
-     better do the trimming when using internal clock 
-     */
+    
     appUI_EVEClkTrim();
 
     /* 
