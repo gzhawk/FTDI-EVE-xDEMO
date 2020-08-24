@@ -626,7 +626,7 @@
 #define VERTEX2F(x,y) ((1UL<<30)|(((x)&32767UL)<<15)|(((y)&32767UL)<<0))
 /* if X coordinate larger than 512, SHOULD NOT use VERTEX2II, use VERTEX2F instead */
 #define VERTEX2II(x,y,handle,cell) ((2UL<<30)|(((x)&511UL)<<21)|(((y)&511UL)<<12)|(((handle)&31UL)<<7)|(((cell)&127UL)<<0))
-#if defined(DEF_81X) ||defined(DEF_BT815)
+#if defined(DEF_81X) ||defined(DEF_BT81X)
 #define BITMAP_SOURCE(addr) ((1UL<<24)|(((addr)&4194303UL)<<0))
 #else
 #define BITMAP_SOURCE(addr) ((1UL<<24)|(((addr)&1048575UL)<<0))
@@ -667,7 +667,7 @@
 #define BITMAP_TRANSFORM_E(e) ((25UL<<24)|(((e)&131071UL)<<0))
 #endif
 
-#if defined(DEF_81X) ||defined(DEF_BT815)
+#if defined(DEF_81X) ||defined(DEF_BT81X)
 #define SCISSOR_XY(x,y) ((27UL<<24)|(((x)&2047UL)<<11)|(((y)&2047UL)<<0))
 #define SCISSOR_SIZE(width,height) ((28UL<<24)|(((width)&4095UL)<<12)|(((height)&4095UL)<<0))
 #else
@@ -706,11 +706,6 @@ typedef enum {
     FT_GPU_INTERNAL_OSC = 0x48, //default
     FT_GPU_EXTERNAL_OSC = 0x44,
 }FT_GPU_PLL_SOURCE_T;
-typedef enum {
-    FT_GPU_PLL_48M = 0x62,  //default
-    FT_GPU_PLL_36M = 0x61,
-    FT_GPU_PLL_24M = 0x64,
-}GPU_80X_PLL_FREQ_T;
 
 typedef enum {
     FT_GPU_ACTIVE_M =    0x00,  
@@ -720,13 +715,20 @@ typedef enum {
 }FT_GPU_POWER_MODE_T;
 
 typedef enum {
-    GPU_SYSCLK_DEFAULT = 0x61,  //default 60mhz
+#if defined(DEF_80X)
+    GPU_SYSCLK_DEFAULT = 0x62,  //default 48MHz
+    GPU_SYSCLK_48M = GPU_SYSCLK_DEFAULT,  
+    GPU_SYSCLK_36M = 0x61,
+    GPU_SYSCLK_24M = 0x64,
+#else
+    GPU_SYSCLK_DEFAULT = 0x61,  //default 60MHz
     GPU_SYSCLK_72M = (0x61 | (0x40 << 8) | (0x06 << 8)), 
     GPU_SYSCLK_60M = (0x61 | (0x40 << 8) | (0x05 << 8)),  
     GPU_SYSCLK_48M = (0x61 | (0x40 << 8) | (0x04 << 8)),  
     GPU_SYSCLK_36M = (0x61 | (0x03 << 8)),
     GPU_SYSCLK_24M = (0x61 | (0x02 << 8)),
-}GPU_81X_PLL_FREQ_T;
+#endif
+}GPU_PLL_FREQ_T;
 
 typedef enum{
     GPU_MAIN_ROM =     0x80, //main graphicas ROM used 

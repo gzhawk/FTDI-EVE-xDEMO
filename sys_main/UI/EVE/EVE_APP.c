@@ -1372,46 +1372,63 @@ STATIC FTVOID appUI_EVEActive ( FTVOID )
     FTDELAY(ACTIVE_DELAY);
 }
 
-STATIC FTVOID appUI_EVEClk ( FTVOID )
+STATIC FTVOID appUI_EVEClk ( FTU8 extOSC, FTU32 clkSEL )
 {
     FTPRINT("\nOSC: ");
 
     /*
      setting the EVE clock source
      */
-#if defined(TRIM_NEEDED)
-    FTPRINT("internal");
-    HAL_Cfg(FT_GPU_INTERNAL_OSC);
+    if (extOSC) {
+        FTPRINT("external");
+        HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
+    } else {
+        FTPRINT("internal");
+        HAL_Cfg(FT_GPU_INTERNAL_OSC);
+    }
+    
+    /*
+     setting the EVE system clock
+     */
+    FTPRINT("\nClock: ");
+    switch (clkSEL) {
+        case GPU_SYSCLK_24M:
+            FTPRINT("24MHz");
+            break;
+        case GPU_SYSCLK_36M:
+            FTPRINT("36MHz");
+            break;
+        case GPU_SYSCLK_48M:
+            FTPRINT("48MHz");
+            break;
+        case GPU_SYSCLK_DEFAULT:
+#if defined(DEF_80X)
+            FTPRINT("48MHz");
+            break;
 #else
-    FTPRINT("external");
-    HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
+        case GPU_SYSCLK_60M:
+            FTPRINT("60MHz");
+            break;
+        case GPU_SYSCLK_72M:
+            FTPRINT("72MHz");
+            break;
 #endif
-    
-    /*
-     setting the EVE system frequence
-     */
-#if !defined(DEF_BT81X)
-    /*
-     default is 48MHz, I'm using default, so no need to config
-     you can set it to other this way:
-     (for example you want it work at 24MHz)
-    
-     HAL_Cfg(FT_GPU_PLL_24M);
-     */
-#else
-    /* 
-     default is 60MHz, I'm using default, so no need to config
-     you can set it to other this way:
-     (for example you want it work at 72MHz)
+        default:
+            FTPRINT("error");
+            return;
+    }
+    /* command will only be effective when PLL is stopped */
+    HAL_Cfg(FT_GPU_SLEEP_M); 
 
-     HAL_Cfg(FT_GPU_SLEEP_M); 
-     FTDELAY(FREQ_DELAY);
-     HAL_Cfg3(GPU_SYSCLK_72M);
-     FTDELAY(FREQ_DELAY);
-     HAL_Cfg(FT_GPU_ACTIVE_M);
-     FTDELAY(FREQ_DELAY);
-    */
+    FTDELAY(FREQ_DELAY);
+
+#if defined(DEF_80X)
+    HAL_Cfg((FTU8)clkSEL);
+#else
+    HAL_Cfg3(clkSEL);
 #endif
+
+    FTDELAY(FREQ_DELAY);
 }
 
 STATIC FTVOID appUI_EVEGPIOCfg ( FTVOID )
@@ -1768,15 +1785,19 @@ FTVOID UI_INIT (FTVOID)
      PD pin has to be pull high.
      */
     HAL_PwdCyc(1);
-    
-    appUI_EVEClk();
-    
+
+#if defined(TRIM_NEEDED)
+    appUI_EVEClk(0, GPU_SYSCLK_DEFAULT);
+#else
+    appUI_EVEClk(1, GPU_SYSCLK_DEFAULT);
+#endif
+   
     appUI_EVEActive();
      
     /* 
      you should be able to see the clock in X1/X2 pin here
-     if not, you will never read the ChipID
-     there is some problem above (power, SPI, PD, CLK, etc.)
+     or, you will never read the ChipID, may have some problem
+     in previous action or HW (power, SPI, PD, CLK, etc.)
      */
     if (!appUI_EVEVerify()) {
         FTPRINT("\nEVE init fail");
