@@ -710,7 +710,7 @@ typedef enum {
     FT_GPU_PLL_48M = 0x62,  //default
     FT_GPU_PLL_36M = 0x61,
     FT_GPU_PLL_24M = 0x64,
-}FT_GPU_PLL_FREQ_T;
+}GPU_80X_PLL_FREQ_T;
 
 typedef enum {
     FT_GPU_ACTIVE_M =    0x00,  
