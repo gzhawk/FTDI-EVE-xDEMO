@@ -1316,8 +1316,9 @@ STATIC FTU8 appUI_GetEVEID (FTVOID)
 #endif
 
         default:
-            /* only new FT81X able to read the EVE ID */
-            FTPRINT("EVE");
+            /* only new FT81X able to read the EVE ID
+               consider others as FT80X*/
+            FTPRINT("FT80X");
 #if defined(EVE_DEF_CHECK) && !defined(DEF_80X)
             FTPRINT("\nDemo not for this chip");
             return 0;
@@ -1387,6 +1388,7 @@ STATIC FTVOID appUI_EVEClkSel ( FTU32 clkSEL )
     FTPRINT("external");
     HAL_Cfg(FT_GPU_EXTERNAL_OSC);  
 #endif    
+    FTDELAY(FREQ_DELAY);
     /*
      setting the EVE system clock
      */

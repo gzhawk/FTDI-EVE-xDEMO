@@ -425,9 +425,12 @@
 /* 
  * default consider using 8x8x8 (24bits) LCD 
  * if your LCD is 6x6x6 (18bits) define it 
-#define LCD_18BITS
+ * some old FT80X demo still use 18bits LCD
+ * so define it when using some old demo
  */
-
+#if (defined(DEF_80X) && defined(LCD_WQVGA))
+#define LCD_18BITS
+#endif
 /* 
  * you may bypass the calibration phase, when no touch in your UI
  */
