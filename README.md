@@ -1,3 +1,7 @@
+This project had been stopped, I was not in FTDI anymore.
+
+===============================================================
+
 a. Everything here is ONLY for learning EVE's purpose, I DO NOT have
    any responsibility to any one or any organization, to their usage
    on any peices of my codes. I'll delete related parts, if any meterials
